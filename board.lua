@@ -219,6 +219,15 @@ function Board:tile(x, y, f)
     return (fget(mget(x, y)) >> f) & 1 == 1
 end
 
+-- gets the numeric value of a tile.
+-- bombs have a value of -1
+function Board:value(x, y)
+    if (self:tile(x, y, is_mine)) return -1
+
+    -- uses mask to obtain value bits
+    return fget(mget(x, y)) & 15
+end
+
 
 -- checks if x,y is in bounds
 function Board:inbounds(x, y)
