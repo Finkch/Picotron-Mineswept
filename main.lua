@@ -25,7 +25,7 @@ function _init()
     logger = Logger:new("appdata/mineswept/logs")
 
     -- keyboard and mouse
-    kbm = KBM:new({"lmb", "rmb"})
+    kbm = KBM:new({"lmb", "rmb", "x"})
 
     -- tracks time
     clock = Clock:new()
@@ -54,6 +54,7 @@ function _update()
     clock()
 
     q:add(kbm.pos)
+    q:add(board:value(kbm.pos.x // board.d, kbm.pos.y // board.d))
 end
 
 function input()
@@ -61,13 +62,17 @@ function input()
     if kbm:released("lmb") then
 
         -- converts from screen coordinates to tile coordinates
-        board:reveal(kbm.pos.x // board.d, kbm.pos.y // board.d)
+        board:lclick(kbm.pos)
     end
 
     if kbm:released("rmb") then
 
         -- converts from screen coordinates to tile coordinates
-        board:flag(kbm.pos.x // board.d, kbm.pos.y // board.d)
+        board:rclick(kbm.pos)
+    end
+
+    if kbm:released("x") then
+        board:reveal_all()
     end
 end
 
