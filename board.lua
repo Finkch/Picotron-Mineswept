@@ -150,11 +150,15 @@ function Board:generate_unfair()
 end
 
 
+
+
+
 -- reveals a tile
 function Board:reveal(x, y)
     
     -- don't reveal if it is already revealed or a flag
     if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag)) return
+
 
     mset(x, y, mget(x, y) + 16)
 end
@@ -206,7 +210,7 @@ end
 function Board:tile(x, y, f)
 
     -- if out of bounds, return false
-    if (x < 0 or y < y or x >= self.w or y >= self.h) return false
+    if (not self:inbounds(x, y)) return false
 
     -- return whether the flag is set.
     -- huh, there's a bug in picotron! fget(n, f) should return the
@@ -214,6 +218,12 @@ function Board:tile(x, y, f)
     -- f parameter and returns the flag bitmap regardless.
     -- here, i unpack the flag and check it
     return (fget(mget(x, y)) >> f) & 1 == 1
+end
+
+
+-- checks if x,y is in bounds
+function Board:inbounds(x, y)
+    return x >= 0 and y >= 0 and x < self.w any y < self.h
 end
 
 
