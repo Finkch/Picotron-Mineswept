@@ -24,7 +24,7 @@ function _init()
     logger = Logger:new("appdata/mineswept/logs")
 
     -- keyboard and mouse
-    kbm = KBM:new("lbm", "rmb")
+    kbm = KBM:new({"lmb", "rmb"})
 
     -- creates the map
     local w, h = 6, 8
@@ -50,11 +50,11 @@ function _update()
 end
 
 function input()
-    if kbm:released("lbm") then
-        board:reveal(kbm.pos.x // board.d, kbm.pos.y // board.b)
+    if kbm:released("lmb") then
+        board:reveal(kbm.pos.x // board.d, kbm.pos.y // board.d)
     end
 
-    if kbm:releaved("rmb") then
+    if kbm:released("rmb") then
         board:flag(kbm.pos.x // board.d, kbm.pos.y // board.d)
     end
 end
