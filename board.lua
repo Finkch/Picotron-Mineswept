@@ -156,9 +156,8 @@ end
 -- reveals a tile
 function Board:reveal(x, y)
     
-    -- don't reveal if it is already revealed or a flag
-    if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag)) return
-
+    -- don't reveal if it is already revealed, a flag, or out of bounds
+    if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag) or not self:inbounds(x, y)) return
 
     mset(x, y, mget(x, y) + 16)
 end
@@ -190,8 +189,8 @@ end
 -- flags a tile
 function Board:flag(x, y)
 
-    -- does nothing if tile is already revealed
-    if (self:tile(x, y, is_reveal)) return
+    -- does nothing if tile is already revealed or out of bounds
+    if (self:tile(x, y, is_reveal) or not self:inbounds(x, y)) return
 
     -- if the tile is flagged, unflag it
     if self:tile(x, y, is_flag) then
@@ -223,7 +222,7 @@ end
 
 -- checks if x,y is in bounds
 function Board:inbounds(x, y)
-    return x >= 0 and y >= 0 and x < self.w any y < self.h
+    return x >= 0 and y >= 0 and x < self.w and y < self.h
 end
 
 
