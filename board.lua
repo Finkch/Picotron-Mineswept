@@ -150,7 +150,7 @@ function Board:generate_unfair()
 end
 
 
--- left click
+-- left click to reveal or cord
 function Board:lclick(pos)
 
     -- converts screen coordinates to grid coordinates
@@ -167,6 +167,7 @@ function Board:lclick(pos)
 
 end
 
+-- right click to flag
 function Board:rclick(pos)
 
     -- converts screen coordinates to grid coordinates
@@ -174,6 +175,7 @@ function Board:rclick(pos)
 
     self:flag(x, y)
 end
+
 
 
 -- reveals a tile
@@ -222,6 +224,9 @@ function Board:reveal_all()
     end
 end
 
+
+
+
 -- cords a tile.
 -- if a revealed tile is clicked and the number of flags neighbouring
 -- the tile equals it's value, reveal all unrevealed neighbours
@@ -238,6 +243,8 @@ function Board:cord(x, y)
     -- if the number of flags matches the revealed tile, reveal neighbours
     if (flags == self:value(x, y)) self:reveal_neighbours(x, y)
 end
+
+
 
 -- flags a tile
 function Board:flag(x, y)
