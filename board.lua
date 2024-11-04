@@ -156,9 +156,7 @@ function Board:reveal(x, y, f)
     
     -- only reveals if the tile if it is not already revealed
     -- or if it is not a flag (unless force reveal)
-    if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag)) and not f then
-        return
-    end
+    if ((self:tile(x, y, is_reveal) or self:tile(x, y, is_flag)) and not f) return
 
 
     -- reveal a flag
@@ -189,6 +187,22 @@ function Board:reveal_all()
 
             self:reveal(i, j, true)
         end
+    end
+end
+
+-- flags a tile
+function Board:flag(x, y)
+
+    -- does nothing if tile is already revealed
+    if (self:tile(x, y, is_reveal)) return
+
+    -- if the tile is flagged, unflag it
+    if self:tile(x, y, is_flag) then
+        mset(x, y, mget(x, y) - 32)
+    
+    -- otherwise, flag tile
+    else
+        mset(x, y, mget(x, y) + 32)
     end
 end
 
