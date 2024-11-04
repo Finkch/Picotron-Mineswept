@@ -175,7 +175,7 @@ function Board:reveal_all()
                     mset(i, j, self.bs + 42)
                 
                 -- otherwise normal reveal
-                else
+                elseif not self:tile(i, j, is_flag) then
                     mset(i, j, mget(i, j) + 16)
                 end
             end
