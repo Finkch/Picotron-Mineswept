@@ -97,7 +97,7 @@ function Board:generate()
 end
 
 -- creates a regular ol' board of mineswept
-function Board:generate_fair()
+function Board:generate_fair(dni)
 
     -- creates a 1d list of all cells
     local cells = {}
@@ -105,6 +105,11 @@ function Board:generate_fair()
         for j = 0, self.h - 1 do
             add(cells, {i, j})
         end
+    end
+
+    -- removes cells listed in 'do not include'
+    for i = 1, #dni do
+        del(cells, dni[i])
     end
 
     -- adds mines to the map
