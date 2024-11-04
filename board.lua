@@ -150,23 +150,50 @@ function Board:generate_unfair()
 end
 
 
+-- left click
+function Board:lclick(pos)
 
+    -- converts screen coordinates to grid coordinates
+    local x, y = pos.x // self.d, pos.y // self.d
+
+    -- if the tile is revealed, attempt to cord
+    if self:tile(x, y, is_reveal) then
+        self:cord(x, y)
+        
+    -- otherwise, attempt to reveal
+    else
+        self:reveal(x, y)
+    end
+
+end
+
+function Board:rclick(pos)
+
+    -- converts screen coordinates to grid coordinates
+    local x, y = pos.x // self.d, pos.y // self.d
+
+    self:flag(x, y)
+end
 
 
 -- reveals a tile
 function Board:reveal(x, y)
-    
-    -- don't reveal if it is already revealed, a flag, or out of bounds
-    if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag) or not self:inbounds(x, y)) return
 
+    -- don't reveal if it is a flag or out of bounds
+    if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag) or not self:inbounds(x, y)) return
+    
+    -- reveals tile
     mset(x, y, mget(x, y) + 16)
 
     -- if the value of a tile is zero, reveal its neighbours
-    if self:value(x, y) == 0 then
-        for dx = -1, 1 do
-            for dy = -1, 1 do
-                if (not (dx == 0 and dy == 0)) self:reveal(x + dx, y + dy)
-            end
+    if (self:value(x, y) == 0) self:reveal_neighbours(x, y)
+end
+
+-- reveals neighbours
+function Board:reveal_neighbours(x, y)
+    for dx = -1, 1 do
+        for dy = -1, 1 do
+            if (not (dx == 0 and dy == 0)) self:reveal(x + dx, y + dy)
         end
     end
 end
@@ -193,6 +220,23 @@ function Board:reveal_all()
             end
         end
     end
+end
+
+-- cords a tile.
+-- if a revealed tile is clicked and the number of flags neighbouring
+-- the tile equals it's value, reveal all unrevealed neighbours
+function Board:cord(x, y)
+
+    -- counts flags around tile
+    local flags = 0
+    for dx = -1, 1 do
+        for dy = -1, 1 do
+            if (self:tile(x + dx, y + dy, 6)) flags += 1
+        end
+    end
+
+    -- if the number of flags matches the revealed tile, reveal neighbours
+    if (flags == self:value(x, y)) self:reveal_neighbours(x, y)
 end
 
 -- flags a tile
