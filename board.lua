@@ -150,6 +150,48 @@ function Board:generate_unfair()
 end
 
 
+-- reveals a tile
+function Board:reveal(x, y, f)
+    f = f or false  -- force reveal
+    
+    -- only reveals if the tile if it is not already revealed
+    -- or if it is not a flag (unless force reveal)
+    if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag)) and not f then
+        return
+    end
+
+
+    -- reveal a flag
+    if self:tile(x, y, is_flag) then
+
+        -- flag is correct
+        if self:tile(x, y, is_mine) then
+            mset(x, y, self.bs + 25)
+        
+        -- flag is incorrect
+        else
+            mset(x, y, self.bs + 42)
+        end
+
+    -- reveal a normal tile
+    else
+        mset(x, y, mget(x, y) + 16)
+    end
+end
+
+
+-- reveals all tiles
+function Board:reveal_all()
+
+    -- force reveal on all tiles
+    for i = 0, self.w - 1 do
+        for j = 0, self.h - 1 do
+
+            self:reveal(i, j, true)
+        end
+    end
+end
+
 
 
 -- checks whether a given flag is set.
