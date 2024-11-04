@@ -160,6 +160,15 @@ function Board:reveal(x, y)
     if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag) or not self:inbounds(x, y)) return
 
     mset(x, y, mget(x, y) + 16)
+
+    -- if the value of a tile is zero, reveal its neighbours
+    if self:value(x, y) == 0 then
+        for dx = -1, 1 do
+            for dy = -1, 1 do
+                if (not (dx == 0 and dy == 0)) self:reveal(x + dx, y + dy)
+            end
+        end
+    end
 end
 
 
