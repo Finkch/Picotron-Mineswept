@@ -17,6 +17,7 @@ include("board.lua")
 include("lib/queue.lua")
 include("lib/logger.lua")
 include("lib/kbm.lua")
+include("lib/Clock.lua")
 
 function _init()
 
@@ -25,6 +26,9 @@ function _init()
 
     -- keyboard and mouse
     kbm = KBM:new({"lmb", "rmb"})
+
+    -- tracks time
+    clock = Clock:new()
 
     -- creates the map
     local w, h = 6, 8
@@ -46,15 +50,23 @@ function _update()
     input()
 
 
+    -- updates the clock
+    clock()
+
     q:add(kbm.pos)
 end
 
 function input()
+
     if kbm:released("lmb") then
+
+        -- converts from screen coordinates to tile coordinates
         board:reveal(kbm.pos.x // board.d, kbm.pos.y // board.d)
     end
 
     if kbm:released("rmb") then
+
+        -- converts from screen coordinates to tile coordinates
         board:flag(kbm.pos.x // board.d, kbm.pos.y // board.d)
     end
 end
