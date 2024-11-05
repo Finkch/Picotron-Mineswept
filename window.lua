@@ -17,12 +17,20 @@ function Window:new(windowed, width, height)
         height = 270
     end
 
+    local bh = 24
+    local p = 2
+
     local w = {
         fullscreen = not fullscreen,
         w = width,
         h = height,
-        p = 2,
-        banner_h = 24
+        p = p,
+        banner_h = bh,
+        wt = bh + 2 * p - 1, -- game window edges
+        wb = height - 2 * p + 1,
+        wl = 2 * p - 1,
+        wr = width - 2 * p + 1,
+        focal = Vec:new(0, 0)           -- centre of camera
     }
     setmetatable(w, Window)
 
@@ -35,26 +43,18 @@ function Window:new(windowed, width, height)
             title = "mineswept"
         })
     end
-    
-    logger(w.width, "window.lua")
 
     return w
 end
 
 -- moves camera
 function Window:update()
-    cam:focus(-Vec:new(2 * self.p, self.banner_h + 2 * self.p) + cam.centre)
+    cam:focus(-self.focal)
 end
 
 -- draws window
 function Window:draw()
     cls()
-
-    -- absolute draws
-    self:draw_frame()
-    self:draw_banner()
-
-    cam:focus(-Vec:new(2 * self.p, self.banner_h + 2 * self.p) + cam.centre)
 
     -- relative draws
     cam()
@@ -62,6 +62,12 @@ function Window:draw()
     board:draw()
     cursor:draw()
 
+
+    cam(true)
+
+    -- absolute draws
+    self:draw_frame()
+    self:draw_banner()
 
     cam(true)
 end
