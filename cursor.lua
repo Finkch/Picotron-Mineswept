@@ -81,6 +81,11 @@ function Cursor:map(d)
     return self.pos.x // d, self.pos.y // d
 end
 
+-- maps down then back up
+function Cursor:mapu(d)
+    return self.pos.x // d * d, self.pos.y // d * d
+end
+
 
 function Cursor:draw()
 
@@ -91,4 +96,16 @@ function Cursor:draw()
     else
         window({cursor = 1})
     end
+
+    -- shows which tile the cursor would select
+    local x, y = self:map(board.d)
+
+    -- don't if out of bounds
+    if (not board:inbounds(x, y)) return
+
+    -- snaps to grid
+    x, y = self:mapu(board.d)
+
+    -- otherwise, draw sprite
+    spr(board.bs + 50, x, y)
 end
