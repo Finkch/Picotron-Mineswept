@@ -37,8 +37,8 @@ function Cursor:update()
         self.mouse = true
     end
 
+    -- performs actions depending on inputs
     self:input()
-
 end
 
 -- checks if the arrow keys are in use
@@ -86,7 +86,7 @@ function Cursor:mapu(d)
     return self.pos.x // d * d, self.pos.y // d * d
 end
 
-
+-- draw
 function Cursor:draw()
 
     -- draw a special cursor when mouse is not in use
