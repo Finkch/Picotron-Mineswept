@@ -77,17 +77,25 @@ end
 
 
 -- maps the coordinates down
+function Cursor:posm()
+    return self.pos - cam.pos - cam.centre - wind.focal
+end
+
 function Cursor:map(d)
-    return self.pos.x // d, self.pos.y // d
+    local pos = self:posm()
+    return pos.x // d, pos.y // d
 end
 
 -- maps down then back up
 function Cursor:mapu(d)
-    return self.pos.x // d * d, self.pos.y // d * d
+    local x, y = self:map(d)
+    return x * d, y * d
 end
 
 -- draw
 function Cursor:draw()
+
+    cam()
 
     -- draw a special cursor when mouse is not in use
     if not self.mouse then
@@ -108,4 +116,6 @@ function Cursor:draw()
 
     -- otherwise, draw sprite
     spr(board.bs + 50, x, y)
+
+    cam(true)
 end
