@@ -98,7 +98,7 @@ function Board:generate(dni)
         mset(dni[1][1], dni[1][2], self.bs + 10)
         for dx = -1, 1 do
             for dy = -1, 1 do
-                if (not (dx == 0 and dy == 0))  mset(dni[1][1] + dx, dni[1][2] + dy, self.bs + 10)
+                if (not (dx == 0 and dy == 0) and self:inbounds(dni[1][1] + dx, dni[1][2] + dy))  mset(dni[1][1] + dx, dni[1][2] + dy, self.bs + 10)
             end
         end
 
@@ -138,7 +138,8 @@ function Board:generate_fair()
 
         -- if the tile has a false flag, mulligan
         if self:tile(bombify[1], bombify[2], is_false) then
-            add(clear, bombify)
+
+            if (self:inbounds(bombify[1], bombify[2])) add(clear, bombify)
         
         else
 
@@ -194,6 +195,8 @@ function Board:lclick(pos)
     -- converts screen coordinates to grid coordinates
     local x, y = pos.x // self.d, pos.y // self.d
 
+    -- makes sure the click is inbounds
+    if (not self:inbounds(x, y)) return
 
     -- if this is the first click, also generate the board
     if (self.reveals == 0) self:generate({{x, y}})
