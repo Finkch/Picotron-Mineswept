@@ -1,0 +1,3 @@
+[submodule "picotron-gui"]
+	path = picotron-gui
+	url = https://github.com/Finkch/picotron-gui.git
