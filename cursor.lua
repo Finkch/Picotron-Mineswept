@@ -11,10 +11,10 @@ Cursor.__type = "cursor"
 function Cursor:new()
 
     local c = {
-        x = 0,
-        y = 0,
+        pos = Vec:new(),
+        lpos = Vec:new(),
         mouse = true,
-        lpos = Vec:new()
+        speed = 1
     }
 
     setmetatable(c, Cursor)
@@ -35,11 +35,23 @@ function Cursor:update()
         self.mouse = true
     end
 
+
     -- don't draw the cursor if keyboard is in use
     if not self.mouse then
         window({cursor = 0})
     else
         window({cursor = 1})
+    end
+
+
+    -- updates cursor's position
+    if self.mouse then
+        self.pos = kbm.pos
+    else
+        if (kbm:held("left"))   self.pos += Vec:new(-self.speed, 0)
+        if (kbm:held("right"))  self.pos += Vec:new(self.speed, 0)
+        if (kbm:held("up"))     self.pos += Vec:new(0, -self.speed)
+        if (kbm:held("down"))   self.pos += Vec:new(0, self.speed)
     end
 
 end
