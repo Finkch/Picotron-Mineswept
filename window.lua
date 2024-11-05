@@ -52,6 +52,9 @@ function Window:draw()
 
     -- absolute draws
     self:draw_frame()
+    self:draw_banner()
+
+    cam:focus(-Vec:new(2 * self.p, self.banner_h + 2 * self.p) + cam.centre)
 
     -- relative draws
     cam()
@@ -81,9 +84,57 @@ function Window:draw_frame()
     line(p, self.banner_h + p, p, self.h - p - 1, 5)
     line(p, self.banner_h + p, self.w - p - 2, self.banner_h + p, 5)
 
-    -- header frame
+    -- banner frame
     rect(p, p, self.w - p - 1, self.banner_h - p, 7)
 
     line(p, p, p, self.banner_h - p, 5)
     line(p, p, self.w - p - 2, p, 5)
+end
+
+function Window:draw_banner()
+
+    local p = self.p
+
+    -- moves the camera to the boxes
+    cam:focus(-Vec:new(self.w / 3 - 15, self.banner_h / 2 - 5) + cam.centre)
+
+    cam()
+
+    -- boxes to contain banner elements
+    rectfill(0, 0, 17, 10, 0)
+
+    rect(-1, -1, 18, 11, 7)
+
+    line(-1, -1, -1, 11, 5)
+    line(-1, -1, 17, -1, 5)
+
+    -- flag banner sprite
+    spr(56, 21, -1)
+
+    -- prints the guessed number of unflagged mines
+    print(string.format("%03d", board.bombs - board.flags), p, p, 8)
+
+
+    -- moves camera to the second box
+    cam:focus(-Vec:new(self.w * 2 / 3 - 15, self.banner_h / 2 - 5) + cam.centre)
+    cam()
+
+    -- boxes to contain banner elements
+    rectfill(0, 0, 17, 10, 0)
+
+    rect(-1, -1, 18, 11, 7)
+
+    line(-1, -1, -1, 11, 5)
+    line(-1, -1, 17, -1, 5)
+
+    -- need to draw a black box so sprite can contain black
+    rectfill(21, -1, 33, 11, 0)
+
+    -- clock banner sprite
+    spr(57, 21, -1)
+
+    -- prints elapsed time
+    print(string.format("%03d", min(flr(clock:secs()), 999)), p, p, 8)
+
+
 end
