@@ -190,10 +190,10 @@ end
 
 
 -- left click to reveal or cord
-function Board:lclick(pos)
+function Board:lclick(cursor)
 
     -- converts screen coordinates to grid coordinates
-    local x, y = pos.x // self.d, pos.y // self.d
+    local x, y = cursor:map(self.d)
 
     -- makes sure the click is inbounds
     if (not self:inbounds(x, y)) return
@@ -221,7 +221,7 @@ function Board:rclick(pos)
     if (self.reveals == 0) return
 
     -- converts screen coordinates to grid coordinates
-    local x, y = pos.x // self.d, pos.y // self.d
+    local x, y = cursor:map(self.d)
 
     self:flag(x, y)
 end
@@ -368,21 +368,4 @@ function Board:draw()
             end
         end
     end
-
-    -- draws a little sprite for the current tile
-    self:draw_cursor()
-end
-
-
-function Board:draw_cursor()
-
-    -- converts screen coordinates to grid coordinates
-    local x, y = kbm.pos.x // self.d, kbm.pos.y // self.d
-
-    -- don't if out of bounds
-    if (not self:inbounds(x, y)) return
-
-    -- otherwise, draw sprite
-    spr(self.bs + 50, x * self.d, y * self.d)
-
 end
