@@ -132,7 +132,8 @@ function Board:generate_fair()
 
 
     -- adds mines to the map
-    for i = 0, self.bombs - 1 do
+    local i = 0
+    while i < self.bombs do
 
         -- pops a random item from the list
         local bombify = del(cells, rnd(cells))
@@ -140,13 +141,14 @@ function Board:generate_fair()
         -- if the tile has a false flag, mulligan
         if self:tile(bombify[1], bombify[2], is_false) then
             add(clear, bombify)
-            i -= 1
         
         else
 
             -- turns the popped cell into a mine.
             -- ...i forgor lua was 1-index :^(
             mset(bombify[1], bombify[2], self.bs + 9)
+
+            i += 1
         end
     end
 
