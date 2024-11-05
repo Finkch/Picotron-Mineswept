@@ -27,6 +27,21 @@ function Cursor:update()
     -- polls kbm
     kbm:update()
 
+    -- tracks whether the mouse was the previous method of input
+    if (self:keydown()) self.mouse = false
+
+    if self:mousedown() then
+        self.lpos = kbm.pos
+        self.mouse = true
+    end
+
+    -- don't draw the cursor if keyboard is in use
+    if not self.mouse then
+        window({cursor = 0})
+    else
+        window({cursor = 1})
+    end
+
 end
 
 function Cursor:keydown()
