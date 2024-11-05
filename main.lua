@@ -8,6 +8,38 @@
     soon to be a widget!
 ]]
 
+
+--[[    todo
+
+    * gameplay
+    x       > reveal
+    x       > cord
+    x       > flag
+        > gameover
+    x   * sprites
+    x       > 16x16 sprites
+    x       > 8x8 sprites
+    * board generation
+    x       > fair
+        > insidious
+        > unfair
+    * gui (use necrodancer gui?)
+        > timer
+        > mine count
+        > camera
+    * menu
+        > dimension selection
+        > screen size?
+        > sprite set
+        > fairness
+    * controls
+    x       > mouse
+        > mouse scrolling
+        > keyboard
+        > scheme swapping
+
+]]
+
 -- a lib of mine with useful functions
 rm("/ram/cart/lib") -- makes sure at most one copy is present
 mount("/ram/cart/lib", "/ram/lib")
@@ -36,8 +68,6 @@ function _init()
     local fairness = 2
     local oldsprites = false
     board = Board:new(w, h, bombs, fairness, oldsprites)
-
-    board:generate()
 end
 
 
