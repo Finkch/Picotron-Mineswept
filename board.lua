@@ -357,14 +357,32 @@ function Board:draw()
     -- is sprites are 16x16 (new sprite set), draw normally
     if self.bs == 8 then
         map(0, 0)
-        return
-    end
 
-    -- when using old sprites, must draw each sprite since map assumes
-    -- sprites are 16x16
-    for i = 0, self.w do
-        for j = 0, self.h do
-            map(i, j, i * self.d, j * self.d, 1, 1)
+    else
+
+        -- when using old sprites, must draw each sprite since map assumes
+        -- sprites are 16x16
+        for i = 0, self.w do
+            for j = 0, self.h do
+                map(i, j, i * self.d, j * self.d, 1, 1)
+            end
         end
     end
+
+    -- draws a little sprite for the current tile
+    self:draw_cursor()
+end
+
+
+function Board:draw_cursor()
+
+    -- converts screen coordinates to grid coordinates
+    local x, y = kbm.pos.x // self.d, kbm.pos.y // self.d
+
+    -- don't if out of bounds
+    if (not self:inbounds(x, y)) return
+
+    -- otherwise, draw sprite
+    spr(self.bs + 50, x * self.d, y * self.d)
+
 end
