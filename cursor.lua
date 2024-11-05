@@ -23,6 +23,7 @@ function Cursor:new()
 end
 
 
+-- update
 function Cursor:update()
 
     -- polls kbm
@@ -40,10 +41,12 @@ function Cursor:update()
 
 end
 
+-- checks if the arrow keys are in use
 function Cursor:keydown()
     return kbm:held("left") or kbm:held("right") or kbm:held("up") or kbm:held("down")
 end
 
+-- checks if the mouse is in use
 function Cursor:mousedown()
     return self.lpos != kbm.pos or kbm:held("lmb") or kbm:held("rmb")
 end
@@ -70,6 +73,12 @@ function Cursor:input()
     else
         self.action = nil
     end
+end
+
+
+-- maps the coordinates down
+function Cursor:map(d)
+    return self.pos.x // d, self.pos.y // d
 end
 
 
