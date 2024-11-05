@@ -32,9 +32,7 @@
     * place mines in the tracked 50-50 in accordance; otherwise
         reveal the board as per normal
 ]]
-
-
-include("lib/tstr.lua")
+        
 
 -- some constants for the checking flags
 is_mine     = 7
