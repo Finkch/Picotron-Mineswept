@@ -60,6 +60,7 @@ function Window:draw()
     cam()
 
     board:draw()
+    cursor:draw()
 
 
     cam(true)
