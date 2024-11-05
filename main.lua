@@ -45,11 +45,16 @@ rm("/ram/cart/lib") -- makes sure at most one copy is present
 mount("/ram/cart/lib", "/ram/lib")
 
 include("board.lua")
+include("window.lua")
+include("cursor.lua")
 
 include("lib/queue.lua")
 include("lib/logger.lua")
 include("lib/kbm.lua")
-include("lib/Clock.lua")
+include("lib/clock.lua")
+include("lib/camera.lua")
+
+include("lib/tstr.lua")
 
 function _init()
 
@@ -57,10 +62,14 @@ function _init()
     logger = Logger:new("appdata/mineswept/logs")
 
     -- keyboard and mouse
-    kbm = KBM:new({"lmb", "rmb", "x"})
+    kbm = KBM:new({"lmb", "rmb", "x", "z", "left", "right", "up", "down", "`"})
 
     -- tracks time
     clock = Clock:new()
+
+    cam = Camera:new()
+
+    cursor = Cursor:new()
 
     -- creates the map
     local w, h = 6, 8
@@ -68,41 +77,46 @@ function _init()
     local fairness = 2
     local oldsprites = false
     board = Board:new(w, h, bombs, fairness, oldsprites)
+
+    wind = Window:new()
+
 end
 
 
 function _update()
 
-    -- polls kbm
-    kbm:update()
+    cursor:update()
 
     -- handles input
     input()
+
+    wind:update()
 
 
     -- updates the clock
     clock()
 
-    q:add(kbm.pos)
-    q:add(board:value(kbm.pos.x // board.d, kbm.pos.y // board.d))
+    q:add(cursor.pos)
+    q:add(cursor.pos // board.d)
+    q:add(board:value(cursor.pos.x // board.d, cursor.pos.y // board.d))
 end
 
 function input()
 
     -- reveal / cord
-    if (kbm:released("lmb")) board:lclick(kbm.pos)
+    if (cursor.action == "reveal") board:lclick(cursor)
 
     -- flag
-    if (kbm:released("rmb")) board:rclick(kbm.pos)
+    if (cursor.action == "flag") board:rclick(cursor)
 
     -- debug; reveal all
-    if (kbm:released("x")) board:reveal_all()
+    if (kbm:released("`")) board:reveal_all()
 end
 
 function _draw()
-    cls()
 
-    q:print(0, 200)
+    -- draws the main window
+    wind:draw()
 
-    board:draw()
+    q:print(4, 200)
 end
