@@ -89,21 +89,14 @@ end
 
 function input()
 
-    if kbm:released("lmb") then
+    -- reveal / cord
+    if (kbm:released("lmb")) board:lclick(kbm.pos)
 
-        -- converts from screen coordinates to tile coordinates
-        board:lclick(kbm.pos)
-    end
+    -- flag
+    if (kbm:released("rmb")) board:rclick(kbm.pos)
 
-    if kbm:released("rmb") then
-
-        -- converts from screen coordinates to tile coordinates
-        board:rclick(kbm.pos)
-    end
-
-    if kbm:released("x") then
-        board:reveal_all()
-    end
+    -- debug; reveal all
+    if (kbm:released("x")) board:reveal_all()
 end
 
 function _draw()
