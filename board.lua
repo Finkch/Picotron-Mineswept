@@ -33,15 +33,17 @@
         reveal the board as per normal
 ]]
 
+
 include("lib/tstr.lua")
 
 -- some constants for the checking flags
 is_mine     = 7
 is_flag     = 6
 is_reveal   = 5
+is_false    = 4
 
 
-
+-- board object
 Board = {}
 Board.__index = Board
 Board.__type  = "board"
@@ -67,37 +69,55 @@ function Board:new(w, h, bombs, fairness, oldsprites)
         h = h,
         bombs = bombs,
         flags = 0,
+        reveals = 0,
         fairness = fairness,    -- 0 = two move, 1 = insidious, 2 = standard
         bs = base_sprite,       -- which sprite represents unrevealed 0
         d = d                   -- cell side length
     }
 
     setmetatable(b, Board)
+
+    -- creates a grid of unrevealed zeroes
+    b:empty()
+
     return b
 end
 
 -- creates a new board
-function Board:generate()
+function Board:generate(dni)
 
-    -- starts by creating a grid of unrevealed zeroes
+    dni = dni or {}
+
+    -- generates the board according to fairness value
+    if self.fairness == 0 then
+        self:generate_unfair(dni)
+    elseif self.fairness == 1 then
+        self:generate_insidious(dni)
+    else
+
+
+        -- sets false flags ensure first click reveals a zero
+        mset(dni[1][1], dni[1][2], self.bs + 10)
+        for dx = -1, 1 do
+            for dy = -1, 1 do
+                if (not (dx == 0 and dy == 0))  mset(dni[1][1] + dx, dni[1][2] + dy, self.bs + 10)
+            end
+        end
+
+        self:generate_fair(dni)
+    end
+end
+
+function Board:empty()
     for i = 0, self.w - 1 do
         for j = 0, self.h - 1 do
             mset(i, j, self.bs)
         end
     end
-
-    -- generates the board according to fairness value
-    if self.fairness == 0 then
-        self:generate_unfair()
-    elseif self.fairness == 1 then
-        self:generate_insidious()
-    else
-        self:generate_fair()
-    end
 end
 
 -- creates a regular ol' board of mineswept
-function Board:generate_fair(dni)
+function Board:generate_fair()
 
     -- creates a 1d list of all cells
     local cells = {}
@@ -107,10 +127,9 @@ function Board:generate_fair(dni)
         end
     end
 
-    -- removes cells listed in 'do not include'
-    for i = 1, #dni do
-        del(cells, dni[i])
-    end
+    -- tiles whose false flag needs to be cleared
+    local clear = {}
+
 
     -- adds mines to the map
     for i = 0, self.bombs - 1 do
@@ -118,9 +137,23 @@ function Board:generate_fair(dni)
         -- pops a random item from the list
         local bombify = del(cells, rnd(cells))
 
-        -- turns the popped cell into a mine.
-        -- ...i forgor lua was 1-index :^(
-        mset(bombify[1], bombify[2], self.bs + 9)
+        -- if the tile has a false flag, mulligan
+        if self:tile(bombify[1], bombify[2], is_false) then
+            add(clear, bombify)
+            i -= 1
+        
+        else
+
+            -- turns the popped cell into a mine.
+            -- ...i forgor lua was 1-index :^(
+            mset(bombify[1], bombify[2], self.bs + 9)
+        end
+    end
+
+    -- adds the false flagged tiles back to cells, reseting their sprite
+    for i = 1, #clear do
+        mset(clear[i][1], clear[i][2], self.bs)
+        add(cells, clear[i])
     end
 
     -- for the remaining cells, count adjacent mines add set the cell's value
@@ -161,6 +194,12 @@ function Board:lclick(pos)
     -- converts screen coordinates to grid coordinates
     local x, y = pos.x // self.d, pos.y // self.d
 
+
+    -- if this is the first click, also generate the board
+    if (self.reveals == 0) self:generate({{x, y}})
+    self.reveals += 1
+
+
     -- if the tile is revealed, attempt to cord
     if self:tile(x, y, is_reveal) then
         self:cord(x, y)
@@ -174,6 +213,9 @@ end
 
 -- right click to flag
 function Board:rclick(pos)
+
+    -- can't flag before the first click
+    if (self.reveals == 0) return
 
     -- converts screen coordinates to grid coordinates
     local x, y = pos.x // self.d, pos.y // self.d
