@@ -14,7 +14,8 @@ function Cursor:new()
         pos = Vec:new(),
         lpos = Vec:new(),
         mouse = true,
-        speed = 1
+        speed = 1,
+        action = nil
     }
 
     setmetatable(c, Cursor)
@@ -35,24 +36,7 @@ function Cursor:update()
         self.mouse = true
     end
 
-
-    -- don't draw the cursor if keyboard is in use
-    if not self.mouse then
-        window({cursor = 0})
-    else
-        window({cursor = 1})
-    end
-
-
-    -- updates cursor's position
-    if self.mouse then
-        self.pos = kbm.pos
-    else
-        if (kbm:held("left"))   self.pos += Vec:new(-self.speed, 0)
-        if (kbm:held("right"))  self.pos += Vec:new(self.speed, 0)
-        if (kbm:held("up"))     self.pos += Vec:new(0, -self.speed)
-        if (kbm:held("down"))   self.pos += Vec:new(0, self.speed)
-    end
+    self:input()
 
 end
 
@@ -64,5 +48,38 @@ function Cursor:mousedown()
     return self.lpos != kbm.pos or kbm:held("lmb") or kbm:held("rmb")
 end
 
+
+-- handles inputs
 function Cursor:input()
+    
+    -- updates cursor's position
+    if self.mouse then
+        self.pos = kbm.pos
+    else
+        if (kbm:held("left"))   self.pos += Vec:new(-self.speed, 0)
+        if (kbm:held("right"))  self.pos += Vec:new(self.speed, 0)
+        if (kbm:held("up"))     self.pos += Vec:new(0, -self.speed)
+        if (kbm:held("down"))   self.pos += Vec:new(0, self.speed)
+    end
+
+    -- sends an action
+    if kbm:released("lmb") or kbm:released("x") then
+        self.action = "reveal"
+    elseif kbm:released("rmb") or kbm:released("z") then
+        self.action = "flag"
+    else
+        self.action = nil
+    end
+end
+
+
+function Cursor:draw()
+
+    -- draw a special cursor when mouse is not in use
+    if not self.mouse then
+        window({cursor = 0})
+        spr(59, self.pos.x - 8, self.pos.y - 8)
+    else
+        window({cursor = 1})
+    end
 end
