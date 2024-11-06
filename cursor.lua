@@ -13,6 +13,7 @@ function Cursor:new()
     local c = {
         pos = Vec:new(),
         lpos = Vec:new(),
+        dpos = Vec:new(), -- mouse differential
         mouse = true,
         speed = 1,
         action = nil
@@ -29,12 +30,15 @@ function Cursor:update()
     -- polls kbm
     kbm:update()
 
+    -- gets mouse velocity
+    self.dpos = kbm.pos - self.lpos
+
     -- tracks whether the mouse was the previous method of input
     if (self:keydown()) self.mouse = false
 
     if self:mousedown() then
-        self.lpos = kbm.pos
         self.mouse = true
+        self.lpos = kbm.pos
     end
 
     -- performs actions depending on inputs
