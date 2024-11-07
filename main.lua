@@ -53,6 +53,7 @@ include("lib/logger.lua")
 include("lib/kbm.lua")
 include("lib/clock.lua")
 include("lib/camera.lua")
+include("lib/vec.lua")
 
 include("lib/tstr.lua")
 
@@ -62,7 +63,7 @@ function _init()
     logger = Logger:new("appdata/mineswept/logs")
 
     -- keyboard and mouse
-    kbm = KBM:new({"lmb", "rmb", "x", "z", "left", "right", "up", "down", "`"})
+    kbm = KBM:new({"lmb", "rmb", "x", "z", "left", "right", "up", "down", "space", "`"})
 
     -- tracks time
     clock = Clock:new()
@@ -72,33 +73,36 @@ function _init()
     cursor = Cursor:new()
 
     -- creates the map
-    local w, h = 6, 8
-    local bombs = 12
+    local w, h = 32, 32
+    local bombs = 256
     local fairness = 2
     local oldsprites = false
     board = Board:new(w, h, bombs, fairness, oldsprites)
 
     wind = Window:new()
 
+    wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
+    wind:edges()
+
 end
 
 
 function _update()
+
+    wind:update()
 
     cursor:update()
 
     -- handles input
     input()
 
-    wind:update()
-
 
     -- updates the clock
     clock()
 
-    q:add(cursor.pos)
-    q:add(cursor.pos // board.d)
-    q:add(board:value(cursor.pos.x // board.d, cursor.pos.y // board.d))
+    q:add(cursor:posm())
+    q:add(Vec:new(cursor:map(board.d)))
+    q:add(board:value(cursor:map(board.d)))
 end
 
 function input()
@@ -118,5 +122,5 @@ function _draw()
     -- draws the main window
     wind:draw()
 
-    q:print(4, 200)
+    q:print(4, 150, 8)
 end
