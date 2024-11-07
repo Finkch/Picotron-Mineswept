@@ -31,6 +31,10 @@ function Window:new(windowed, width, height)
         wb = height - 2 * p + 1,
         wl = 2 * p - 1,
         wr = width - 2 * p + 1,
+        st = 0,
+        sb = 0,
+        sl = 0,
+        sr = 0,
         focal = Vec:new(0, 0)           -- centre of camera
     }
     setmetatable(w, Window)
@@ -46,6 +50,14 @@ function Window:new(windowed, width, height)
     end
 
     return w
+end
+
+-- updates the window bounds based on the board
+function Window:edges()
+    self.sl = 0
+    self.sr = board.w * board.d
+    self.st = 0
+    self.sb = board.h * board.d
 end
 
 -- moves camera
@@ -75,11 +87,11 @@ function Window:update()
     end
 
     -- bounds camera
-    self.focal.x = min(-self.wl, self.focal.x)
-    self.focal.x = max(-self.wr, self.focal.x)
+    self.focal.x = min(-self.sl, self.focal.x)
+    self.focal.x = max(-self.sr, self.focal.x)
 
-    self.focal.y = min(-self.wt, self.focal.y)
-    self.focal.y = max(-self.wb, self.focal.y)
+    self.focal.y = min(-self.st, self.focal.y)
+    self.focal.y = max(-self.sb, self.focal.y)
 
     cam:focus(-self.focal)
 end
