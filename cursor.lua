@@ -83,16 +83,18 @@ function Cursor:input()
             self.action = nil
         end
 
+
     -- pan the camera
     else
         
+        -- mouse pan
         wind.focal += self.mpos - self.lmpos
 
-        local c = 2.5
-        if (kbm:held("left"))   self.pos += Vec:new(-c * self.speed, 0)
-        if (kbm:held("right"))  self.pos += Vec:new(c * self.speed, 0)
-        if (kbm:held("up"))     self.pos += Vec:new(0, -c * self.speed)
-        if (kbm:held("down"))   self.pos += Vec:new(0, c * self.speed)
+        -- fast arrow key movement
+        if (kbm:held("left"))   self.pos += Vec:new(-2.5 * self.speed, 0)
+        if (kbm:held("right"))  self.pos += Vec:new(2.5 * self.speed, 0)
+        if (kbm:held("up"))     self.pos += Vec:new(0, -2.5 * self.speed)
+        if (kbm:held("down"))   self.pos += Vec:new(0, 2.5 * self.speed)
     end
 end
 
