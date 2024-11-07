@@ -54,18 +54,32 @@ function Window:update()
     -- if the cursor is on the edge of the window, pan
     if not kbm:held("space") or cursor:keydown() then
 
-        if cursor.mpos.x < self.wl + self.b then
-            self.focal.x += 1.5
-        elseif cursor.mpos.x > self.wr - self.b then
-            self.focal.x -= 1.5
+        -- prevents panning if the map is too small
+        if board.w * board.d > self.w - 4 * self.p then
+
+            -- pans if cursor is at edge of screen
+            if cursor.pos.x < self.wl + self.b then
+                self.focal.x += 1.5
+            elseif cursor.pos.x > self.wr - self.b then
+                self.focal.x -= 1.5
+            end
         end
 
-        if (cursor.mpos.y < self.wt + self.b) and not (cursor.mpos.y < self.banner_h) then
-            self.focal.y += 1.5
-        elseif cursor.mpos.y > self.wb - self.b then
-            self.focal.y -= 1.5
+        if board.h * board.d > self.h - 4 * self.p - self.banner_h then
+            if (cursor.pos.y < self.wt + self.b) and not (cursor.pos.y < self.banner_h) then
+                self.focal.y += 1.5
+            elseif cursor.pos.y > self.wb - self.b then
+                self.focal.y -= 1.5
+            end
         end
     end
+
+    -- bounds camera
+    self.focal.x = min(-self.wl, self.focal.x)
+    self.focal.x = max(-self.wr, self.focal.x)
+
+    self.focal.y = min(-self.wt, self.focal.y)
+    self.focal.y = max(-self.wb, self.focal.y)
 
     cam:focus(-self.focal)
 end
