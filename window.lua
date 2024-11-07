@@ -55,9 +55,9 @@ end
 -- updates the window bounds based on the board
 function Window:edges()
     self.sl = 0
-    self.sr = board.w * board.d
+    self.sr = board.w * board.d - 1
     self.st = 0
-    self.sb = board.h * board.d
+    self.sb = board.h * board.d - 1
 end
 
 -- moves camera
