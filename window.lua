@@ -52,7 +52,7 @@ end
 function Window:update()
 
     -- if the cursor is on the edge of the window, pan
-    if not kbm:held("space") or cursor:keydown() then
+    if not (kbm:held("space") and cursor.mouse) then
 
         -- prevents panning if the map is too small
         if board.w * board.d > self.w - 4 * self.p then
