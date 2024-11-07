@@ -13,6 +13,8 @@ function Cursor:new()
     local c = {
         pos = Vec:new(),
         lpos = Vec:new(),
+        mpos = Vec:new(),
+        lmpos = Vec:new(),
         mouse = true,
         speed = 1,
         action = nil
@@ -28,6 +30,10 @@ function Cursor:update()
 
     -- polls kbm
     kbm:update()
+
+    -- gets raw mouse position
+    self.lmpos = self.mpos
+    self.mpos = Vec:new(mouse())
 
     -- tracks whether the mouse was the previous method of input
     if (self:keydown()) self.mouse = false
@@ -54,24 +60,39 @@ end
 
 -- handles inputs
 function Cursor:input()
-    
-    -- updates cursor's position
-    if self.mouse then
-        self.pos = kbm.pos
-    else
-        if (kbm:held("left"))   self.pos += Vec:new(-self.speed, 0)
-        if (kbm:held("right"))  self.pos += Vec:new(self.speed, 0)
-        if (kbm:held("up"))     self.pos += Vec:new(0, -self.speed)
-        if (kbm:held("down"))   self.pos += Vec:new(0, self.speed)
-    end
 
-    -- sends an action
-    if kbm:released("lmb") or kbm:released("x") then
-        self.action = "reveal"
-    elseif kbm:released("rmb") or kbm:released("z") then
-        self.action = "flag"
+    -- don't accept input while panning
+    if not kbm:held("space") then
+    
+        -- updates cursor's position
+        if self.mouse then
+            self.pos = kbm.pos
+        else
+            if (kbm:held("left"))   self.pos += Vec:new(-self.speed, 0)
+            if (kbm:held("right"))  self.pos += Vec:new(self.speed, 0)
+            if (kbm:held("up"))     self.pos += Vec:new(0, -self.speed)
+            if (kbm:held("down"))   self.pos += Vec:new(0, self.speed)
+        end
+
+        -- sends an action
+        if kbm:released("lmb") or kbm:released("x") then
+            self.action = "reveal"
+        elseif kbm:released("rmb") or kbm:released("z") then
+            self.action = "flag"
+        else
+            self.action = nil
+        end
+
+    -- pan the camera
     else
-        self.action = nil
+        
+        wind.focal += self.mpos - self.lmpos
+
+        local c = 2.5
+        if (kbm:held("left"))   self.pos += Vec:new(-c * self.speed, 0)
+        if (kbm:held("right"))  self.pos += Vec:new(c * self.speed, 0)
+        if (kbm:held("up"))     self.pos += Vec:new(0, -c * self.speed)
+        if (kbm:held("down"))   self.pos += Vec:new(0, c * self.speed)
     end
 end
 
