@@ -92,14 +92,21 @@ function Window:draw()
     cam()
 
     board:draw()
-    cursor:draw()
-
 
     cam(true)
 
     -- absolute draws
     self:draw_frame()
     self:draw_banner()
+
+    cam(true)
+
+    -- more relative draws
+    cam:focus(-self.focal)
+    cam()
+
+    cursor:draw()
+    
 
     cam(true)
 end
