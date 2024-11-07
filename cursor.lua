@@ -127,6 +127,8 @@ function Cursor:draw()
     end
 
     -- shows which tile the cursor would select
+    if (kbm:held("space")) return
+
     local x, y = self:map(board.d)
 
     -- don't if out of bounds
