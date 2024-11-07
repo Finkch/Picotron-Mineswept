@@ -24,7 +24,8 @@ function Window:new(windowed, width, height)
         fullscreen = not fullscreen,
         w = width,
         h = height,
-        p = p,
+        p = p,              -- padding
+        b = 20 * p,         -- buffer; big padding
         banner_h = bh,
         wt = bh + 2 * p - 1, -- game window edges
         wb = height - 2 * p + 1,
@@ -49,6 +50,23 @@ end
 
 -- moves camera
 function Window:update()
+
+    -- if the cursor is on the edge of the window, pan
+    if not kbm:held("space") or cursor:keydown() then
+
+        if cursor.mpos.x < self.wl + self.b then
+            self.focal.x += 1.5
+        elseif cursor.mpos.x > self.wr - self.b then
+            self.focal.x -= 1.5
+        end
+
+        if (cursor.mpos.y < self.wt + self.b) and not (cursor.mpos.y < self.banner_h) then
+            self.focal.y += 1.5
+        elseif cursor.mpos.y > self.wb - self.b then
+            self.focal.y -= 1.5
+        end
+    end
+
     cam:focus(-self.focal)
 end
 
