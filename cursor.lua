@@ -36,7 +36,10 @@ function Cursor:update()
     self.mpos = Vec:new(mouse())
 
     -- tracks whether the mouse was the previous method of input
-    if (self:keydown()) self.mouse = false
+    if self:keydown() then
+        self.pos = Vec:new(wind.w / 2, wind.h / 2)
+        self.mouse = false
+    end
 
     if self:mousedown() then
         self.lpos = kbm.spos
@@ -72,10 +75,10 @@ function Cursor:input()
         if self.mouse then
             self.pos = kbm.spos
         else
-            if (kbm:held("left"))   self.pos += Vec:new(-self.speed, 0)
-            if (kbm:held("right"))  self.pos += Vec:new(self.speed, 0)
-            if (kbm:held("up"))     self.pos += Vec:new(0, -self.speed)
-            if (kbm:held("down"))   self.pos += Vec:new(0, self.speed)
+            if (kbm:held("left"))   wind.focal += Vec:new(self.speed, 0)
+            if (kbm:held("right"))  wind.focal += Vec:new(-self.speed, 0)
+            if (kbm:held("up"))     wind.focal += Vec:new(0, self.speed)
+            if (kbm:held("down"))   wind.focal += Vec:new(0, -self.speed)
         end
 
         -- sends an action
@@ -95,10 +98,10 @@ function Cursor:input()
         wind.focal += self.mpos - self.lmpos
 
         -- fast arrow key movement
-        if (kbm:held("left"))   self.pos += Vec:new(-2.5 * self.speed, 0)
-        if (kbm:held("right"))  self.pos += Vec:new(2.5 * self.speed, 0)
-        if (kbm:held("up"))     self.pos += Vec:new(0, -2.5 * self.speed)
-        if (kbm:held("down"))   self.pos += Vec:new(0, 2.5 * self.speed)
+        if (kbm:held("left"))   wind.focal += Vec:new(2.5 * self.speed, 0)
+        if (kbm:held("right"))  wind.focal += Vec:new(-2.5 * self.speed, 0)
+        if (kbm:held("up"))     wind.focal += Vec:new(0, 2.5 * self.speed)
+        if (kbm:held("down"))   wind.focal += Vec:new(0, -2.5 * self.speed)
     end
 end
 
