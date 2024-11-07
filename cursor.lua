@@ -13,8 +13,6 @@ function Cursor:new()
     local c = {
         pos = Vec:new(),
         lpos = Vec:new(),
-        mpos = Vec:new(),
-        lmpos = Vec:new(),
         mouse = true,
         speed = 1,
         action = nil
@@ -31,15 +29,11 @@ function Cursor:update()
     -- polls kbm
     kbm:update()
 
-    -- gets raw mouse position
-    self.lmpos = self.mpos
-    self.mpos = Vec:new(mouse())
-
     -- tracks whether the mouse was the previous method of input
     if (self:keydown()) self.mouse = false
 
     if self:mousedown() then
-        self.lpos = kbm.pos
+        self.lpos = kbm.spos
         self.mouse = true
     end
 
@@ -54,7 +48,7 @@ end
 
 -- checks if the mouse is in use
 function Cursor:mousedown()
-    return self.lpos != kbm.pos or kbm:held("lmb") or kbm:held("rmb")
+    return self.lpos != kbm.spos or kbm:held("lmb") or kbm:held("rmb")
 end
 
 
@@ -66,7 +60,7 @@ function Cursor:input()
     
         -- updates cursor's position
         if self.mouse then
-            self.pos = kbm.pos
+            self.pos = kbm.spos
         else
             if (kbm:held("left"))   self.pos += Vec:new(-self.speed, 0)
             if (kbm:held("right"))  self.pos += Vec:new(self.speed, 0)
@@ -86,7 +80,7 @@ function Cursor:input()
     -- pan the camera
     else
         
-        wind.focal += self.mpos - self.lmpos
+        wind.focal += self.pos - self.lpos
 
         local c = 2.5
         if (kbm:held("left"))   self.pos += Vec:new(-c * self.speed, 0)
@@ -99,7 +93,7 @@ end
 
 -- maps the coordinates down
 function Cursor:posm()
-    return self.pos - cam.pos - cam.centre - wind.focal
+    return self.pos + cam.pos
 end
 
 function Cursor:map(d)
@@ -121,7 +115,8 @@ function Cursor:draw()
     -- draw a special cursor when mouse is not in use
     if not self.mouse then
         window({cursor = 0})
-        spr(59, self.pos.x - 8, self.pos.y - 8)
+        local x, y = self:posm():u()
+        spr(59, x - 8, y - 8)
     else
         window({cursor = 1})
     end
