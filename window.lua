@@ -25,7 +25,7 @@ function Window:new(windowed, width, height)
         w = width,
         h = height,
         p = p,              -- padding
-        b = 20 * p,         -- buffer; big padding
+        b = 15 * p,         -- buffer; big padding
         banner_h = bh,
         wt = bh + 2 * p - 1, -- game window edges
         wb = height - 2 * p + 1,
