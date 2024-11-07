@@ -13,6 +13,8 @@ function Cursor:new()
     local c = {
         pos = Vec:new(),
         lpos = Vec:new(),
+        mpos = Vec:new(),
+        lmpos = Vec:new(),
         mouse = true,
         speed = 1,
         action = nil
@@ -28,6 +30,10 @@ function Cursor:update()
 
     -- polls kbm
     kbm:update()
+
+    -- updates raw mouse position
+    self.lmpos = self.mpos
+    self.mpos = Vec:new(mouse())
 
     -- tracks whether the mouse was the previous method of input
     if (self:keydown()) self.mouse = false
@@ -80,7 +86,7 @@ function Cursor:input()
     -- pan the camera
     else
         
-        wind.focal += self.pos - self.lpos
+        wind.focal += self.mpos - self.lmpos
 
         local c = 2.5
         if (kbm:held("left"))   self.pos += Vec:new(-c * self.speed, 0)
