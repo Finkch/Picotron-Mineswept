@@ -45,6 +45,10 @@ function Cursor:update()
 
     -- performs actions depending on inputs
     self:input()
+
+    -- binds cursor to screen
+    self.pos.x = mid(8, self.pos.x, 472)
+    self.pos.y = mid(8, self.pos.y, 262)
 end
 
 -- checks if the arrow keys are in use
