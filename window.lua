@@ -102,14 +102,18 @@ end
 
 
 -- draws a box
-function Window:box(l, t, r, b, two_wide, up)
+function Window:box(l, t, r, b, two_wide, background)
 
-    local c1, c2 = 5, 7
+    logger(string.format("%s, %s, %s, %s",  l, t, r, b), "box.txt")
 
-    if (up) c1, c2 = c2, c1
+    if (not background) background = 0
+
+    local c1, c2 = 7, 5
+
+    if (background != 0) c1, c2 = c2, c1
 
     -- background
-    rectfill(l, t, r, b, 0)
+    rectfill(l, t, r, b, background)
 
     -- grey border
     rect(l, t, r, b, c1)
@@ -135,7 +139,7 @@ function Window:draw()
     -- relative draws
     cam()
 
-    board:draw()
+    if (not state:__eq("menu")) board:draw()
 
     cam(true)
 
@@ -145,8 +149,16 @@ function Window:draw()
 
     cam(true)
 
-    -- only draw cursor when game is still going
-    if not state:__eq("gameover") then
+    -- state appropriate draws
+
+    -- menus
+    if state:__eq("menu") then
+
+        self:draw_menu()
+
+    -- board and cursor
+    -- well, board is in another step
+    elseif state:__eq("play") then
 
         -- more relative draws
         cam:focus(-self.focal)
@@ -154,7 +166,8 @@ function Window:draw()
 
         cursor:draw()
 
-    else
+    -- menus
+    elseif state:__eq("gameover") then
 
         self:draw_gameover()
     end
@@ -199,7 +212,7 @@ function Window:draw_banner()
     cam()
 
     -- boxes to contain banner elements
-    self:box(-1, -1, 18, 11, false, true)
+    self:box(-1, -1, 18, 11, false)
 
     -- flag banner sprite
     spr(56, 21, -1)
@@ -213,7 +226,7 @@ function Window:draw_banner()
     cam()
 
     -- boxes to contain banner elements
-    self:box(-1, -1, 18, 11, false, true)
+    self:box(-1, -1, 18, 11, false)
 
     -- need to draw a black box so sprite can contain black
     rectfill(21, -1, 33, 11, 0)
@@ -253,4 +266,41 @@ function Window:draw_gameover()
     pw = print("press z to return to menu", 500, 500, 8) - 500
     print("press z to return to menu", wm - pw / 2, tl + 24, 8)
 
+end
+
+function Window:draw_menu()
+
+    -- precalcs
+    local wm = self.w / 2
+    
+    local t = 80
+    local b = 30
+
+    local pw = print("000", 500, 500) - 500
+
+    -- width selection
+    self:box(wm - pw / 2 - 3, t, wm + pw / 2 + 1, t + 12)
+    print(string.format("%03d", board.w), wm - pw / 2, t + 3, 5)
+
+
+    -- height selection
+    self:box(wm - pw / 2 - 3, t + b, wm + pw / 2 + 1, t + b + 12)
+    print(string.format("%03d", board.h), wm - pw / 2, t + b + 3, 5)
+
+    -- mines selection
+    self:box(wm - pw / 2 - 3, t + 2 * b, wm + pw / 2 + 1, t + 2 * b + 12)
+    print(string.format("%03d", board.bombs), wm - pw / 2, t + 2 * b + 3, 5)
+
+
+    -- draws box
+    pw = print("press x to start", 500, 500) - 500
+    self:box(wm - pw / 2 - 4, t + 3 * b, wm + pw / 2 + 3, t + 3 * b + 16, true, 6)
+
+    -- text shadow
+    print("press x to start", wm - pw / 2, t + 3 * b + 5, 5)
+    print("press x to start", wm - pw / 2 + 1, t + 3 * b + 4, 5)
+    print("press x to start", wm - pw / 2 + 1, t + 3 * b + 5, 5)
+
+    -- text
+    print("press x to start", wm - pw / 2, t + 3 * b + 4, 7)
 end
