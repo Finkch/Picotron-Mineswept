@@ -59,9 +59,6 @@ function gamestate(state)
 
         gameover()
     
-    else
-
-        q:add(string.format("unknown state: %s", state.state))
     end
 end
 
@@ -72,8 +69,6 @@ function menu()
 end
 
 function menu_input()
-
-    q:add(state.data.mi)
     
     -- navigates through the manu
     if (kbm:pressed("down")) then
@@ -147,7 +142,6 @@ function play()
     -- updates the clock after the first reveal
     if (board.reveals > 0) clock()
 
-    q:add(board.reveals)
 
     q:add(cursor:posm())
     q:add(Vec:new(cursor:map(board.d)))

@@ -142,8 +142,6 @@ function _update()
 
     gamestate(state)
 
-    q:add(mid(4, 5, 100))
-
 end
 
 function _draw()
