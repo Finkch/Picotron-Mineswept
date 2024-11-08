@@ -7,12 +7,13 @@ State.__index = State
 State.__type = "state"
 
 
-function State:new(initial, states)
+function State:new(states)
     states = states or {}
 
     local s = {
-        state = initial,
-        states = states
+        state = nil,
+        states = states,
+        data = {}           -- misc data that doesn't fit elsewhere
     }
 
     setmetatable(s, State)
@@ -38,7 +39,9 @@ end
 
 function gamestate(state)
 
-    if state:__eq("menu")then
+    if state:__eq("menu") then
+
+        menu()
 
     elseif state:__eq("play") then
         
@@ -63,14 +66,88 @@ function gamestate(state)
 end
 
 
+-- menus
+function menu()
+    menu_input()
+end
+
+function menu_input()
+
+    q:add(state.data.mi)
+    
+    -- navigates through the manu
+    if (kbm:pressed("down")) then
+        state.data.mi += 1
+        state.data.mi %= state.data.ml
+    end
+
+    if (kbm:pressed("up")) then
+        state.data.mi -= 1
+        state.data.mi %= state.data.ml
+    end
+
+    -- updates appropraite item
+    if state.data.mi == 0 then
+
+        -- changes selected item
+        if kbm:pressedr("right") then 
+            board.w += 1
+
+            board.bombs = board.w * board.h // 5
+        elseif kbm:pressedr("left") then
+            board.w -= 1
+
+            board.bombs = board.w * board.h // 5
+        end
+
+        -- enforces bounds
+        board.w = mid(state.data.mind, board.w, state.data.maxd)
+
+    elseif state.data.mi == 1 then
+
+        -- changes selected item
+        if kbm:pressedr("right") then 
+            board.h += 1
+
+            board.bombs = board.w * board.h // 5
+        elseif kbm:pressedr("left") then
+            board.h -= 1
+
+            board.bombs = board.w * board.h // 5
+        end
+
+        -- enforces bounds
+        board.h = mid(state.data.mind, board.h, state.data.maxd)
+
+
+    elseif state.data.mi == 2 then
+
+        -- changes selected item
+        if (kbm:pressedr("right")) board.bombs += 1
+        if (kbm:pressedr("left")) board.bombs -= 1
+    end
+
+    -- enforces bounds on mines
+    state.data.maxmines = mid(4, (board.w - 1) * (board.h - 1) - 1, 999)
+    board.bombs = mid(state.data.minmines, board.bombs, state.data.maxmines)
+
+
+    -- starts the game
+    if (kbm:released("x")) state:change("play")
+
+end
+
+
 -- mineswept controls
 function play()
     
     -- handles input
     play_input()
 
-    -- updates the clock
-    clock()
+    -- updates the clock after the first reveal
+    if (board.reveals > 0) clock()
+
+    q:add(board.reveals)
 
     q:add(cursor:posm())
     q:add(Vec:new(cursor:map(board.d)))
@@ -90,6 +167,7 @@ function play_input()
 end
 
 
+-- end of game logic
 function gameover()
     -- nothing to do here but check for new game or menu
     gameover_input()
@@ -101,6 +179,6 @@ function gameover_input()
     if (cursor.action == "reveal") state:change("play")
 
     -- return to menu
-    --if (cursor.action == "flag") board:rclick(cursor)
+    if (cursor.action == "flag") state:change("menu")
 
 end
