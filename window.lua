@@ -117,11 +117,19 @@ function Window:draw()
 
     cam(true)
 
-    -- more relative draws
-    cam:focus(-self.focal)
-    cam()
+    -- only draw cursor when game is still going
+    if not state:__eq("gameover") then
 
-    cursor:draw()
+        -- more relative draws
+        cam:focus(-self.focal)
+        cam()
+
+        cursor:draw()
+
+    else
+
+        self:draw_gameover()
+    end
     
 
     cam(true)
@@ -198,5 +206,40 @@ function Window:draw_banner()
     -- prints elapsed time
     print(string.format("%03d", min(flr(clock:secs()), 999)), p, p, 8)
 
+
+end
+
+
+function Window:draw_gameover()
+
+    local w = 41
+    local wm = self.w / 2
+
+    local wt = self.h / 2 + w
+    local wl = wm - 2 * w
+    local wr = wm + 2 * w
+
+    local tl = self.h / 2 + w + 2 * self.p + 1
+    
+
+    rectfill(wl, wt, wr, wt + w, 0)
+
+    rect(wl, wt, wr, wt + w, 5)
+    rect(wl + 1, wt, wr + 1, wt + w + 1, 5)
+
+    line(wl, wt, wl, wt + w + 1, 7)
+    line(wl, wt, wr, wt, 7)
+
+    line(wl + 1, wt + 1, wl + 1, wt + w, 7)
+    line(wl + 1, wt + 1, wr - 1, wt + 1, 7)
+
+    local pw = print("gameover!", 500, 500, 8) - 500
+    print("gameover!", wm - pw / 2, tl, 8)
+
+    pw = print("press x to start a new game", 500, 500, 8) - 500
+    print("press x to start a new game", wm - pw / 2, tl + 12, 8)
+
+    pw = print("press z to return to menu", 500, 500, 8) - 500
+    print("press z to return to menu", wm - pw / 2, tl + 24, 8)
 
 end
