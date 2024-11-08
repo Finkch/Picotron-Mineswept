@@ -28,9 +28,6 @@ end
 -- update
 function Cursor:update()
 
-    -- polls kbm
-    kbm:update()
-
     -- updates raw mouse position
     self.lmpos = self.mpos
     self.mpos = Vec:new(mouse())
