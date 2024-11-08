@@ -278,18 +278,37 @@ function Window:draw_menu()
 
     local pw = print("000", 500, 500) - 500
 
+    local c1, c2, c3 = 5, 5, 5
+
+    if state.data.mi == 0 then
+        c1 = 8
+
+        spr(60, wm - 13 - 13, t + 1)
+        spr(61, wm + 13, t + 1)
+    elseif state.data.mi == 2 then
+        c2 = 8
+
+        spr(60, wm - 13 - 13, t + b + 1)
+        spr(61, wm + 13, t + b + 1)
+    elseif state.data.mi == 3 then
+        c3 = 8
+
+        spr(60, wm - 13 - 13, t + 2 * b + 1)
+        spr(61, wm + 13, t + 2 * b + 1)
+    end
+
     -- width selection
     self:box(wm - pw / 2 - 3, t, wm + pw / 2 + 1, t + 12)
-    print(string.format("%03d", board.w), wm - pw / 2, t + 3, 5)
+    print(string.format("%03d", board.w), wm - pw / 2, t + 3, c1)
 
 
     -- height selection
     self:box(wm - pw / 2 - 3, t + b, wm + pw / 2 + 1, t + b + 12)
-    print(string.format("%03d", board.h), wm - pw / 2, t + b + 3, 5)
+    print(string.format("%03d", board.h), wm - pw / 2, t + b + 3, c2)
 
     -- mines selection
     self:box(wm - pw / 2 - 3, t + 2 * b, wm + pw / 2 + 1, t + 2 * b + 12)
-    print(string.format("%03d", board.bombs), wm - pw / 2, t + 2 * b + 3, 5)
+    print(string.format("%03d", board.bombs), wm - pw / 2, t + 2 * b + 3, c3)
 
 
     -- draws box
