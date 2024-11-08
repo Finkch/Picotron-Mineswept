@@ -212,6 +212,7 @@ end
 
 function Window:draw_gameover()
 
+    -- precalculations
     local w = 41
     local wm = self.w / 2
 
@@ -222,8 +223,10 @@ function Window:draw_gameover()
     local tl = self.h / 2 + w + 2 * self.p + 1
     
 
+    -- draws a black background
     rectfill(wl, wt, wr, wt + w, 0)
 
+    -- a two wide frame
     rect(wl, wt, wr, wt + w, 5)
     rect(wl + 1, wt, wr + 1, wt + w + 1, 5)
 
@@ -233,6 +236,8 @@ function Window:draw_gameover()
     line(wl + 1, wt + 1, wl + 1, wt + w, 7)
     line(wl + 1, wt + 1, wr - 1, wt + 1, 7)
 
+
+    -- centres the messages
     local pw = print("gameover!", 500, 500, 8) - 500
     print("gameover!", wm - pw / 2, tl, 8)
 
