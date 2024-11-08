@@ -239,6 +239,9 @@ function Board:reveal(x, y)
 
     -- if the value of a tile is zero, reveal its neighbours
     if (self:value(x, y) == 0) self:reveal_neighbours(x, y)
+
+    -- if the tile is a bomb, change to gameover state
+    if (self:tile(x, y, is_mine)) state:change("gameover")
 end
 
 -- reveals neighbours
@@ -267,6 +270,28 @@ function Board:reveal_all()
                 
                 -- otherwise normal reveal
                 elseif not self:tile(i, j, is_flag) then
+                    mset(i, j, mget(i, j) + 16)
+                end
+            end
+        end
+    end
+end
+
+-- reveals remaining bombs
+function Board:reveal_mines()
+
+    for i = 0, self.w - 1 do
+        for j = 0, self.h - 1 do
+
+            -- do nothing if it's already revealed
+            if not self:tile(i, j, is_reveal) then
+
+                -- if it's an incorrect flag
+                if self:tile(i, j, is_flag) and not self:tile(i, j, is_mine) then
+                    mset(i, j, self.bs + 42)
+                
+                -- otherwise, reveal if it's a mine
+                elseif self:tile(i, j, is_mine) and not self:tile(i, j, is_reveal) and not self:tile(i, j, is_flag) then
                     mset(i, j, mget(i, j) + 16)
                 end
             end
