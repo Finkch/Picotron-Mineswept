@@ -280,18 +280,31 @@ function Window:draw_menu()
 
     local c1, c2, c3 = 5, 5, 5
 
+    -- conditional highlighting
     if state.data.mi == 0 then
         c1 = 8
+
+        print("width", wm - t, t + 3, 5)
+        print(state.data.mind, wm - b - 6, t + 3, 5)
+        print(state.data.maxd, wm + b, t + 3, 5)
 
         spr(60, wm - 13 - 13, t + 1)
         spr(61, wm + 13, t + 1)
     elseif state.data.mi == 2 then
         c2 = 8
 
+        print("height", wm - t, t + b + 3, 5)
+        print(state.data.mind, wm - b - 6, t + b + 3, 5)
+        print(state.data.maxd, wm + b, t + b + 3, 5)
+
         spr(60, wm - 13 - 13, t + b + 1)
         spr(61, wm + 13, t + b + 1)
     elseif state.data.mi == 3 then
         c3 = 8
+
+        print("mines", wm - t, t + 3, 5)
+        print(state.data.minmines, wm - b - 6, t + 2 * b + 3, 5)
+        print(state.data.maxmines, wm + b, t + 2 * b + 3, 5)
 
         spr(60, wm - 13 - 13, t + 2 * b + 1)
         spr(61, wm + 13, t + 2 * b + 1)
