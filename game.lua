@@ -19,7 +19,13 @@ function State:new(initial, states)
     return s
 end
 
-function State:change() end -- override me!
+function State:change(state)
+    self.state = state
+
+    self:_change()
+end
+
+function State:_change() end -- override me!
 
 function State:__eq(state)
     return self.state == state
@@ -35,14 +41,22 @@ function gamestate(state)
     if state:__eq("menu")then
 
     elseif state:__eq("play") then
+        
+        -- update key elements
+        wind:update()
+        cursor:update()
 
         play()
 
     elseif state:__eq("gameover") then
+
+        -- update key elements
+        wind:update()
+        cursor:update()
     
     else
 
-        q:add("unknown state: " .. state.state)
+        q:add(string.format("unknown state: %s", state.state))
     end
 end
 
@@ -52,7 +66,6 @@ function play()
     
     -- handles input
     play_input()
-
 
     -- updates the clock
     clock()
