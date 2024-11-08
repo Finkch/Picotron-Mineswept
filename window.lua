@@ -100,6 +100,34 @@ function Window:update()
     cam:focus(-self.focal)
 end
 
+
+-- draws a box
+function Window:box(l, t, r, b, two_wide, up)
+
+    local c1, c2 = 5, 7
+
+    if (up) c1, c2 = c2, c1
+
+    -- background
+    rectfill(l, t, r, b, 0)
+
+    -- grey border
+    rect(l, t, r, b, c1)
+
+    -- white border
+    line(l, t, l, b, c2)
+    line(l, t, r - 1, t, c2)
+
+    -- additional border
+    if two_wide then
+        rect(l + 1, t + 1, r - 1, b - 1, c1)
+
+        line(l + 1, t + 1, l + 1, b - 1, c2)
+        line(l + 1, t + 1, r - 2, t + 1, c2)
+    end
+
+end
+
 -- draws window
 function Window:draw()
     cls()
@@ -171,12 +199,7 @@ function Window:draw_banner()
     cam()
 
     -- boxes to contain banner elements
-    rectfill(0, 0, 17, 10, 0)
-
-    rect(-1, -1, 18, 11, 7)
-
-    line(-1, -1, -1, 11, 5)
-    line(-1, -1, 17, -1, 5)
+    self:box(-1, -1, 18, 11, false, true)
 
     -- flag banner sprite
     spr(56, 21, -1)
@@ -190,12 +213,7 @@ function Window:draw_banner()
     cam()
 
     -- boxes to contain banner elements
-    rectfill(0, 0, 17, 10, 0)
-
-    rect(-1, -1, 18, 11, 7)
-
-    line(-1, -1, -1, 11, 5)
-    line(-1, -1, 17, -1, 5)
+    self:box(-1, -1, 18, 11, false, true)
 
     -- need to draw a black box so sprite can contain black
     rectfill(21, -1, 33, 11, 0)
@@ -221,21 +239,9 @@ function Window:draw_gameover()
     local wr = wm + 2 * w
 
     local tl = self.h / 2 + w + 2 * self.p + 1
-    
 
-    -- draws a black background
-    rectfill(wl, wt, wr, wt + w, 0)
-
-    -- a two wide frame
-    rect(wl, wt, wr, wt + w, 5)
-    rect(wl + 1, wt, wr + 1, wt + w + 1, 5)
-
-    line(wl, wt, wl, wt + w + 1, 7)
-    line(wl, wt, wr, wt, 7)
-
-    line(wl + 1, wt + 1, wl + 1, wt + w, 7)
-    line(wl + 1, wt + 1, wr - 1, wt + 1, 7)
-
+    -- box to contain the messages
+    self:box(wl, wt, wr, wt + w, true)
 
     -- centres the messages
     local pw = print("gameover!", 500, 500, 8) - 500
