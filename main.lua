@@ -16,6 +16,7 @@
     x       > cord
     x       > flag
         > gameover
+        > reveal ONLY MINES on gameover
     x   * sprites
     x       > 16x16 sprites
     x       > 8x8 sprites
@@ -23,20 +24,22 @@
     x       > fair
         > insidious
         > unfair
-    * gui (use necrodancer gui?)
-        > timer
-        > mine count
-        > camera
+    x   * gui (use necrodancer gui?)
+    x       > timer
+    x       > mine count
+    x       > camera
     * menu
         > dimension selection
         > screen size?
         > sprite set
         > fairness
-    * controls
+    x   * controls
     x       > mouse
-        > mouse scrolling
-        > keyboard
-        > scheme swapping
+    x       > mouse scrolling
+    x       > keyboard
+    x       > scheme swapping
+
+    * starting new game returns cursor to centre screen
 
 ]]
 
@@ -47,6 +50,7 @@ mount("/ram/cart/lib", "/ram/lib")
 include("board.lua")
 include("window.lua")
 include("cursor.lua")
+include("game.lua")
 
 include("lib/queue.lua")
 include("lib/logger.lua")
@@ -73,8 +77,8 @@ function _init()
     cursor = Cursor:new()
 
     -- creates the map
-    local w, h = 32, 32
-    local bombs = 256
+    local w, h = 8, 8
+    local bombs = w * h / 4
     local fairness = 2
     local oldsprites = false
     board = Board:new(w, h, bombs, fairness, oldsprites)
@@ -84,37 +88,62 @@ function _init()
     wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
     wind:edges()
 
+    state = State:new({"menu", "play", "gameover"})
+    state._change = function(self, continue)
+        
+        if self:__eq("menu") then
+
+            -- resets menu index
+            self.data.mi = 0
+
+            -- reset the clock
+            clock.f = 0
+
+        elseif self:__eq("gameover") then
+
+            -- reveals mines
+            board:reveal_mines()
+
+        -- when starting a game...
+        elseif self:__eq("play") then
+
+            -- create a new board
+            board = Board:new(board.w, board.h, board.bombs, board.fairness, board.oldsprites)
+
+            -- moves the cursor to the centre of the screen
+            cursor.pos = Vec:new(480 / 2, 270 / 2)
+
+            -- reset the clock
+            clock.f = 0
+
+            -- focus the camera to the centre of the board
+            wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
+
+        end
+    end
+
+    -- default values
+    state.data.mi = 0   -- menu index
+    state.data.ml = 3   -- menu length
+    state.data.mind = 4
+    state.data.maxd = 32
+    state.data.minmines = 4
+    state.data.maxmines = -1 -- will be update to match board dimensions
+
+    state:change("menu")
+
 end
 
 
 function _update()
 
-    wind:update()
+    -- polls kbm
+    kbm:update()
 
-    cursor:update()
+    gamestate(state)
 
-    -- handles input
-    input()
+    q:add(mid(4, 5, 100))
 
-
-    -- updates the clock
-    clock()
-
-    q:add(cursor:posm())
-    q:add(Vec:new(cursor:map(board.d)))
-    q:add(board:value(cursor:map(board.d)))
-end
-
-function input()
-
-    -- reveal / cord
-    if (cursor.action == "reveal") board:lclick(cursor)
-
-    -- flag
-    if (cursor.action == "flag") board:rclick(cursor)
-
-    -- debug; reveal all
-    if (kbm:released("`")) board:reveal_all()
 end
 
 function _draw()
