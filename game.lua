@@ -53,6 +53,8 @@ function gamestate(state)
         -- update key elements
         wind:update()
         cursor:update()
+
+        gameover()
     
     else
 
@@ -85,4 +87,20 @@ function play_input()
 
     -- debug; reveal all
     if (kbm:released("`")) board:reveal_all()
+end
+
+
+function gameover()
+    -- nothing to do here but check for new game or menu
+    gameover_input()
+end
+
+function gameover_input()
+
+    -- newgame
+    if (cursor.action == "reveal") state:change("play")
+
+    -- return to menu
+    --if (cursor.action == "flag") board:rclick(cursor)
+
 end
