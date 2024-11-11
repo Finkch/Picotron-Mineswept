@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-04 21:33:57",revision=5]]
+--[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-11 22:17:09",revision=7]]
 --[[
     the board is an wxh grid. each tile is an object that encodes
     the state of that tile; whether its a bomb or its value.
@@ -32,6 +32,9 @@
     * place mines in the tracked 50-50 in accordance; otherwise
         reveal the board as per normal
 ]]
+
+include("lib/tstr.lua")
+include("lib/log.lua")
         
 
 -- some constants for the checking flags
@@ -92,30 +95,19 @@ function Board:clear()
 end
 
 -- creates a new board
-function Board:generate(dni)
-
-    dni = dni or {}
+function Board:generate(x, y, mines)
 
     -- generates the board according to fairness value
     if self.fairness == 0 then
-        self:generate_unfair(dni)
+        self:generate_insidious(x, y, mines)
     elseif self.fairness == 1 then
-        self:generate_insidious(dni)
+        self:generate_unfair(x, y, mines)
     else
-
-
-        -- sets false flags ensure first click reveals a zero
-        mset(dni[1][1], dni[1][2], self.bs + 10)
-        for dx = -1, 1 do
-            for dy = -1, 1 do
-                if (not (dx == 0 and dy == 0) and self:inbounds(dni[1][1] + dx, dni[1][2] + dy))  mset(dni[1][1] + dx, dni[1][2] + dy, self.bs + 10)
-            end
-        end
-
-        self:generate_fair(dni)
+        self:generate_fair(x, y, mines)
     end
 end
 
+-- creates an empty board
 function Board:empty()
     for i = 0, self.w - 1 do
         for j = 0, self.h - 1 do
@@ -124,34 +116,52 @@ function Board:empty()
     end
 end
 
--- creates a regular ol' board of mineswept
-function Board:generate_fair()
-
-    -- creates a 1d list of all cells
+-- creates a 1d list of all cells.
+function Board:cells()
     local cells = {}
     for i = 0, self.w - 1 do
         for j = 0, self.h - 1 do
             add(cells, {i, j})
         end
     end
+    return cells
+end
+
+-- places mines
+function Board:place_mines(mines, cells)
+
+    -- in case cells were not provided
+    if (not cells) cells = self:cells()
+
+    log("bombs.txt", "")
+    logger(#cells, "bombs.txt")
+    logger(tstr(cells), "bombs.txt")
+    logger("\n---------\n\n\n", "bombs.txt")
+    
 
     -- tiles whose false flag needs to be cleared
     local clear = {}
 
-
     -- adds mines to the map
     local i = 0
-    while i < self.bombs do
+    while i < mines do
 
         -- pops a random item from the list
         local bombify = del(cells, rnd(cells))
 
+        logger(string.format("Trying (%d, %d):", bombify[1], bombify[2]), "bombs.txt")
+
         -- if the tile has a false flag, mulligan
         if self:tile(bombify[1], bombify[2], is_false) then
 
+            logger("\t..fail: false flag", "bombs.txt")
+
             if (self:inbounds(bombify[1], bombify[2])) add(clear, bombify)
         
-        else
+        -- places a mine, if the tile isn't already revealed
+        elseif not self:tile(bombify[1], bombify[2], is_reveal) then
+
+            logger("\t..success", "bombs.txt")
 
             -- turns the popped cell into a mine.
             -- ...i forgor lua was 1-index :^(
@@ -159,43 +169,164 @@ function Board:generate_fair()
 
             i += 1
         end
+
+        logger("\n", "bombs.txt")
     end
 
-    -- adds the false flagged tiles back to cells, reseting their sprite
+    -- adds the false flagged tiles back to cells, reseting their sprite to 0 value
     for i = 1, #clear do
         mset(clear[i][1], clear[i][2], self.bs)
         add(cells, clear[i])
     end
 
-    -- for the remaining cells, count adjacent mines add set the cell's value
+    -- all cells that do not have a mine
+    return cells
+end
+
+-- updates values
+function Board:count(cells)
+
+    -- if cells aren't supplied, creates the list
+    if (not cells) cells = self:cells()
+
+    -- for each cell, count its neighbours
     for i = 1, #cells do
 
-        -- counts neighbours
-        local count = 0
+        -- don't set count it tile is already revealed or is a mine
+        if not self:tile(cells[i][1], cells[i][2], is_reveal) and not self:tile(cells[i][1], cells[i][2], is_mine) then
 
-        for dx = -1, 1 do
-            for dy = -1, 1 do
-                if not (dx == 0 and dy == 0) then   -- don't consider self
+            -- counts neighbours
+            local count = 0
 
-                    -- check if neighbour is a mine; if so, increment count
-                    if (self:tile(cells[i][1] + dx, cells[i][2] + dy, is_mine)) count += 1
+            for dx = -1, 1 do
+                for dy = -1, 1 do
+                    if not (dx == 0 and dy == 0) then   -- don't consider self
+
+                        -- check if neighbour is a mine; if so, increment count
+                        if (self:tile(cells[i][1] + dx, cells[i][2] + dy, is_mine)) count += 1
+                    end
                 end
             end
-        end
 
-        -- sets the value of the tile
-        mset(cells[i][1], cells[i][2], self.bs + count)
+            -- sets the value of the tile
+            mset(cells[i][1], cells[i][2], self.bs + count)
+        end
     end
 end
 
+-- creates a regular ol' board of mineswept
+function Board:generate_fair(x, y, mines)
+
+    -- sets false flags ensure first click reveals a zero
+    for dx = -1, 1 do
+        for dy = -1, 1 do
+            if (self:inbounds(x + dx, y + dy)) mset(x + dx, y + dy, self.bs + 10)
+        end
+    end
+
+    local cells = self:place_mines(mines)
+    self:count(cells)
+end
+
 -- generates a guaranteed loss, that will take a while to uncover
-function Board:generate_insidious()
+function Board:generate_insidious(x, y, mines)
     -- todo
 end
 
 -- lose in two moves
-function Board:generate_unfair()
-    -- todo
+function Board:generate_unfair(x, y, mines)
+
+    -- converts screen coordinates to grid coordinates
+    local x, y = cursor:map(self.d)
+
+    -- on first click, perform a false generation
+    if self.reveals == 0 then
+
+        -- chooses an appropriate starting number that is always possible.
+        -- counts adjacent inbounds cells
+        local nearby = 0
+        for dx = -1, 1 do
+            for dy = -1, 1 do
+                if (not (dx == 0 and dy == 0) and self:inbounds(x + dx, y + dy)) nearby += 1
+            end
+        end
+
+        -- ensures the starting number isn't larger than the number of mines
+        nearby = min(nearby, mines - 1)
+
+        -- chooses a starting number.
+        -- weights the starting number to be lower,
+        -- this feels marginally more fair, but
+        -- more importanatly it obfuscates the cheating
+        local start = nearby - flr(sqrt(rnd(nearby ^ 2)))
+
+        -- tracks the data of the first reveal for the second gen pass
+        self.first_reveal = {x, y, start}
+
+        -- place a random number under the cursor
+        mset(x, y, self.bs + start)
+
+        -- reveal the tile
+        self:reveal(x, y)
+
+    -- on second click, force the loss
+    elseif self.reveals == 1 then
+
+        -- places false flags around the first reveal.
+        -- later, we'll place these mines to ensure they match the fake initial reveal
+        for dx = -1, 1 do
+            for dy = -1, 1 do
+                if (not (dx == 0 and dy == 0) and self:inbounds(self.first_reveal[1] + dx, self.first_reveal[2] + dy)) mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 10)
+            end
+        end
+        
+        -- also a false flag under the cursor
+        mset(x, y, self.bs + 10)
+
+        -- checks if the mine placed was adjacent to the first reveal
+        local adj = false
+        if (abs(x - self.first_reveal[1]) <= 1 and abs(y - self.first_reveal[2]) <= 1) adj = true
+
+        -- places most mines
+        if adj then
+            self:place_mines(mines - self.first_reveal[3])
+        else
+            self:place_mines(mines - self.first_reveal[3] - 1)
+        end
+
+        -- places a mine under the cursor
+        mset(x, y, self.bs + 9)
+
+        -- creates a list of cells about the start
+        local cells = {}
+        for dx = -1, 1 do
+            for dy = -1, 1 do
+                if not (dx == 0 and dy == 0) and self:inbounds(self.first_reveal[1] + dx, self.first_reveal[2] + dy) and not self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_mine) then
+
+                    -- if the cell doesn't have a mine, add it to choices
+                    add(cells, {flr(self.first_reveal[1] + dx), flr(self.first_reveal[2] + dy)})
+
+                    -- resets false flag, becuase sometimes it doesn't reset?
+                    if (self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_false)) mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs)
+                end
+            end
+        end
+
+        -- places the final mines
+        if adj then
+            self:place_mines(self.first_reveal[3] - 1, cells)
+        else
+            self:place_mines(self.first_reveal[3], cells)
+        end
+
+        -- updates the counts around the board.
+        -- stricly, we don't need to do this because other tiles are never revealed...
+        self:count()
+
+    -- it should be impossible to reach this far
+    else
+        assert(false, "how'd you do that?")
+    end
 end
 
 
@@ -209,7 +340,10 @@ function Board:lclick(cursor)
     if (not self:inbounds(x, y)) return
 
     -- if this is the first click, also generate the board
-    if (self.reveals == 0) self:generate({{x, y}})
+    if (self.reveals == 0) self:generate(x, y, self.bombs)
+    
+    -- on cruel mode, generate again on the second click
+    if (self.fairness == 1 and self.reveals > 0 and not self:tile(x, y, is_reveal)) self:generate(x, y, self.bombs)
 
     -- if the tile is revealed, attempt to cord
     if self:tile(x, y, is_reveal) then
