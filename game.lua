@@ -131,7 +131,13 @@ function menu_input()
 
 
     -- starts the game
-    if (kbm:released("x")) state:change("play")
+    if kbm:pressed("x") then
+
+        -- secret input for normal play
+        if (kbm:held("z"))  state.data.fairness = 2
+
+        state:change("play")
+    end
 
 end
 
