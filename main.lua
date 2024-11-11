@@ -44,8 +44,8 @@
     x   * starting new game returns cursor to centre screen
     x   * start new game keep map centred
     x   * memory leak?
-    * going oob on menu board dimensions falsly updates mines
-    * can't create board with d < 8
+    x   * going oob on menu board dimensions falsly updates mines
+    x   * can't create board with d < 8; can create, just forgot to clear previous boards
 
 ]]
 
@@ -82,12 +82,9 @@ function _init()
 
     cursor = Cursor:new()
 
-    -- creates the map
-    local w, h = 8, 8
-    local bombs = w * h / 4
-    local fairness = 2
-    local oldsprites = false
-    board = Board:new(w, h, bombs, fairness, oldsprites)
+    -- creates the map.
+    -- these values don't matter since new board will be made during bootup
+    board = Board:new(8, 8, 4, 2, false)
 
     -- creates the display window
     wind = Window:new()
@@ -113,6 +110,9 @@ function _init()
 
         -- when starting a game...
         elseif self:__eq("play") then
+
+            -- clears any previous boards
+            board:clear()
 
             -- create a new board
             board = Board:new(board.w, board.h, board.bombs, board.fairness, board.oldsprites)
@@ -146,6 +146,7 @@ function _init()
     state.data.minmines = 4
     state.data.maxmines = -1 -- will be update to match board dimensions
 
+    -- moves state to menu
     state:change("menu")
 
 end

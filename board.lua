@@ -81,6 +81,16 @@ function Board:new(w, h, bombs, fairness, oldsprites)
     return b
 end
 
+
+-- clears any existing boards
+function Board:clear()
+    for i = 0, state.data.maxd do
+        for j = 0, state.data.maxd do
+            mset(i, j, 0)
+        end
+    end
+end
+
 -- creates a new board
 function Board:generate(dni)
 
