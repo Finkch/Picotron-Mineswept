@@ -24,7 +24,7 @@
     * board generation
     x       > fair
         > insidious
-        > unfair
+    x       > unfair
     x   * gui (use necrodancer gui?); no.
     x       > timer
     x       > mine count
@@ -34,7 +34,7 @@
     x       > mine selection
         > screen size?
         > sprite set
-        > fairness
+    x       > fairness
     x   * controls
     x       > mouse
     x       > mouse scrolling
