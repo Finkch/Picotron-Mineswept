@@ -87,33 +87,30 @@ function menu_input()
         -- changes selected item
         if kbm:pressedr("right") then 
             board.w += 1
+            board.w = mid(state.data.mind, board.w, state.data.maxd)
 
             board.bombs = board.w * board.h // 5
         elseif kbm:pressedr("left") then
             board.w -= 1
+            board.w = mid(state.data.mind, board.w, state.data.maxd)
 
             board.bombs = board.w * board.h // 5
         end
-
-        -- enforces bounds
-        board.w = mid(state.data.mind, board.w, state.data.maxd)
 
     elseif state.data.mi == 1 then
 
         -- changes selected item
         if kbm:pressedr("right") then 
             board.h += 1
+            board.h = mid(state.data.mind, board.h, state.data.maxd)
 
             board.bombs = board.w * board.h // 5
         elseif kbm:pressedr("left") then
             board.h -= 1
+            board.h = mid(state.data.mind, board.h, state.data.maxd)
 
             board.bombs = board.w * board.h // 5
         end
-
-        -- enforces bounds
-        board.h = mid(state.data.mind, board.h, state.data.maxd)
-
 
     elseif state.data.mi == 2 then
 
