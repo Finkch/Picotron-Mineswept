@@ -258,7 +258,7 @@ function Board:generate_unfair(x, y, mines)
         -- weights the starting number to be lower,
         -- this feels marginally more fair, but
         -- more importanatly it obfuscates the cheating
-        local start = nearby - flr(sqrt(rnd(nearby ^ 2)))
+        local start = nearby - flr((rnd(nearby ^ 3)) ^ (1 / 3))
 
         -- tracks the data of the first reveal for the second gen pass
         self.first_reveal = {x, y, start}
