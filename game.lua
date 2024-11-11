@@ -117,6 +117,12 @@ function menu_input()
         -- changes selected item
         if (kbm:pressedr("right")) board.bombs += 1
         if (kbm:pressedr("left")) board.bombs -= 1
+    
+    elseif state.data.mi == 3 then
+
+        -- changes selected item.
+        -- only two options, so toggle between them
+        if (kbm:pressed("right") or kbm:pressed("left")) state.data.fairness = (state.data.fairness + 1) % 2
     end
 
     -- enforces bounds on mines
