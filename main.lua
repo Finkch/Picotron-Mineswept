@@ -11,7 +11,7 @@
 
 --[[    todo
 
-    * gameplay
+    x   * gameplay
     x       > reveal
     x       > cord
     x       > flag
