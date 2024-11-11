@@ -25,7 +25,7 @@
     x       > fair
         > insidious
         > unfair
-    x   * gui (use necrodancer gui?)
+    x   * gui (use necrodancer gui?); no.
     x       > timer
     x       > mine count
     x       > camera
@@ -145,7 +145,7 @@ function _init()
     state.data.maxd = 32
     state.data.minmines = 4
     state.data.maxmines = -1 -- will be update to match board dimensions
-    state.data.fairness = 0  -- tracking fairness here, not board, for interround continuity
+    state.data.fairness = 1  -- tracking fairness here, not board, for interround continuity
 
     -- moves state to menu
     state:change("menu")
