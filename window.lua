@@ -205,35 +205,35 @@ function Window:draw_banner()
     local p = self.p
 
     -- moves the camera to the boxes
-    cam:focus(-Vec:new(self.w / 3 - 15, self.banner_h / 2 - 5) + cam.centre)
+    cam:focus(-Vec:new(self.w / 3 - 17, self.banner_h / 2 - 5) + cam.centre)
 
     cam()
 
     -- boxes to contain banner elements
-    self:box(-1, -1, 18, 11, false)
+    self:box(-1, -1, 23, 11, false)
 
     -- flag banner sprite
-    spr(56, 21, -1)
+    spr(56, 26, -1)
 
     -- prints the guessed number of unflagged mines
-    print(string.format("%03d", board.bombs - board.flags), p, p, 8)
+    print(string.format("%04d", board.bombs - board.flags), p, p, 8)
 
 
     -- moves camera to the second box
-    cam:focus(-Vec:new(self.w * 2 / 3 - 15, self.banner_h / 2 - 5) + cam.centre)
+    cam:focus(-Vec:new(self.w * 2 / 3 - 17, self.banner_h / 2 - 5) + cam.centre)
     cam()
 
     -- boxes to contain banner elements
-    self:box(-1, -1, 18, 11, false)
+    self:box(-1, -1, 23, 11, false)
 
     -- need to draw a black box so sprite can contain black
-    rectfill(21, -1, 33, 11, 0)
+    rectfill(26, -1, 38, 11, 0)
 
     -- clock banner sprite
-    spr(57, 21, -1)
+    spr(57, 26, -1)
 
     -- prints elapsed time
-    print(string.format("%03d", min(flr(clock:secs()), 999)), p, p, 8)
+    print(string.format("%04d", min(flr(clock:secs()), 999)), p, p, 8)
 
 
 end
