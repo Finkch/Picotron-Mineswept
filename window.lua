@@ -104,8 +104,6 @@ end
 -- draws a box
 function Window:box(l, t, r, b, two_wide, background)
 
-    logger(string.format("%s, %s, %s, %s",  l, t, r, b), "box.txt")
-
     if (not background) background = 0
 
     local c1, c2 = 7, 5
