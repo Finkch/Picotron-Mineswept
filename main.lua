@@ -15,8 +15,9 @@
     x       > reveal
     x       > cord
     x       > flag
-        > gameover
-        > reveal ONLY MINES on gameover
+    x       > gameover loss
+        > gameover win
+    x       > reveal ONLY MINES on gameover
     x   * sprites
     x       > 16x16 sprites
     x       > 8x8 sprites
@@ -29,7 +30,8 @@
     x       > mine count
     x       > camera
     * menu
-        > dimension selection
+    x       > dimension selection
+    x       > mine selection
         > screen size?
         > sprite set
         > fairness
@@ -39,7 +41,9 @@
     x       > keyboard
     x       > scheme swapping
 
-    * starting new game returns cursor to centre screen
+    x   * starting new game returns cursor to centre screen
+    * start new game keep map centred
+    * memory leak?
 
 ]]
 
@@ -83,12 +87,13 @@ function _init()
     local oldsprites = false
     board = Board:new(w, h, bombs, fairness, oldsprites)
 
+    -- creates the display window
     wind = Window:new()
 
-    wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
-    wind:edges()
-
+    -- creates the state machine
     state = State:new({"menu", "play", "gameover"})
+
+    -- executes on a state change
     state._change = function(self, continue)
         
         if self:__eq("menu") then
@@ -116,8 +121,13 @@ function _init()
             -- reset the clock
             clock.f = 0
 
+            -- precalculations for this board
+            wind:edges()
+
             -- focus the camera to the centre of the board
             wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
+
+            cam()
 
         end
     end
@@ -140,6 +150,7 @@ function _update()
     -- polls kbm
     kbm:update()
 
+    -- updates based on the current state
     gamestate(state)
 
 end
@@ -149,5 +160,6 @@ function _draw()
     -- draws the main window
     wind:draw()
 
+    -- debug
     q:print(4, 150, 8)
 end
