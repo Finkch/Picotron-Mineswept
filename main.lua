@@ -42,8 +42,8 @@
     x       > scheme swapping
 
     x   * starting new game returns cursor to centre screen
-    * start new game keep map centred
-    * memory leak?
+    x   * start new game keep map centred
+    x   * memory leak?
 
 ]]
 
@@ -127,7 +127,8 @@ function _init()
             -- focus the camera to the centre of the board
             wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
 
-            cam()
+            -- updates the window to show the board immediately
+            wind:update()
 
         end
     end
