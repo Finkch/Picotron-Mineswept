@@ -336,7 +336,12 @@ function Window:draw_menu()
 
     -- difficulty select
     self:box(wm - pw / 2 - 3, t + 3 * b, wm + pw / 2 + 1, t + 3 * b + 12)
-    print("easy", wm - pw / 2, t + 3 * b + 3 - 1, c4)
+    if state.data.fairness == 0 then
+        print("easy", wm - pw / 2, t + 3 * b + 3 - 1, c4)
+    elseif state.data.fairness == 1 then
+        print("hard", wm - pw / 2, t + 3 * b + 3, c4)
+    end
+    
 
 
     -- draws box
