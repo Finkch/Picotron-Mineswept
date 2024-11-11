@@ -254,9 +254,12 @@ function Window:draw_gameover()
     -- box to contain the messages
     self:box(wl, wt, wr, wt + w, true)
 
+    local gameover_message = "gameover!"
+    if (state.data.win) gameover_message = "you win!"
+
     -- centres the messages
-    local pw = print("gameover!", 500, 500, 8) - 500
-    print("gameover!", wm - pw / 2, tl, 8)
+    local pw = print(gameover_message, 500, 500, 8) - 500
+    print(gameover_message, wm - pw / 2, tl, 8)
 
     pw = print("press x to start a new game", 500, 500, 8) - 500
     print("press x to start a new game", wm - pw / 2, tl + 12, 8)

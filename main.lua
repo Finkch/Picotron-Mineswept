@@ -16,7 +16,7 @@
     x       > cord
     x       > flag
     x       > gameover loss
-        > gameover win
+    x       > gameover win
     x       > reveal ONLY MINES on gameover
     x   * sprites
     x       > 16x16 sprites
@@ -44,6 +44,8 @@
     x   * starting new game returns cursor to centre screen
     x   * start new game keep map centred
     x   * memory leak?
+    * going oob on menu board dimensions falsly updates mines
+    * can't create board with d < 8
 
 ]]
 
@@ -120,6 +122,9 @@ function _init()
 
             -- reset the clock
             clock.f = 0
+
+            -- resets state values
+            self.data.win = false
 
             -- precalculations for this board
             wind:edges()
