@@ -250,10 +250,7 @@ function Board:reveal(x, y)
     if (self:value(x, y) == 0) self:reveal_neighbours(x, y)
 
     -- if the tile is a bomb, change to gameover state
-    if self:tile(x, y, is_mine) then
-        state:change("gameover")
-        return
-    end
+    if (self:tile(x, y, is_mine)) state:change("gameover")
 
     -- if the final tile was revealed, and it isn't a gameover, win the game
     if not state:__eq("gameover") and self.w * self.h - self.bombs == self.reveals then

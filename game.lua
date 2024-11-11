@@ -139,6 +139,9 @@ function play()
     -- updates the clock after the first reveal
     if (board.reveals > 0) clock()
 
+    -- check if the game has ended to reveal mines
+    if (state:__eq("gameover")) board:reveal_mines()
+
 
     q:add(cursor:posm())
     q:add(Vec:new(cursor:map(board.d)))

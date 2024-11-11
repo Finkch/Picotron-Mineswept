@@ -46,6 +46,7 @@
     x   * memory leak?
     x   * going oob on menu board dimensions falsly updates mines
     x   * can't create board with d < 8; can create, just forgot to clear previous boards
+    x   * losing during cord causes false flag to have incorrect sprite (reveal then cord is issue?)
 
 ]]
 
@@ -84,7 +85,7 @@ function _init()
 
     -- creates the map.
     -- these values don't matter since new board will be made during bootup
-    board = Board:new(8, 8, 4, 2, false)
+    board = Board:new(8, 8, 12, 2, false)
 
     -- creates the display window
     wind = Window:new()
@@ -105,8 +106,7 @@ function _init()
 
         elseif self:__eq("gameover") then
 
-            -- reveals mines
-            board:reveal_mines()
+            -- do nothing special
 
         -- when starting a game...
         elseif self:__eq("play") then
