@@ -200,8 +200,6 @@ function Board:lclick(cursor)
 
     -- if this is the first click, also generate the board
     if (self.reveals == 0) self:generate({{x, y}})
-    self.reveals += 1
-
 
     -- if the tile is revealed, attempt to cord
     if self:tile(x, y, is_reveal) then
@@ -236,12 +234,24 @@ function Board:reveal(x, y)
     
     -- reveals tile
     mset(x, y, mget(x, y) + 16)
+    self.reveals += 1
 
     -- if the value of a tile is zero, reveal its neighbours
     if (self:value(x, y) == 0) self:reveal_neighbours(x, y)
 
     -- if the tile is a bomb, change to gameover state
-    if (self:tile(x, y, is_mine)) state:change("gameover")
+    if self:tile(x, y, is_mine) then
+        state:change("gameover")
+        return
+    end
+
+    -- if the final tile was revealed, and it isn't a gameover, win the game
+    if not state:__eq("gameover") and self.w * self.h - self.bombs == self.reveals then
+        state:change("gameover")
+        
+        -- push win to state
+        state.data.win = true
+    end
 end
 
 -- reveals neighbours
