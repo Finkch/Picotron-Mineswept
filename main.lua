@@ -85,7 +85,7 @@ function _init()
 
     -- creates the map.
     -- these values don't matter since new board will be made during bootup
-    board = Board:new(8, 8, 12, 2, false)
+    board = Board:new(8, 8, 12, 0, false)
 
     -- creates the display window
     wind = Window:new()
@@ -115,7 +115,7 @@ function _init()
             board:clear()
 
             -- create a new board
-            board = Board:new(board.w, board.h, board.bombs, board.fairness, board.oldsprites)
+            board = Board:new(board.w, board.h, board.bombs, self.data.fairness, board.oldsprites)
 
             -- moves the cursor to the centre of the screen
             cursor.pos = Vec:new(480 / 2, 270 / 2)
@@ -140,11 +140,12 @@ function _init()
 
     -- default values
     state.data.mi = 0   -- menu index
-    state.data.ml = 3   -- menu length
+    state.data.ml = 4   -- menu length
     state.data.mind = 4
     state.data.maxd = 32
     state.data.minmines = 4
     state.data.maxmines = -1 -- will be update to match board dimensions
+    state.data.fairness = 0  -- tracking fairness here, not board, for interround continuity
 
     -- moves state to menu
     state:change("menu")
