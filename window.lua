@@ -277,63 +277,77 @@ function Window:draw_menu()
     local t = 80
     local b = 30
 
-    local pw = print("000", 500, 500) - 500
+    local pw = print("0000", 500, 500) - 500
 
-    local c1, c2, c3 = 5, 5, 5
+    local c1, c2, c3, c4 = 5, 5, 5, 5
 
     -- conditional highlighting
     if state.data.mi == 0 then
         c1 = 8
 
         print("width", wm - t, t + 3, 5)
-        print(state.data.mind, wm - b - 6, t + 3, 5)
-        print(state.data.maxd, wm + b, t + 3, 5)
+        print(state.data.mind, wm - b - 9, t + 3, 5)
+        print(state.data.maxd, wm + b + 3, t + 3, 5)
 
-        spr(60, wm - 13 - 13, t + 1)
-        spr(61, wm + 13, t + 1)
+        spr(60, wm - 13 - 15, t + 1)
+        spr(61, wm + 16, t + 1)
     elseif state.data.mi == 1 then
         c2 = 8
 
         print("height", wm - t, t + b + 3, 5)
-        print(state.data.mind, wm - b - 6, t + b + 3, 5)
-        print(state.data.maxd, wm + b, t + b + 3, 5)
+        print(state.data.mind, wm - b - 9, t + b + 3, 5)
+        print(state.data.maxd, wm + b + 3, t + b + 3, 5)
 
-        spr(60, wm - 13 - 13, t + b + 1)
-        spr(61, wm + 13, t + b + 1)
+        spr(60, wm - 13 - 15, t + b + 1)
+        spr(61, wm + 16, t + b + 1)
     elseif state.data.mi == 2 then
         c3 = 8
 
         print("mines", wm - t, t + 2 * b + 3, 5)
-        print(state.data.minmines, wm - b - 6, t + 2 * b + 3, 5)
-        print(state.data.maxmines, wm + b, t + 2 * b + 3, 5)
+        print(state.data.minmines, wm - b - 9, t + 2 * b + 3, 5)
+        print(state.data.maxmines, wm + b + 3, t + 2 * b + 3, 5)
 
-        spr(60, wm - 13 - 13, t + 2 * b + 1)
-        spr(61, wm + 13, t + 2 * b + 1)
+        spr(60, wm - 13 - 15, t + 2 * b + 1)
+        spr(61, wm + 16, t + 2 * b + 1)
+    elseif state.data.mi == 3 then
+        c4 = 8
+
+        print("difficulty", wm - t, t + 3 * b + 3, 5)
+
+        spr(60, wm - 13 - 15, t + 3 * b + 1)
+        spr(61, wm + 16, t + 3 * b + 1)
     end
+
 
     -- width selection
     self:box(wm - pw / 2 - 3, t, wm + pw / 2 + 1, t + 12)
-    print(string.format("%03d", board.w), wm - pw / 2, t + 3, c1)
+    print(string.format("%04d", board.w), wm - pw / 2, t + 3, c1)
 
 
     -- height selection
     self:box(wm - pw / 2 - 3, t + b, wm + pw / 2 + 1, t + b + 12)
-    print(string.format("%03d", board.h), wm - pw / 2, t + b + 3, c2)
+    print(string.format("%04d", board.h), wm - pw / 2, t + b + 3, c2)
+
 
     -- mines selection
     self:box(wm - pw / 2 - 3, t + 2 * b, wm + pw / 2 + 1, t + 2 * b + 12)
-    print(string.format("%03d", board.bombs), wm - pw / 2, t + 2 * b + 3, c3)
+    print(string.format("%04d", board.bombs), wm - pw / 2, t + 2 * b + 3, c3)
+
+
+    -- difficulty select
+    self:box(wm - pw / 2 - 3, t + 3 * b, wm + pw / 2 + 1, t + 3 * b + 12)
+    print("easy", wm - pw / 2, t + 3 * b + 3 - 1, c4)
 
 
     -- draws box
     pw = print("press x to start", 500, 500) - 500
-    self:box(wm - pw / 2 - 4, t + 3 * b, wm + pw / 2 + 3, t + 3 * b + 16, true, 6)
+    self:box(wm - pw / 2 - 4, t + 4 * b, wm + pw / 2 + 3, t + 4 * b + 16, true, 6)
 
     -- text shadow
-    print("press x to start", wm - pw / 2, t + 3 * b + 5, 5)
-    print("press x to start", wm - pw / 2 + 1, t + 3 * b + 4, 5)
-    print("press x to start", wm - pw / 2 + 1, t + 3 * b + 5, 5)
+    print("press x to start", wm - pw / 2, t + 4 * b + 5, 5)
+    print("press x to start", wm - pw / 2 + 1, t + 4 * b + 4, 5)
+    print("press x to start", wm - pw / 2 + 1, t + 4 * b + 5, 5)
 
     -- text
-    print("press x to start", wm - pw / 2, t + 3 * b + 4, 7)
+    print("press x to start", wm - pw / 2, t + 4 * b + 4, 7)
 end
