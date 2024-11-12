@@ -73,7 +73,8 @@ function Board:new(w, h, bombs, fairness, oldsprites)
         reveals = 0,
         fairness = fairness,    -- 0 = two move, 1 = insidious, 2 = standard
         bs = base_sprite,       -- which sprite represents unrevealed 0
-        d = d                   -- cell side length
+        d = d,                  -- cell side length
+        second_gen = false      -- trackes whether fairness < 2 second generation pass has occured
     }
 
     setmetatable(b, Board)
@@ -133,12 +134,6 @@ function Board:place_mines(mines, cells)
     -- in case cells were not provided
     if (not cells) cells = self:cells()
 
-    log("bombs.txt", "")
-    logger(#cells, "bombs.txt")
-    logger(tstr(cells), "bombs.txt")
-    logger("\n---------\n\n\n", "bombs.txt")
-    
-
     -- tiles whose false flag needs to be cleared
     local clear = {}
 
@@ -149,33 +144,34 @@ function Board:place_mines(mines, cells)
         -- pops a random item from the list
         local bombify = del(cells, rnd(cells))
 
-        logger(string.format("Trying (%d, %d):", bombify[1], bombify[2]), "bombs.txt")
-
         -- if the tile has a false flag, mulligan
         if self:tile(bombify[1], bombify[2], is_false) then
-
-            logger("\t..fail: false flag", "bombs.txt")
 
             if (self:inbounds(bombify[1], bombify[2])) add(clear, bombify)
         
         -- places a mine, if the tile isn't already revealed
         elseif not self:tile(bombify[1], bombify[2], is_reveal) then
 
-            logger("\t..success", "bombs.txt")
-
             -- turns the popped cell into a mine.
             -- ...i forgor lua was 1-index :^(
-            mset(bombify[1], bombify[2], self.bs + 9)
+            if self:tile(bombify[1], bombify[2], is_flag) then
+                mset(bombify[1], bombify[2], self.bs + 25)
+            else
+                mset(bombify[1], bombify[2], self.bs + 9)
+            end
 
             i += 1
         end
-
-        logger("\n", "bombs.txt")
     end
 
     -- adds the false flagged tiles back to cells, reseting their sprite to 0 value
     for i = 1, #clear do
-        mset(clear[i][1], clear[i][2], self.bs)
+        if self:tile(clear[i][1], clear[i][2], is_flag) then
+            logger(string.format("%d, %d is flagged and false flag", clear[i][1], clear[i][2]), "flag.txt")
+            mset(clear[i][1], clear[i][2], self.bs + 32)
+        else
+            mset(clear[i][1], clear[i][2], self.bs)
+        end
         add(cells, clear[i])
     end
 
@@ -209,7 +205,11 @@ function Board:count(cells)
             end
 
             -- sets the value of the tile
-            mset(cells[i][1], cells[i][2], self.bs + count)
+            if self:tile(cells[i][1], cells[i][2], is_flag) then
+                mset(cells[i][1], cells[i][2], self.bs + count + 32)
+            else
+                mset(cells[i][1], cells[i][2], self.bs + count)
+            end
         end
     end
 end
@@ -230,7 +230,76 @@ end
 
 -- generates a guaranteed loss, that will take a while to uncover
 function Board:generate_insidious(x, y, mines)
-    -- todo
+    
+    -- on normal board generation
+    if self.reveals == 0 then
+
+        -- chooses an appropriate 50-50
+        --      todo!
+        local fifty = fifties.grids[1]
+
+        -- chooses a location on the board
+        --      todo!
+        local t = self.h - fifty.h
+        local l = 0
+
+        -- sets false flags on the 50-50
+        for i = 0, fifty.w - 1 do
+            for j = 0, fifty.h - 1 do
+                mset(l + i, t + j, self.bs + 10)
+            end
+        end
+
+        -- normal generation
+        -- sets false flags ensure first click reveals a zero
+        for dx = -1, 1 do
+            for dy = -1, 1 do
+                if (self:inbounds(x + dx, y + dy)) mset(x + dx, y + dy, self.bs + 10)
+            end
+        end
+
+        self:place_mines(mines)
+        -- end normal generation
+
+
+        -- generates 50-50 boundary
+        for i = 0, fifty.w - 1 do
+            for j = 0, fifty.h - 1 do
+                if (fifty.grid[j + 1][i + 1] == -1) mset(l + i, t + j, self.bs + 9)
+            end
+        end
+
+        -- counts board
+        self:count()
+
+        -- introduces quantum information
+        for i = 0, fifty.w - 1 do
+            for j = 0, fifty.h - 1 do
+
+                -- sets false flag
+                if fifty.grid[j + 1][i + 1] == -2 then
+                    mset(l + i, t + j, self.bs + 10)
+
+                -- counts quantum mines
+                elseif fifty.grid[j + 1][i + 1] > 0 then
+                    mset(l + i, t + j, mget(l + i, t + j) + fifty.grid[j + 1][i + 1])
+                end
+            end
+        end
+
+
+    -- on finding the special 50-50.
+    -- i.e., when revealing a false flag tile
+    else
+
+        self.second_gen = true
+
+        -- sets a mine under the cursor
+
+        -- places the remaining necessary mines in the 50-50 zone such that
+        -- boundary conditions are satisfied
+    
+    end
 end
 
 -- lose in two moves
@@ -269,11 +338,21 @@ function Board:generate_unfair(x, y, mines)
     -- on second click, force the loss
     elseif self.reveals == 1 then
 
+        self.second_gen = true
+
         -- places false flags around the first reveal.
         -- later, we'll place these mines to ensure they match the fake initial reveal
         for dx = -1, 1 do
             for dy = -1, 1 do
-                if (not (dx == 0 and dy == 0) and self:inbounds(self.first_reveal[1] + dx, self.first_reveal[2] + dy)) mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 10)
+                if not (dx == 0 and dy == 0) and self:inbounds(self.first_reveal[1] + dx, self.first_reveal[2] + dy) then
+                    if self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_flag) then
+                        logger(string.format("second gen: %d, %d is flagged and false flag", self.first_reveal[1] + dx, self.first_reveal[2] + dy), "flag.txt")
+                        mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 11)
+                    else
+                        logger(string.format("second gen: %d, %d is nominal", self.first_reveal[1] + dx, self.first_reveal[2] + dy), "flag.txt")
+                        mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 10)
+                    end
+                end
             end
         end
         
@@ -304,7 +383,13 @@ function Board:generate_unfair(x, y, mines)
                     add(cells, {flr(self.first_reveal[1] + dx), flr(self.first_reveal[2] + dy)})
 
                     -- resets false flag, becuase sometimes it doesn't reset?
-                    if (self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_false)) mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs)
+                    if self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_false) then
+                        if self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_flag) then
+                            mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 32)
+                        else
+                            mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs)
+                        end
+                    end
                 end
             end
         end
@@ -338,9 +423,6 @@ function Board:lclick(cursor)
 
     -- if this is the first click, also generate the board
     if (self.reveals == 0) self:generate(x, y, self.bombs)
-    
-    -- on cruel mode, generate again on the second click
-    if (self.fairness == 1 and self.reveals > 0 and not self:tile(x, y, is_reveal)) self:generate(x, y, self.bombs)
 
     -- if the tile is revealed, attempt to cord
     if self:tile(x, y, is_reveal) then
@@ -372,6 +454,12 @@ function Board:reveal(x, y)
 
     -- don't reveal if it is a flag or out of bounds
     if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag) or not self:inbounds(x, y)) return
+
+    -- on insidious mode, generate again when clicking on a false flag
+    --      todo
+
+    -- on cruel mode, generate again on the second click
+    if (self.fairness == 1 and self.reveals > 0 and not self:tile(x, y, is_reveal) and not self.second_gen) self:generate(x, y, self.bombs)
     
     -- reveals tile
     mset(x, y, mget(x, y) + 16)
@@ -454,6 +542,12 @@ end
 -- if a revealed tile is clicked and the number of flags neighbouring
 -- the tile equals it's value, reveal all unrevealed neighbours
 function Board:cord(x, y)
+
+    -- on insidious mode, generate again when clicking on a false flag
+    --      todo
+
+    -- on cruel mode, generate again on the second click
+    if (self.fairness == 1 and self.reveals > 0 and not self:tile(x, y, is_reveal) and not self.second_gen) self:generate(x, y, self.bombs)
 
     -- counts flags around tile
     local flags = 0
