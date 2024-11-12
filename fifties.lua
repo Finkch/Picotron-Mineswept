@@ -10,13 +10,14 @@ Fifty.__type = "fifty"
 --  0   = normal cell
 --  1   = mine
 --  2   = false flag
-function Fifty:new(grid, mines)
+function Fifty:new(grid, mines, bc_mines)
 
     local f = {
         grid = grid,
         w = #grid[1],
         h = #grid,
-        mines = mines
+        mines = mines,  -- total mines
+        bc_mines        -- mines sitting on the boundary
     }
     setmetatable(f, Fifty)
     return f
@@ -104,14 +105,14 @@ function Fifties:new()
 end
 
 -- adds a new 50-50 grid to the collection
-function Fifties:add(mines, grid)
-    add(self.grids, Fifty:new(grid, mines))
+function Fifties:add(mines, bc_mines, grid)
+    add(self.grids, Fifty:new(grid, mines, bc_mines))
 end
 
 
 -- edit this to add 50-50s
 function Fifties:_init()
-    self:add(3, 
+    self:add(3, 1,
         {
             {1, 1},
             {2, 0},
