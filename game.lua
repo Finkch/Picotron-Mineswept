@@ -55,6 +55,33 @@ end
 
 function menu_input()
     
+    if cursor.mouse then
+        menu_input_mouse()
+    else
+        menu_input_keys()
+    end
+
+    -- enforces bounds on mines
+    state.data.maxmines = mid(4, (board.w - 1) * (board.h - 1) - 1, 999)
+    board.bombs = mid(state.data.minmines, board.bombs, state.data.maxmines)
+
+
+    -- starts the game
+    if kbm:released("x") or kbm:released("rmb") then
+
+        -- secret input for normal play
+        if (kbm:held("z"))  state.data.fairness = 2
+
+        state:change("play")
+    end
+
+end
+
+-- menu input with keyboard
+function menu_input_keys()
+
+    q:add("keys")
+
     -- navigates through the manu
     if (kbm:pressed("down")) then
         state.data.mi += 1
@@ -112,21 +139,99 @@ function menu_input()
             state.data.fairness = state.data.menu_fairness
         end
     end
+end
 
-    -- enforces bounds on mines
-    state.data.maxmines = mid(4, (board.w - 1) * (board.h - 1) - 1, 999)
-    board.bombs = mid(state.data.minmines, board.bombs, state.data.maxmines)
+function menu_input_mouse()
 
+    -- precalcs
+    local wm = wind.w / 2
+    
+    local b = 30
+    local t = 80 - b / 4
 
-    -- starts the game
-    if kbm:released("x") or kbm:released("lmb") then
+    local pw = print("0000", 500, 500) - 500
 
-        -- secret input for normal play
-        if (kbm:held("z"))  state.data.fairness = 2
-
-        state:change("play")
+    -- hover over menu item to select it
+    if t < kbm.spos.y and kbm.spos.y < t + b then
+        state.data.mi = 0
+    elseif t + b < kbm.spos.y and kbm.spos.y < t + 2 * b then
+        state.data.mi = 1
+    elseif t + 2 * b < kbm.spos.y and kbm.spos.y < t + 3 * b then
+        state.data.mi = 2
+    elseif t + 3 * b < kbm.spos.y and kbm.spos.y < t + 4 * b then
+        state.data.mi = 3
+    else
+        state.data.mi = -1
     end
 
+    -- when the user clicks on a menu item
+    --if state.data.mi > -1 and kbm:pressedr("lmb") then
+    if state.data.mi > -1 and kbm:pressedr("lmb") then
+
+        local select = false    -- if the user clicked within the target area
+        local left = false      -- decrement?
+
+        -- figure out if it's on the left or right
+        -- i.e., increment or decrement value
+        if wm - pw / 2 - b < kbm.spos.x and kbm.spos.x < wm - pw / 2 then
+            select = true
+            left = true
+
+        elseif wm + pw / 2 < kbm.spos.x and kbm.spos.x < wm + pw / 2 + b then
+            select = true
+            left = false
+        end
+
+        if (not select) return
+
+
+        -- updates appropraite item
+        if state.data.mi == 0 then
+
+            -- changes selected item
+            if not left then 
+                board.w += 1
+                board.w = mid(state.data.mind, board.w, state.data.maxd)
+
+                board.bombs = board.w * board.h // 5
+            elseif left then
+                board.w -= 1
+                board.w = mid(state.data.mind, board.w, state.data.maxd)
+
+                board.bombs = board.w * board.h // 5
+            end
+
+        elseif state.data.mi == 1 then
+
+            -- changes selected item
+            if not left then 
+                board.h += 1
+                board.h = mid(state.data.mind, board.h, state.data.maxd)
+
+                board.bombs = board.w * board.h // 5
+            elseif left then
+                board.h -= 1
+                board.h = mid(state.data.mind, board.h, state.data.maxd)
+
+                board.bombs = board.w * board.h // 5
+            end
+
+        elseif state.data.mi == 2 then
+
+            -- changes selected item
+            if (not left) board.bombs += 1
+            if (left) board.bombs -= 1
+        
+        elseif state.data.mi == 3 then
+
+            -- changes selected item.
+            -- only two options, so toggle between them
+            state.data.menu_fairness = (state.data.menu_fairness + 1) % 2
+            state.data.fairness = state.data.menu_fairness
+        end
+    end
+
+    --q:add(kbm.spos)
 end
 
 
