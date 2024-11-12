@@ -261,11 +261,20 @@ function Window:draw_gameover()
     local pw = print(gameover_message, 500, 500, 8) - 500
     print(gameover_message, wm - pw / 2, tl, 8)
 
-    pw = print("press x to start a new game", 500, 500, 8) - 500
-    print("press x to start a new game", wm - pw / 2, tl + 12, 8)
 
-    pw = print("press z to return to menu", 500, 500, 8) - 500
-    print("press z to return to menu", wm - pw / 2, tl + 24, 8)
+    if cursor.mouse then
+        pw = print("left click to start a new game", 500, 500, 8) - 500
+        print("left click to start a new game", wm - pw / 2, tl + 12, 8)
+
+        pw = print("right click to return to menu", 500, 500, 8) - 500
+        print("right click to return to menu", wm - pw / 2, tl + 24, 8)
+    else
+        pw = print("press x to start a new game", 500, 500, 8) - 500
+        print("press x to start a new game", wm - pw / 2, tl + 12, 8)
+
+        pw = print("press z to return to menu", 500, 500, 8) - 500
+        print("press z to return to menu", wm - pw / 2, tl + 24, 8)
+    end
 
 end
 
@@ -345,14 +354,27 @@ function Window:draw_menu()
 
 
     -- draws box
-    pw = print("press x to start", 500, 500) - 500
-    self:box(wm - pw / 2 - 4, t + 4 * b, wm + pw / 2 + 3, t + 4 * b + 16, true, 6)
+    if cursor.mouse then
+        pw = print("left click to start", 500, 500) - 500
+        self:box(wm - pw / 2 - 4, t + 4 * b, wm + pw / 2 + 3, t + 4 * b + 16, true, 6)
 
-    -- text shadow
-    print("press x to start", wm - pw / 2, t + 4 * b + 5, 5)
-    print("press x to start", wm - pw / 2 + 1, t + 4 * b + 4, 5)
-    print("press x to start", wm - pw / 2 + 1, t + 4 * b + 5, 5)
+        -- text shadow
+        print("left click to start", wm - pw / 2, t + 4 * b + 5, 5)
+        print("left click to start", wm - pw / 2 + 1, t + 4 * b + 4, 5)
+        print("left click to start", wm - pw / 2 + 1, t + 4 * b + 5, 5)
 
-    -- text
-    print("press x to start", wm - pw / 2, t + 4 * b + 4, 7)
+        -- text
+        print("left click to start", wm - pw / 2, t + 4 * b + 4, 7)
+    else
+        pw = print("press x to start", 500, 500) - 500
+        self:box(wm - pw / 2 - 4, t + 4 * b, wm + pw / 2 + 3, t + 4 * b + 16, true, 6)
+
+        -- text shadow
+        print("press x to start", wm - pw / 2, t + 4 * b + 5, 5)
+        print("press x to start", wm - pw / 2 + 1, t + 4 * b + 4, 5)
+        print("press x to start", wm - pw / 2 + 1, t + 4 * b + 5, 5)
+
+        -- text
+        print("press x to start", wm - pw / 2, t + 4 * b + 4, 7)
+    end
 end
