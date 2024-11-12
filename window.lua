@@ -355,16 +355,16 @@ function Window:draw_menu()
 
     -- draws box
     if cursor.mouse then
-        pw = print("left click to start", 500, 500) - 500
+        pw = print("right click to start", 500, 500) - 500
         self:box(wm - pw / 2 - 4, t + 4 * b, wm + pw / 2 + 3, t + 4 * b + 16, true, 6)
 
         -- text shadow
-        print("left click to start", wm - pw / 2, t + 4 * b + 5, 5)
-        print("left click to start", wm - pw / 2 + 1, t + 4 * b + 4, 5)
-        print("left click to start", wm - pw / 2 + 1, t + 4 * b + 5, 5)
+        print("right click to start", wm - pw / 2, t + 4 * b + 5, 5)
+        print("right click to start", wm - pw / 2 + 1, t + 4 * b + 4, 5)
+        print("right click to start", wm - pw / 2 + 1, t + 4 * b + 5, 5)
 
         -- text
-        print("left click to start", wm - pw / 2, t + 4 * b + 4, 7)
+        print("right click to start", wm - pw / 2, t + 4 * b + 4, 7)
     else
         pw = print("press x to start", 500, 500) - 500
         self:box(wm - pw / 2 - 4, t + 4 * b, wm + pw / 2 + 3, t + 4 * b + 16, true, 6)
