@@ -7,9 +7,9 @@ Fifty.__index = Fifty
 Fifty.__type = "fifty"
 
 -- all grids will face the bottom left corner by default.
---  0   = normal cell
---  1   = mine
---  2   = false flag
+--  n > 0   = normal cell; n = count of adjacent quantum mines
+--  -1      = mine
+--  -2      = false flag
 function Fifty:new(grid, mines, bc_mines)
 
     local f = {
@@ -114,9 +114,9 @@ end
 function Fifties:_init()
     self:add(3, 1,
         {
-            {1, 1},
-            {2, 0},
-            {2, 0}
+            {-1, -1},
+            {-2, 1},
+            {-2, 1}
         }
     )
 end
