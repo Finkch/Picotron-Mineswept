@@ -38,27 +38,12 @@ end
 
 
 function gamestate(state)
-
     if state:__eq("menu") then
-
         menu()
-
     elseif state:__eq("play") then
-        
-        -- update key elements
-        wind:update()
-        cursor:update()
-
         play()
-
     elseif state:__eq("gameover") then
-
-        -- update key elements
-        wind:update()
-        cursor:update()
-
         gameover()
-    
     end
 end
 
@@ -134,7 +119,7 @@ function menu_input()
 
 
     -- starts the game
-    if kbm:released("x") then
+    if kbm:released("x") or kbm:released("lmb") then
 
         -- secret input for normal play
         if (kbm:held("z"))  state.data.fairness = 2

@@ -48,7 +48,8 @@
     x   * can't create board with d < 8; can create, just forgot to clear previous boards
     x   * losing during cord causes false flag to have incorrect sprite (reveal then cord is issue?)
     x   * secret fairness 2 needs to reset to menu fairness upon returning to menu
-    * menu button promts change depending on current input method
+    * menu button prompts change depending on current input method
+        > menu mouse inputs
 
 ]]
 
@@ -161,6 +162,12 @@ function _update()
 
     -- polls kbm
     kbm:update()
+
+    -- handles input
+    cursor:update()
+
+    -- updates gui
+    wind:update()
 
     -- updates based on the current state
     gamestate(state)
