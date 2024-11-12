@@ -6,12 +6,15 @@ Fifty = {}
 Fifty.__index = Fifty
 Fifty.__type = "fifty"
 
--- all grids will face the bottom left corner by default
+-- all grids will face the bottom left corner by default.
+--  0   = normal cell
+--  1   = mine
+--  2   = false flag
 function Fifty:new(grid, mines)
 
     local f = {
         grid = grid,
-        w = #grid[0],
+        w = #grid[1],
         h = #grid,
         mines = mines
     }
@@ -65,4 +68,34 @@ function Fifty:rotate270()
         end
     end
     return Fifty:new(newGrid, self.mines)
+end
+
+
+-- metamethods
+function Fifty:__tostring()
+    local s = ""
+    for i = 1, #self.grid do
+        for j = 1, #self.grid[1] do
+            s ..= string.format("%d ", self.grid[i][j]) 
+        end
+        s ..= "\n"
+    end
+    return s
+end
+
+
+
+
+
+
+-- initialises various 50-50s
+function init_fifties()
+    fifties = {}
+
+    add(fifties, Fifty:new({
+            {1, 1},
+            {2, 0},
+            {2, 0}
+        }, 3)
+    )
 end
