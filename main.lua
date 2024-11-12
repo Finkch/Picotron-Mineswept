@@ -47,6 +47,8 @@
     x   * going oob on menu board dimensions falsly updates mines
     x   * can't create board with d < 8; can create, just forgot to clear previous boards
     x   * losing during cord causes false flag to have incorrect sprite (reveal then cord is issue?)
+    x   * secret fairness 2 needs to reset to menu fairness upon returning to menu
+    * menu button promts change depending on current input method
 
 ]]
 
@@ -101,8 +103,9 @@ function _init()
             -- resets menu index
             self.data.mi = 0
 
-            -- reset the clock
-            clock.f = 0
+            -- resets displayed fairness value
+            self.data.fairness = self.data.menu_fairness
+
 
         elseif self:__eq("gameover") then
 
@@ -146,6 +149,7 @@ function _init()
     state.data.minmines = 4
     state.data.maxmines = -1 -- will be update to match board dimensions
     state.data.fairness = 1  -- tracking fairness here, not board, for interround continuity
+    state.data.menu_fairness = 1
 
     -- moves state to menu
     state:change("menu")

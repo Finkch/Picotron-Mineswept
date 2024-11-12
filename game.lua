@@ -122,7 +122,10 @@ function menu_input()
 
         -- changes selected item.
         -- only two options, so toggle between them
-        if (kbm:pressed("right") or kbm:pressed("left")) state.data.fairness = (state.data.fairness + 1) % 2
+        if kbm:pressed("right") or kbm:pressed("left") then
+            state.data.menu_fairness = (state.data.menu_fairness + 1) % 2
+            state.data.fairness = state.data.menu_fairness
+        end
     end
 
     -- enforces bounds on mines
