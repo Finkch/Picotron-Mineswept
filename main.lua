@@ -29,11 +29,11 @@
     x       > timer
     x       > mine count
     x       > camera
-    * menu
+    x   * menu
     x       > dimension selection
     x       > mine selection
-        > screen size?
-        > sprite set
+    -       > screen size?
+    -       > sprite set
     x       > fairness
     x   * controls
     x       > mouse
@@ -61,6 +61,7 @@ include("board.lua")
 include("window.lua")
 include("cursor.lua")
 include("game.lua")
+include("fifties.lua")
 
 include("lib/queue.lua")
 include("lib/logger.lua")
@@ -145,9 +146,9 @@ function _init()
     -- default values
     state.data.mi = 0   -- menu index
     state.data.ml = 4   -- menu length
-    state.data.mind = 4
+    state.data.mind = 6
     state.data.maxd = 32
-    state.data.minmines = 4
+    state.data.minmines = 6
     state.data.maxmines = -1 -- will be update to match board dimensions
     state.data.fairness = 1  -- tracking fairness here, not board, for interround continuity
     state.data.menu_fairness = 1
@@ -155,6 +156,8 @@ function _init()
     -- moves state to menu
     state:change("menu")
 
+    -- initialises list of possible 50-50s
+    init_fifties()
 end
 
 
@@ -171,7 +174,6 @@ function _update()
 
     -- updates based on the current state
     gamestate(state)
-
 end
 
 function _draw()
