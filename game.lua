@@ -62,7 +62,7 @@ function menu_input()
     end
 
     -- enforces bounds on mines
-    state.data.maxmines = mid(4, (board.w - 1) * (board.h - 1) - 1, 999)
+    state.data.maxmines = mid(6, (board.w - 1) * (board.h - 1) - 1, 999)
     board.bombs = mid(state.data.minmines, board.bombs, state.data.maxmines)
 
 
@@ -79,8 +79,6 @@ end
 
 -- menu input with keyboard
 function menu_input_keys()
-
-    q:add("keys")
 
     -- navigates through the manu
     if (kbm:pressed("down")) then
@@ -230,8 +228,6 @@ function menu_input_mouse()
             state.data.fairness = state.data.menu_fairness
         end
     end
-
-    --q:add(kbm.spos)
 end
 
 
