@@ -97,11 +97,19 @@ function Fifties:new()
     }
     setmetatable(f, Fifties)
 
+    -- inits the list of 50-50s
     f:_init()
 
     return f
 end
 
+-- adds a new 50-50 grid to the collection
+function Fifties:add(mines, grid)
+    add(self.grids, Fifty:new(grid, mines))
+end
+
+
+-- edit this to add 50-50s
 function Fifties:_init()
     self:add(3, 
         {
@@ -110,8 +118,4 @@ function Fifties:_init()
             {2, 0}
         }
     )
-end
-
-function Fifties:add(mines, grid)
-    add(self.grids, Fifty:new(grid, mines))
 end
