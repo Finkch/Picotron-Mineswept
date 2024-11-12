@@ -236,9 +236,6 @@ end
 -- lose in two moves
 function Board:generate_unfair(x, y, mines)
 
-    -- converts screen coordinates to grid coordinates
-    local x, y = cursor:map(self.d)
-
     -- on first click, perform a false generation
     if self.reveals == 0 then
 
