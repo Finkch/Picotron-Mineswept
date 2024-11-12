@@ -158,8 +158,6 @@ function menu_input_mouse()
         state.data.mi = 2
     elseif t + 3 * b < kbm.spos.y and kbm.spos.y < t + 4 * b then
         state.data.mi = 3
-    else
-        state.data.mi = -1
     end
 
     -- when the user clicks on a menu item
