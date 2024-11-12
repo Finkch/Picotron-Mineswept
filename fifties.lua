@@ -85,17 +85,33 @@ end
 
 
 
+-- fifties stores fifty's
+Fifties = {}
+Fifties.__index = Fifties
+Fifties.__type = "fifties"
 
+function Fifties:new()
+    
+    local f = {
+        grids = {}
+    }
+    setmetatable(f, Fifties)
 
+    f:_init()
 
--- initialises various 50-50s
-function init_fifties()
-    fifties = {}
+    return f
+end
 
-    add(fifties, Fifty:new({
+function Fifties:_init()
+    self:add(3, 
+        {
             {1, 1},
             {2, 0},
             {2, 0}
-        }, 3)
+        }
     )
+end
+
+function Fifties:add(mines, grid)
+    add(self.grids, Fifty:new(grid, mines))
 end
