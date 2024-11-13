@@ -38,6 +38,10 @@ function Fifty:rotate90()
             newGrid[col][numRows - row + 1] = grid[row][col]
         end
     end
+
+    -- swaps dimensions
+    self.w, self.h = self.h, self.w
+
     return Fifty:new(newGrid, self.mines)
 end
 
@@ -68,6 +72,10 @@ function Fifty:rotate270()
             newGrid[numCols - col + 1][row] = grid[row][col]
         end
     end
+
+    -- swaps dimensions
+    self.w, self.h = self.h, self.w
+
     return Fifty:new(newGrid, self.mines)
 end
 
