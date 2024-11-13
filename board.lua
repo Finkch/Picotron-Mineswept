@@ -480,12 +480,29 @@ function Board:reveal(x, y)
     end
 end
 
--- reveals neighbours
+-- reveals neighbours in a random order.
+-- random order makes cording in cruel mode look more real
 function Board:reveal_neighbours(x, y)
+    
+    -- list of neighbouring cells
+    local adjs = {}
     for dx = -1, 1 do
         for dy = -1, 1 do
-            if (not (dx == 0 and dy == 0)) self:reveal(x + dx, y + dy)
+            if (not (dx == 0 and dy == 0)) add(adjs, {dx, dy})
         end
+    end
+
+    -- pops random neighbours until no neighbours remain
+    while #adjs > 0 do
+
+        -- exit should this lead to a gameover
+        if (state:__eq("gameover")) return
+
+        -- choose a random item
+        local adj = del(adjs, rnd(adjs))
+
+        -- reveal the neighbour
+        self:reveal(x + adj[1], y + adj[2])
     end
 end
 
@@ -571,6 +588,7 @@ function Board:flag(x, y)
 
     -- if the tile is flagged, unflag it
     if self:tile(x, y, is_flag) then
+        
         mset(x, y, mget(x, y) - 32)
 
         self.flags -= 1
