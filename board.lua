@@ -588,15 +588,23 @@ function Board:flag(x, y)
 
     -- if the tile is flagged, unflag it
     if self:tile(x, y, is_flag) then
-        
-        mset(x, y, mget(x, y) - 32)
+
+        if self:tile(x, y, is_false) then
+            mset(x, y, mget(x, y) - 1)
+        else
+            mset(x, y, mget(x, y) - 32)
+        end
 
         self.flags -= 1
     
     -- otherwise, unless it would cause more flags than bombs, flag tile
     elseif self.flags < self.bombs then
         
-        mset(x, y, mget(x, y) + 32)
+        if self:tile(x, y, is_false) then
+            mset(x, y, mget(x, y) + 1)
+        else
+            mset(x, y, mget(x, y) + 32)
+        end
 
         self.flags += 1
     end
