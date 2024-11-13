@@ -317,6 +317,7 @@ function Board:generate_insidious(x, y, mines)
         self.second_gen = true
 
         -- sets a mine under the cursor
+        mset(x, y, self.bs + 9)
 
         -- places the remaining necessary mines in the 50-50 zone such that
         -- boundary conditions are satisfied
@@ -470,7 +471,7 @@ function Board:reveal(x, y)
     if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag) or not self:inbounds(x, y)) return
 
     -- on insidious mode, generate again when clicking on a false flag
-    -- todo
+    if (self.fairness == 0 and self.reveals > 0 and self:tile(x, y, is_false) and not self.second_gen) self.generate(x, y, self.bombs)
 
     -- on cruel mode, generate again on the second click
     if (self.fairness == 1 and self.reveals > 0 and not self.second_gen) self:generate(x, y, self.bombs)
