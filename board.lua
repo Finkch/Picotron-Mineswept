@@ -118,7 +118,7 @@ function Board:empty()
 end
 
 -- resets all false flags to normal cells
-function Board:trueify(cells)
+function Board:trueify(cells, cleared)
     
     -- gets a list of cells
     if (not cells) cells = self:cells()
@@ -132,8 +132,12 @@ function Board:trueify(cells)
             else
                 mset(cells[i][1], cells[i][2], self.bs)
             end
+
+            if (cleared) add(cleared, cells[i])
         end
     end
+
+    return cleared
 end
 
 -- creates a 1d list of all cells.
@@ -466,7 +470,7 @@ function Board:reveal(x, y)
     if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag) or not self:inbounds(x, y)) return
 
     -- on insidious mode, generate again when clicking on a false flag
-    --      todo
+    -- todo
 
     -- on cruel mode, generate again on the second click
     if (self.fairness == 1 and self.reveals > 0 and not self:tile(x, y, is_reveal) and not self.second_gen) self:generate(x, y, self.bombs)
@@ -569,12 +573,6 @@ end
 -- if a revealed tile is clicked and the number of flags neighbouring
 -- the tile equals it's value, reveal all unrevealed neighbours
 function Board:cord(x, y)
-
-    -- on insidious mode, generate again when clicking on a false flag
-    --      todo
-
-    -- on cruel mode, generate again on the second click
-    if (self.fairness == 1 and self.reveals > 0 and not self:tile(x, y, is_reveal) and not self.second_gen) self:generate(x, y, self.bombs)
 
     -- counts flags around tile
     local flags = 0
