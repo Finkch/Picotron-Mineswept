@@ -10,11 +10,14 @@ Fifty.__type = "fifty"
 --  n > 0   = normal cell; n = count of adjacent quantum mines
 --  -1      = mine
 --  -2      = false flag
-function Fifty:new(grid, mgrid, mines, bc_mines)
+--
+-- a mine grid, or mgrid, is a fifty that is a specific placement of mines.
+-- in other words, a specific collapse of the quantum mine funciton.
+function Fifty:new(grid, mgrids, mines, bc_mines)
 
     local f = {
         grid = grid,
-        mgrid = mgrid,
+        mgrids = mgrids,
         w = #grid[1],
         h = #grid,
         mines = mines,  -- total mines
@@ -28,9 +31,15 @@ end
 
 -- rotates the fifty's grid to fit in other corners
 function Fifty:rotate90()
+    
+    local mgrids = {}
+    for i = 1, #self.mgrids do
+        add(mgrids, self:_rotate90(self.mgrids[i]))
+    end
+
     return Fifty:new(
         self:_rotate90(self.grid), 
-        self:_rotate90(self.mgrid),
+        mgrids,
         self.mines,
         self.bc_mines
     )
@@ -52,9 +61,15 @@ function Fifty:_rotate90(grid)
 end
 
 function Fifty:rotate180()
+
+    local mgrids = {}
+    for i = 1, #self.mgrids do
+        add(mgrids, self:_rotate180(self.mgrids[i]))
+    end
+
     return Fifty:new(
         self:_rotate180(self.grid), 
-        self:_rotate180(self.mgrid),
+        mgrids,
         self.mines,
         self.bc_mines
     )
@@ -76,9 +91,15 @@ function Fifty:_rotate180(grid)
 end
 
 function Fifty:rotate270()
+
+    local mgrids = {}
+    for i = 1, #self.mgrids do
+        add(mgrids, self:_rotate270(self.mgrids[i]))
+    end
+
     return Fifty:new(
         self:_rotate270(self.grid), 
-        self:_rotate270(self.mgrid),
+        mgrids,
         self.mines,
         self.bc_mines
     )
