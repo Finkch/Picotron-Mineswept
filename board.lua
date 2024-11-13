@@ -258,7 +258,7 @@ function Board:generate_insidious(x, y, mines)
 
         -- chooses an appropriate 50-50
         --      todo!
-        local fifty = fifties.grids[1]
+        local fifty = fifties.grids[2]
 
         -- chooses a location on the board
         --      todo!
@@ -337,7 +337,7 @@ function Board:generate_insidious(x, y, mines)
 
                     -- in case user flagged
                     if self:tile(l + i, t + j, is_flag) then
-                        mset(l + i, t + j, self.bs + 25)
+                        mset(l + i, t + j, self.bs + 41)
                     else
                         mset(l + i, t + j, self.bs + 9)
                     end
