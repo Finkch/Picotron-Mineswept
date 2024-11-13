@@ -117,6 +117,25 @@ function Board:empty()
     end
 end
 
+-- resets all false flags to normal cells
+function Board:trueify(cells)
+    
+    -- gets a list of cells
+    if (not cells) cells = self:cells()
+
+    -- sets all false flags back to the base sprite.
+    -- or the base flag sprite, if flagged
+    for i = 1, #cells do
+        if self:tile(cells[i][1], cells[i][2], is_false) then
+            if self:tile(cells[i][1], cells[i][2], is_flag) then
+                mset(cells[i][1], cells[i][2], self.bs + 32)
+            else
+                mset(cells[i][1], cells[i][2], self.bs)
+            end
+        end
+    end
+end
+
 -- creates a 1d list of all cells.
 function Board:cells()
     local cells = {}
@@ -155,7 +174,7 @@ function Board:place_mines(mines, cells)
             -- turns the popped cell into a mine.
             -- ...i forgor lua was 1-index :^(
             if self:tile(bombify[1], bombify[2], is_flag) then
-                mset(bombify[1], bombify[2], self.bs + 25)
+                mset(bombify[1], bombify[2], self.bs + 41)
             else
                 mset(bombify[1], bombify[2], self.bs + 9)
             end
@@ -382,14 +401,8 @@ function Board:generate_unfair(x, y, mines)
                     -- if the cell doesn't have a mine, add it to choices
                     add(cells, {flr(self.first_reveal[1] + dx), flr(self.first_reveal[2] + dy)})
 
-                    -- resets false flag, becuase sometimes it doesn't reset?
-                    if self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_false) then
-                        if self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_flag) then
-                            mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 32)
-                        else
-                            mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs)
-                        end
-                    end
+                    -- resets any lingering false flags
+                    self:trueify(cells)
                 end
             end
         end
