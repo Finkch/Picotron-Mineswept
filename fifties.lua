@@ -12,12 +12,12 @@ Fifty.__type = "fifty"
 --  -2      = false flag
 --
 -- a mine grid, or mgrid, is a fifty that is a specific placement of mines.
--- in other words, a specific collapse of the quantum mine funciton.
-function Fifty:new(grid, mgrids, mines, bc_mines)
+-- the active bits represent which variants in which that cell contains a mine.
+function Fifty:new(grid, mgrid, mines, bc_mines)
 
     local f = {
         grid = grid,
-        mgrids = mgrids,
+        mgrid = mgrid,
         w = #grid[1],
         h = #grid,
         mines = mines,  -- total mines
@@ -31,15 +31,9 @@ end
 
 -- rotates the fifty's grid to fit in other corners
 function Fifty:rotate90()
-    
-    local mgrids = {}
-    for i = 1, #self.mgrids do
-        add(mgrids, self:_rotate90(self.mgrids[i]))
-    end
-
     return Fifty:new(
         self:_rotate90(self.grid), 
-        mgrids,
+        self:_rotate90(self.mgrid),
         self.mines,
         self.bc_mines
     )
@@ -61,15 +55,9 @@ function Fifty:_rotate90(grid)
 end
 
 function Fifty:rotate180()
-
-    local mgrids = {}
-    for i = 1, #self.mgrids do
-        add(mgrids, self:_rotate180(self.mgrids[i]))
-    end
-
     return Fifty:new(
         self:_rotate180(self.grid), 
-        mgrids,
+        self:_rotate180(self.mgrid),
         self.mines,
         self.bc_mines
     )
@@ -91,15 +79,9 @@ function Fifty:_rotate180(grid)
 end
 
 function Fifty:rotate270()
-
-    local mgrids = {}
-    for i = 1, #self.mgrids do
-        add(mgrids, self:_rotate270(self.mgrids[i]))
-    end
-
     return Fifty:new(
         self:_rotate270(self.grid), 
-        mgrids,
+        self:_rotate270(self.mgrid),
         self.mines,
         self.bc_mines
     )
@@ -154,8 +136,8 @@ function Fifties:new()
 end
 
 -- adds a new 50-50 grid to the collection
-function Fifties:add(mines, bc_mines, grid)
-    add(self.grids, Fifty:new(grid, mines, bc_mines))
+function Fifties:add(mines, bc_mines, grid, mgrid)
+    add(self.grids, Fifty:new(grid, mgrid, mines, bc_mines))
 end
 
 
@@ -166,6 +148,10 @@ function Fifties:_init()
             {-1, -1},
             {-2, 1},
             {-2, 1}
+        }, {
+            {0, 0},
+            {1, 0},
+            {2, 0}
         }
     )
 end
