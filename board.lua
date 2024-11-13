@@ -257,8 +257,7 @@ function Board:generate_insidious(x, y, mines)
     if self.reveals == 0 then
 
         -- chooses an appropriate 50-50
-        --      todo!
-        local fifty = fifties.grids[2]
+        local fifty = fifties.grids[flr(rnd(#fifties.grids)) + 1]
 
         -- chooses a location on the board
         --      todo!
@@ -345,7 +344,7 @@ function Board:place_variant(v)
         for j = 0, fifty.h - 1 do
             if fifty.mgrid[j + 1][i + 1] & v > 0 then
 
-                -- in case user flagged
+                -- in case flagged
                 if self:tile(l + i, t + j, is_flag) then
                     mset(l + i, t + j, self.bs + 41)
                 else
