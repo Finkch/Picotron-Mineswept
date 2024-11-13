@@ -186,7 +186,6 @@ function Board:place_mines(mines, cells)
     -- adds the false flagged tiles back to cells, reseting their sprite to 0 value
     for i = 1, #clear do
         if self:tile(clear[i][1], clear[i][2], is_flag) then
-            logger(string.format("%d, %d is flagged and false flag", clear[i][1], clear[i][2]), "flag.txt")
             mset(clear[i][1], clear[i][2], self.bs + 32)
         else
             mset(clear[i][1], clear[i][2], self.bs)
@@ -365,10 +364,8 @@ function Board:generate_unfair(x, y, mines)
             for dy = -1, 1 do
                 if not (dx == 0 and dy == 0) and self:inbounds(self.first_reveal[1] + dx, self.first_reveal[2] + dy) then
                     if self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_flag) then
-                        logger(string.format("second gen: %d, %d is flagged and false flag", self.first_reveal[1] + dx, self.first_reveal[2] + dy), "flag.txt")
                         mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 11)
                     else
-                        logger(string.format("second gen: %d, %d is nominal", self.first_reveal[1] + dx, self.first_reveal[2] + dy), "flag.txt")
                         mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 10)
                     end
                 end
