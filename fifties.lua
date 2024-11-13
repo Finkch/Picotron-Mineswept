@@ -10,10 +10,11 @@ Fifty.__type = "fifty"
 --  n > 0   = normal cell; n = count of adjacent quantum mines
 --  -1      = mine
 --  -2      = false flag
-function Fifty:new(grid, mines, bc_mines)
+function Fifty:new(grid, mgrid, mines, bc_mines)
 
     local f = {
         grid = grid,
+        mgrid = mgrid,
         w = #grid[1],
         h = #grid,
         mines = mines,  -- total mines
@@ -27,7 +28,15 @@ end
 
 -- rotates the fifty's grid to fit in other corners
 function Fifty:rotate90()
-    local grid = self.grid
+    return Fifty:new(
+        self:_rotate90(self.grid), 
+        self:_rotate90(self.mgrid),
+        self.mines,
+        self.bc_mines
+    )
+end
+
+function Fifty:_rotate90(grid)
     local numRows = #grid
     local numCols = #grid[1]
     local newGrid = {}
@@ -39,14 +48,19 @@ function Fifty:rotate90()
         end
     end
 
-    -- swaps dimensions
-    self.w, self.h = self.h, self.w
-
-    return Fifty:new(newGrid, self.mines)
+    return newGrid
 end
 
 function Fifty:rotate180()
-    local grid = self.grid
+    return Fifty:new(
+        self:_rotate180(self.grid), 
+        self:_rotate180(self.mgrid),
+        self.mines,
+        self.bc_mines
+    )
+end
+
+function Fifty:_rotate180(grid)
     local numRows = #grid
     local numCols = #grid[1]
     local newGrid = {}
@@ -57,11 +71,20 @@ function Fifty:rotate180()
             newGrid[numRows - row + 1][numCols - col + 1] = grid[row][col]
         end
     end
-    return Fifty:new(newGrid, self.mines)
+
+    return newGrid
 end
 
 function Fifty:rotate270()
-    local grid = self.grid
+    return Fifty:new(
+        self:_rotate270(self.grid), 
+        self:_rotate270(self.mgrid),
+        self.mines,
+        self.bc_mines
+    )
+end
+
+function Fifty:_rotate270(grid)
     local numRows = #grid
     local numCols = #grid[1]
     local newGrid = {}
@@ -73,10 +96,7 @@ function Fifty:rotate270()
         end
     end
 
-    -- swaps dimensions
-    self.w, self.h = self.h, self.w
-
-    return Fifty:new(newGrid, self.mines)
+    return newGrid
 end
 
 
