@@ -331,16 +331,25 @@ function Board:generate_insidious(x, y, mines)
         local variant = fifty.mgrid[y - t + 1][x - l + 1]
 
         -- places mines according to that variant
-        for i = 0, fifty.w - 1 do
-            for j = 0, fifty.h - 1 do
-                if fifty.mgrid[j + 1][i + 1] & variant > 0 then
+        self:place_variant(variant)
+    end
+end
 
-                    -- in case user flagged
-                    if self:tile(l + i, t + j, is_flag) then
-                        mset(l + i, t + j, self.bs + 41)
-                    else
-                        mset(l + i, t + j, self.bs + 9)
-                    end
+function Board:place_variant(v)
+
+    local fifty = self.fifty
+    local t = self.t
+    local l = self.l
+
+    for i = 0, fifty.w - 1 do
+        for j = 0, fifty.h - 1 do
+            if fifty.mgrid[j + 1][i + 1] & v > 0 then
+
+                -- in case user flagged
+                if self:tile(l + i, t + j, is_flag) then
+                    mset(l + i, t + j, self.bs + 41)
+                else
+                    mset(l + i, t + j, self.bs + 9)
                 end
             end
         end
@@ -570,6 +579,11 @@ end
 -- reveals remaining bombs
 function Board:reveal_mines()
 
+
+    -- in insidious mode, places the final mines in the special zone
+    if (self.fairness == 0 and not self.second_gen) self:ensure_insidious()
+
+
     for i = 0, self.w - 1 do
         for j = 0, self.h - 1 do
 
@@ -587,6 +601,25 @@ function Board:reveal_mines()
             end
         end
     end
+end
+
+function Board:ensure_insidious()
+
+    local fifty = self.fifty
+
+    -- looks for that largest value in the grid
+    local maxi = 0
+    for i = 0, fifty.w - 1 do
+        for j = 0, fifty.h - 1 do
+            if (fifty.mgrid[j + 1][i + 1] > maxi) maxi = fifty.mgrid[j + 1][i + 1]
+        end
+    end
+
+    -- randomly selects a variant
+    local variant = flr(rnd(maxi)) + 1
+
+    -- places the mines for that variant
+    self:place_variant(variant)
 end
 
 
