@@ -473,7 +473,7 @@ function Board:reveal(x, y)
     -- todo
 
     -- on cruel mode, generate again on the second click
-    if (self.fairness == 1 and self.reveals > 0 and not self:tile(x, y, is_reveal) and not self.second_gen) self:generate(x, y, self.bombs)
+    if (self.fairness == 1 and self.reveals > 0 and not self.second_gen) self:generate(x, y, self.bombs)
     
     -- reveals tile
     mset(x, y, mget(x, y) + 16)
