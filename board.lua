@@ -640,6 +640,7 @@ end
 -- bombs have a value of -1
 function Board:value(x, y)
     if (self:tile(x, y, is_mine)) return -1
+    if (self:tile(x, y, is_false)) return -2
 
     -- uses mask to obtain value bits
     return fget(mget(x, y)) & 15
