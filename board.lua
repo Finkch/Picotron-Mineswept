@@ -265,6 +265,11 @@ function Board:generate_insidious(x, y, mines)
         local t = self.h - fifty.h
         local l = 0
 
+        -- stores the data for second gen
+        self.fifty = fifty
+        self.t = t
+        self.l = l
+
         -- sets false flags on the 50-50
         for i = 0, fifty.w - 1 do
             for j = 0, fifty.h - 1 do
@@ -316,12 +321,29 @@ function Board:generate_insidious(x, y, mines)
 
         self.second_gen = true
 
-        -- sets a mine under the cursor
-        mset(x, y, self.bs + 9)
+        -- retrieves some handy info
+        local fifty = self.fifty
+        local t = self.t
+        local l = self.l
 
-        -- places the remaining necessary mines in the 50-50 zone such that
-        -- boundary conditions are satisfied
-    
+        -- figures out which variant supports this mine placement.
+        -- i.e., which variant has an active bit in this tile
+        local variant = fifty.mgrid[y - t + 1][x - l + 1]
+
+        -- places mines according to that variant
+        for i = 0, fifty.w - 1 do
+            for j = 0, fifty.h - 1 do
+                if fifty.mgrid[j + 1][i + 1] & variant > 0 then
+
+                    -- in case user flagged
+                    if self:tile(l + i, t + j, is_flag) then
+                        mset(l + i, t + j, self.bs + 25)
+                    else
+                        mset(l + i, t + j, self.bs + 9)
+                    end
+                end
+            end
+        end
     end
 end
 
@@ -471,7 +493,7 @@ function Board:reveal(x, y)
     if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag) or not self:inbounds(x, y)) return
 
     -- on insidious mode, generate again when clicking on a false flag
-    if (self.fairness == 0 and self.reveals > 0 and self:tile(x, y, is_false) and not self.second_gen) self.generate(x, y, self.bombs)
+    if (self.fairness == 0 and self.reveals > 0 and self:tile(x, y, is_false) and not self.second_gen) self:generate(x, y, self.bombs)
 
     -- on cruel mode, generate again on the second click
     if (self.fairness == 1 and self.reveals > 0 and not self.second_gen) self:generate(x, y, self.bombs)
