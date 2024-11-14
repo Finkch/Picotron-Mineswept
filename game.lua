@@ -240,11 +240,6 @@ function play()
 
     -- check if the game has ended to reveal mines
     if (state:__eq("gameover")) board:reveal_mines()
-
-
-    q:add(cursor:posm())
-    q:add(Vec:new(cursor:map(board.d)))
-    q:add(board:value(cursor:map(board.d)))
 end
 
 function play_input()
