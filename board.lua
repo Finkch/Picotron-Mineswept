@@ -197,6 +197,8 @@ end
 
 -- generates a guaranteed loss, that will take a while to uncover
 function Board:generate_insidious(x, y, mines)
+
+    local do_log = false
     
     -- on normal board generation
     if self.reveals == 0 then
@@ -206,7 +208,7 @@ function Board:generate_insidious(x, y, mines)
         -- thus, there must be space on the board for the 50-50 regardless
         -- of the initial reveal
         local fifty = fifties:rnd(
-            function(f) return max(f.w, f.h) < min(board.w, board.h) // 2 end
+            function(f) return min(f.w, f.h) < max(board.w, board.h) // 2 end
         )
 
         -- if the grid is reflectable, perform a coin flip for the version
@@ -217,11 +219,28 @@ function Board:generate_insidious(x, y, mines)
         local corners = {0, 1, 2, 3}
         local corner = -1
 
+        if do_log then
+            logger(string.format("min f(%d, %d) = %d; max d(%d, %d) // 2 = %d", fifty.w, fifty.h, min(fifty.w, fifty.h), board.w, board.h, max(board.w, board.h) // 2), "fd.txt")
+            logger(string.format("cursor: (%d, %d)\n", x, y), "fd.txt")
+        end
+
         -- ensures the chosen corner is sificiently far from the revealed tile
         local d = 0
-        while d < max(fifty.w, fifty.h) + 2 do
+        local second_try = false
+        while d < min(fifty.w, fifty.h) + 2 do
 
-            assert(#corners > 0, "sorry! i'll cheat better next time.\ncouldn't find corner in which to place 50-50.")
+            if (do_log and d != 0) logger(string.format("invalid corner. trying again...\n"), "fd.txt")
+
+            -- if we can't fit the 50-50, try reflecting it
+            if #corners == 0 then
+                fifty = fifty:reflect()
+                corners = {0, 1, 2, 3}
+
+                -- crashes rather than trying infinitely
+                assert(not second_try, "sorry! i'll cheat better next time (couldn't find corner in which to place 50-50).")
+
+                second_try = true
+            end
 
             -- picks a random corner
             corner = del(corners, rnd(corners))
@@ -229,11 +248,13 @@ function Board:generate_insidious(x, y, mines)
             -- x and y distances
             local dx, dy = 0, 0
 
-            -- ensures the initial reveal is not close to
+            -- ensures the initial reveal is not close.
+            -- otherwise, initial reveal would not be guaranteed
+            -- to be a zero.
             -- bottom left
             if corner == 0 then
                 dx = x
-                dy = self.h - y + 1
+                dy = self.h - y
 
             -- top left
             elseif corner == 1 then
@@ -242,17 +263,25 @@ function Board:generate_insidious(x, y, mines)
 
             -- top right
             elseif corner == 2 then
-                dx = self.w - x + 1
+                dx = self.w - x
                 dy = y
 
             -- bottom right
             elseif corner == 3 then
-                dx = self.w - x + 1
-                dy = self.h - y + 1
+                dx = self.w - x
+                dy = self.h - y
             end
 
             -- distance from cursor to prospective corner
-            d = min(abs(dx), abs(dy))
+            d = max(abs(dx), abs(dy))
+
+            if do_log then
+                logger(string.format("corner:\t%d", corner), "fd.txt")
+                logger(string.format("max d(%d, %d) = %d", dx, dy, d), "fd.txt")
+                logger(string.format("min f(%d, %d) + 2 = %d", fifty.w, fifty.h, min(fifty.w, fifty.h) + 2), "fd.txt")
+                logger(string.format("\t%d < %d? -> %s", d, min(fifty.w, fifty.h) + 2, d < min(fifty.w, fifty.h) + 2), "fd.txt")
+                --logger(string.format("", ), "fd.txt")
+            end
         end
 
         -- top left corner of the grid relative to the board.
