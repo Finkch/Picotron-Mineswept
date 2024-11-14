@@ -238,7 +238,7 @@ function Window:draw_banner()
     spr(57, 26, -1)
 
     -- prints elapsed time
-    print(string.format("%04d", min(flr(clock:secs()), 999)), p, p, 8)
+    print(string.format("%04d", min(flr(clock:secs()), 9999)), p, p, 8)
 
 
 end
