@@ -17,13 +17,13 @@
     * after mines have been placed, go over remaining tiles and
         tally the count of neighbouring mines
 
-    the strategy (swept, naive) to build a baord is as follows:
+    the cruel strategy to build a board is as follows:
     * don't do anything to build the board.
     * after the players selects the first tile, reveal is as 1-8
     * after the player selects a second tile, reveal it as a bomb
     * place mines such that the board could be valid
 
-    the strategy (swept, advanced) to build a baord is as follows:
+    the insidious strategy to build a board is as follows:
     * first, place a 50-50 on the board; this 50-50 is tracked
     * as the rest of the board is built, build according to first
         strategy, except maintining boundary conditions
