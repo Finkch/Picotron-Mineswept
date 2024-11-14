@@ -650,7 +650,8 @@ function Board:ensure_insidious()
     local maxi = 0
     for i = 0, fifty.w - 1 do
         for j = 0, fifty.h - 1 do
-            if (fifty.mgrid[j + 1][i + 1] > maxi) maxi = fifty.mgrid[j + 1][i + 1]
+            local x, y = i + 1, j + 1
+            if (fifty.mgrid[y][x] > maxi) maxi = fifty.mgrid[x][y]
         end
     end
 
