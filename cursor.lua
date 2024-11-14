@@ -134,7 +134,7 @@ function Cursor:draw()
     end
 
     -- shows which tile the cursor would select
-    if (kbm:held("space")) return
+    if (kbm:held("space") or kbm:held("lshift")) return
 
     local x, y = self:map(board.d)
 
