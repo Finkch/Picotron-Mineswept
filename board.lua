@@ -226,24 +226,33 @@ function Board:generate_insidious(x, y, mines)
             -- picks a random corner
             corner = del(corners, rnd(corners))
 
+            -- x and y distances
+            local dx, dy = 0, 0
 
             -- ensures the initial reveal is not close to
             -- bottom left
             if corner == 0 then
-                d = min(abs(0 - x), abs(self.h - y + 1))
+                dx = x
+                dy = self.h - y + 1
 
             -- top left
             elseif corner == 1 then
-                d = min(abs(0 - x), abs(0 - y))
+                dx = x
+                dy = y
 
             -- top right
             elseif corner == 2 then
-                d = min(abs(self.w - x + 1), abs(0 - y))
+                dx = self.w - x + 1
+                dy = y
 
             -- bottom right
             elseif corner == 3 then
-                d = min(abs(self.w - x + 1), abs(self.h - y + 1))
+                dx = self.w - x + 1
+                dy = self.h - y + 1
             end
+
+            -- distance from cursor to prospective corner
+            d = min(abs(dx), abs(dy))
         end
 
         -- top left corner of the grid relative to the board.
