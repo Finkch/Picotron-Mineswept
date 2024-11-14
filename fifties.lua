@@ -14,7 +14,6 @@ Fifty.__type = "fifty"
 -- a mine grid, or mgrid, is a fifty that is a specific placement of mines.
 -- the active bits represent which variants in which that cell contains a mine.
 function Fifty:new(grid, mgrid, mines, reflectable, weight)
-
     local f = {
         grid = grid,
         mgrid = mgrid,
@@ -22,7 +21,7 @@ function Fifty:new(grid, mgrid, mines, reflectable, weight)
         h = #grid,
         mines = mines,              -- mines needed for this grid
         reflectable = reflectable,  -- whether or not it can be usefully reflected about the diagonal
-        weight = weight             -- how common this pattern appears
+        weight = weight or 1        -- how common this pattern appears
     }
     setmetatable(f, Fifty)
     return f
@@ -183,7 +182,7 @@ end
 function Fifties:_init()
 
     -- 2x3
-    self:add(3, true,
+    self:add(3, true, 2,
         {
             {-1, -1},
             {-2, 1},
@@ -195,7 +194,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(4, true,
+    self:add(4, true, 2,
         {
             {-1, -1},
             {-2, -1},
@@ -207,7 +206,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(4, true,
+    self:add(4, true, 2,
         {
             {-1, -1},
             {-2, 1},
