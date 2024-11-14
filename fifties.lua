@@ -197,8 +197,10 @@ function Fifties:rnd(condition)
 
     -- finds and returns the corresponding choice
     for i = 1, #valid_fifties do
-        if (choice <= cumulatives[i]) return valid_fifties[i]
+        if (choice < cumulatives[i]) return valid_fifties[i]
     end
+
+    assert(false, "sorry! i'll cheat better next time (rnd call was out of table during 50-50 selection).")
 end
 
 -- adds a new 50-50 grid to the collection
