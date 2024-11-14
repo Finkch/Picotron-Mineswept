@@ -16,6 +16,7 @@ function Cursor:new()
         mpos = Vec:new(),
         lmpos = Vec:new(),
         mouse = true,
+        pant = 0, -- pan not -> pan't -> pant
         speed = 1,
         action = nil
     }
@@ -61,12 +62,17 @@ function Cursor:mousedown()
     return self.lpos != kbm.spos or kbm:held("lmb") or kbm:held("rmb")
 end
 
+-- checks whether the cursor should pan
+function Cursor:pan()
+    return kbm:held("space") or kbm:held("lshift") or kbm.keys["lmb"].down > 5
+end
+
 
 -- handles inputs
 function Cursor:input()
 
     -- don't accept input while panning
-    if not (kbm:held("space") or kbm:held("lshift")) then
+    if not (self:pan()) then
     
         -- updates cursor's position
         if self.mouse then
@@ -79,9 +85,9 @@ function Cursor:input()
         end
 
         -- sends an action
-        if kbm:released("lmb") or kbm:released("x") then
+        if kbm:released("lmb") and self.pant > 0 or kbm:released("x") then
             self.action = "reveal"
-        elseif kbm:released("rmb") or kbm:released("z") then
+        elseif kbm:released("rmb") and self.pant > 0 or kbm:released("z") then
             self.action = "flag"
         else
             self.action = nil
@@ -99,6 +105,14 @@ function Cursor:input()
         if (kbm:held("right"))  wind.focal += Vec:new(-2.5 * self.speed, 0)
         if (kbm:held("up"))     wind.focal += Vec:new(0, 2.5 * self.speed)
         if (kbm:held("down"))   wind.focal += Vec:new(0, -2.5 * self.speed)
+    end
+
+    -- update time since last pan.
+    -- ensures stopping a pan doesn't immediately reveal
+    if self:pan() then
+        self.pant = 0
+    else
+        self.pant += 1
     end
 end
 
@@ -135,7 +149,7 @@ function Cursor:draw()
     end
 
     -- shows which tile the cursor would select
-    if (kbm:held("space") or kbm:held("lshift") or state:__eq("menu") or state:__eq("gameover")) return
+    if (self:pan() or state:__eq("menu") or state:__eq("gameover")) return
 
     local x, y = self:map(board.d)
 
