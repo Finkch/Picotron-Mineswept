@@ -33,10 +33,6 @@
         reveal the board as per normal
 ]]
 
-include("lib/tstr.lua")
-include("lib/log.lua")
-        
-
 -- some constants for the checking flags
 is_mine     = 7
 is_flag     = 6
