@@ -227,11 +227,10 @@ function Board:generate_insidious(x, y, mines)
         -- if the grid is reflectable, perform a coin flip for the version
         if (rnd() < 0.5) fifty = fifty:reflect()
 
-
         -- chooses a random corner.
         -- 0 is bottom left, increasing is clockwise
         local corners = {0, 1, 2, 3}
-        local corner
+        local corner = 0
 
         -- ensures the chosen corner is sificiently far from the revealed tile
         local d = 0
