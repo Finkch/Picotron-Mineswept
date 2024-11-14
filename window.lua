@@ -215,8 +215,13 @@ function Window:draw_banner()
     -- flag banner sprite
     spr(56, 26, -1)
 
-    -- prints the guessed number of unflagged mines
-    print(string.format("%04d", board.bombs - board.flags), p, p, 8)
+    -- prints the guessed number of unflagged mines.
+    -- on the menu, display 0
+    if state:__eq("menu") then
+        print("0000", p, p, 8)
+    else
+        print(string.format("%04d", board.bombs - board.flags), p, p, 8)
+    end
 
 
     -- moves camera to the second box

@@ -114,6 +114,9 @@ function _init()
             -- resets displayed fairness value
             self.data.fairness = self.data.menu_fairness
 
+            -- resets clock
+            clock.f = 0
+
 
         elseif self:__eq("gameover") then
 
