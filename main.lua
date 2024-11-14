@@ -55,6 +55,7 @@
     x   * fix cruel mode deleting flags adjacent to first reveal
     x   * on insidious, game over also runs second gen
     * allow insidious gens not in corners
+    * lshift also pans/speeds up cursor
 
 ]]
 
@@ -83,7 +84,7 @@ function _init()
     logger = Logger:new("appdata/mineswept/logs")
 
     -- keyboard and mouse
-    kbm = KBM:new({"lmb", "rmb", "x", "z", "left", "right", "up", "down", "space", "`"})
+    kbm = KBM:new({"lmb", "rmb", "x", "z", "left", "right", "up", "down", "space", "lshift"})
 
     -- tracks time
     clock = Clock:new()

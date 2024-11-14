@@ -249,9 +249,6 @@ function play_input()
 
     -- flag
     if (cursor.action == "flag") board:rclick(cursor)
-
-    -- debug; reveal all
-    if (kbm:released("`")) board:reveal_all()
 end
 
 
