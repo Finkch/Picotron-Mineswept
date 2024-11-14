@@ -13,7 +13,7 @@ Fifty.__type = "fifty"
 --
 -- a mine grid, or mgrid, is a fifty that is a specific placement of mines.
 -- the active bits represent which variants in which that cell contains a mine.
-function Fifty:new(grid, mgrid, mines, bc_mines)
+function Fifty:new(grid, mgrid, mines, bc_mines, reflectable)
 
     local f = {
         grid = grid,
@@ -21,7 +21,8 @@ function Fifty:new(grid, mgrid, mines, bc_mines)
         w = #grid[1],
         h = #grid,
         mines = mines,  -- total mines
-        bc_mines        -- mines sitting on the boundary
+        bc_mines,       -- mines sitting on the boundary
+        reflectable = reflectable   -- whether or not it can be usefully reflected about the diagonal
     }
     setmetatable(f, Fifty)
     return f
@@ -29,7 +30,10 @@ end
 
 
 
--- rotates the fifty's grid to fit in other corners
+-- rotates the fifty's grid to fit in other corners.
+-- also reflects a grid about the off-diagonal.
+-- methods that begin with an '_' were made by ChatGPT
+
 function Fifty:rotate90()
     return Fifty:new(
         self:_rotate90(self.grid), 
@@ -102,6 +106,35 @@ function Fifty:_rotate270(grid)
     return newGrid
 end
 
+function Fifty:reflect()
+    return Fifty:new(
+        self:_reflect(self.grid), 
+        self:_reflect(self.mgrid),
+        self.mines,
+        self.bc_mines
+    )
+end
+
+function Fifty:_reflect(grid)
+    local numRows = #grid
+    local numCols = #grid[1]
+    local newGrid = {}
+
+    -- Initialize the new grid
+    for i = 1, numCols do
+        newGrid[i] = {}
+    end
+
+    -- Swap elements (i, j) with (numCols - j + 1, numRows - i + 1)
+    for i = 1, numRows do
+        for j = 1, numCols do
+            newGrid[numCols - j + 1][numRows - i + 1] = grid[i][j]
+        end
+    end
+
+    return newGrid
+end
+
 
 -- metamethods
 function Fifty:__tostring()
@@ -136,14 +169,14 @@ function Fifties:new()
 end
 
 -- adds a new 50-50 grid to the collection
-function Fifties:add(mines, bc_mines, grid, mgrid)
-    add(self.grids, Fifty:new(grid, mgrid, mines, bc_mines))
+function Fifties:add(mines, bc_mines, reflectable, grid, mgrid)
+    add(self.grids, Fifty:new(grid, mgrid, mines, bc_mines, reflectable))
 end
 
 
 -- edit this to add 50-50s
 function Fifties:_init()
-    self:add(3, 1,
+    self:add(3, 1, true,
         {
             {-1, -1},
             {-2, 1},
@@ -155,7 +188,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(3, 2,
+    self:add(3, 2, false,
         {
             {1, 1, -1},
             {-2, -2, 1},
