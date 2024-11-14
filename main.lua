@@ -56,6 +56,38 @@
     x   * on insidious, game over also runs second gen
     * allow insidious gens not in corners
     x   * lshift also pans/speeds up cursor
+    * get tighter bounds for insidious through smart reflection of 3x2
+    * insidious loses on the n + mth move (allow moves that result in further 50-50s)
+    * demo game with set board to showcase colours...but it's actually insiidous
+    * show win-loss ratio on gameover screen
+        > write to appdata
+        > reset by through grave on menu/gameover?
+    * title on menu screen?
+    x   * don't reset cursor to centre screen if playing again
+    x       > track previous gamestate
+    * move random 50-50 selection into fifties
+        > add weight to given types
+        > find clever way of compressing similar layouts
+    * fix insidious gen starting on non-0 due to inideal 50-50 placement
+
+    * refactor board
+    x       > better tile manipulation logic (clean functions, no if tile(is_flag_false) lying about)
+        > move board to memory to allow alternative sprite sets?
+            - or simply wrap mg/set functions?
+            - infinite board (for quantum) might not work using map
+        > small sprites!
+
+    * quantum minesweeper
+        > infinite board
+        > density of mines, not count of mines
+        > board is generated as play progresses
+        > always results in a valid board
+        > difficulty chooses probability of random choice succeeding
+            - easy:     guaranteed success (where possible)
+            - normal:   1/rho chance of success
+            - hard:     guaranteed loss (where possible)
+        > victory is tracked through tiles revealed
+        > what is minimum density to prevent an infinite reveal?
 
 ]]
 
@@ -131,23 +163,23 @@ function _init()
             -- create a new board
             board = Board:new(board.w, board.h, board.bombs, self.data.fairness, board.oldsprites)
 
-            -- moves the cursor to the centre of the screen
-            cursor.pos = Vec:new(480 / 2, 270 / 2)
+            -- precalculations for this board
+            wind:edges()
+
+            -- focus the camera to the centre of the board
+            if self.previous == "menu" then
+                cursor.pos = Vec:new(480 / 2, 270 / 2)
+                wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
+            end
+
+            -- updates the window to show the board immediately
+            wind:update()
 
             -- reset the clock
             clock.f = 0
 
             -- resets state values
             self.data.win = false
-
-            -- precalculations for this board
-            wind:edges()
-
-            -- focus the camera to the centre of the board
-            wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
-
-            -- updates the window to show the board immediately
-            wind:update()
 
         end
     end
@@ -191,6 +223,8 @@ function _update()
         q:add(cursor:posm())
         q:add(Vec:new(cursor:map(board.d)))
         q:add(board:value(cursor:map(board.d)))
+        q:add(state.state)
+        q:add(state.previous)
     end
 end
 
