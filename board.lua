@@ -279,7 +279,7 @@ function Board:generate_insidious(x, y, mines)
 
         -- ensures the chosen corner is sificiently far from the revealed tile
         local d = 0
-        while d < max(fifty.w, fifty.h) + 2 do
+        while d < max(fifty.w, fifty.h) + 1 do
 
             -- picks a random corner
             corner = del(corners, rnd(corners))
@@ -303,6 +303,8 @@ function Board:generate_insidious(x, y, mines)
                 d = max(abs(self.w - x), abs(self.h - y))
 
             end
+
+            if (#corners == 0) assert(false, "sorry! i'll cheat better next time")
         end
 
         -- top left corner of the grid relative to the board.
