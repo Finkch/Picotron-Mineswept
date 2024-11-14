@@ -254,7 +254,7 @@ function Window:draw_gameover()
     -- box to contain the messages
     self:box(wl, wt, wr, wt + w, true)
 
-    local gameover_message = "gameover!"
+    local gameover_message = "you lose!"
     if (state.data.win) gameover_message = "you win!"
 
     -- centres the messages
