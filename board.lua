@@ -202,7 +202,9 @@ function Board:generate_insidious(x, y, mines)
     if self.reveals == 0 then
 
         -- chooses an appropriate 50-50.
-        -- largest dimensions must be less than integer half min d
+        -- largest dimensions must be less than integer half min d;
+        -- thus, there must be space on the board for the 50-50 regardless
+        -- of the initial reveal
         local fifty = fifties:rnd(
             function(f) return max(f.w, f.h) < min(board.w, board.h) // 2 end
         )
@@ -213,11 +215,13 @@ function Board:generate_insidious(x, y, mines)
         -- chooses a random corner.
         -- 0 is bottom left, increasing is clockwise
         local corners = {0, 1, 2, 3}
-        local corner = 0
+        local corner = -1
 
         -- ensures the chosen corner is sificiently far from the revealed tile
         local d = 0
         while d < max(fifty.w, fifty.h) + 2 do
+
+            assert(#corners > 0, "sorry! i'll cheat better next time.\ncouldn't find corner in which to place 50-50.")
 
             -- picks a random corner
             corner = del(corners, rnd(corners))
@@ -226,23 +230,20 @@ function Board:generate_insidious(x, y, mines)
             -- ensures the initial reveal is not close to
             -- bottom left
             if corner == 0 then
-                d = max(abs(0 - x), abs(self.h - y + 1))
+                d = min(abs(0 - x), abs(self.h - y + 1))
 
             -- top left
             elseif corner == 1 then
-                d = max(abs(0 - x), abs(0 - y))
+                d = min(abs(0 - x), abs(0 - y))
 
             -- top right
             elseif corner == 2 then
-                d = max(abs(self.w - x + 1), abs(0 - y))
+                d = min(abs(self.w - x + 1), abs(0 - y))
 
             -- bottom right
             elseif corner == 3 then
-                d = max(abs(self.w - x + 1), abs(self.h - y + 1))
-
+                d = min(abs(self.w - x + 1), abs(self.h - y + 1))
             end
-
-            if (#corners == 0) assert(false, "sorry! i'll cheat better next time.\ncouldn't find corner in which to place 50-50.")
         end
 
         -- top left corner of the grid relative to the board.
