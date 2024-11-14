@@ -13,15 +13,14 @@ Fifty.__type = "fifty"
 --
 -- a mine grid, or mgrid, is a fifty that is a specific placement of mines.
 -- the active bits represent which variants in which that cell contains a mine.
-function Fifty:new(grid, mgrid, mines, bc_mines, reflectable)
+function Fifty:new(grid, mgrid, mines, reflectable)
 
     local f = {
         grid = grid,
         mgrid = mgrid,
         w = #grid[1],
         h = #grid,
-        mines = mines,  -- total mines
-        bc_mines,       -- mines sitting on the boundary
+        mines = mines,              -- mines needed for this grid
         reflectable = reflectable   -- whether or not it can be usefully reflected about the diagonal
     }
     setmetatable(f, Fifty)
@@ -38,8 +37,7 @@ function Fifty:rotate90()
     return Fifty:new(
         self:_rotate90(self.grid), 
         self:_rotate90(self.mgrid),
-        self.mines,
-        self.bc_mines
+        self.mines
     )
 end
 
@@ -62,8 +60,7 @@ function Fifty:rotate180()
     return Fifty:new(
         self:_rotate180(self.grid), 
         self:_rotate180(self.mgrid),
-        self.mines,
-        self.bc_mines
+        self.mines
     )
 end
 
@@ -86,8 +83,7 @@ function Fifty:rotate270()
     return Fifty:new(
         self:_rotate270(self.grid), 
         self:_rotate270(self.mgrid),
-        self.mines,
-        self.bc_mines
+        self.mines
     )
 end
 
@@ -110,8 +106,7 @@ function Fifty:reflect()
     return Fifty:new(
         self:_reflect(self.grid), 
         self:_reflect(self.mgrid),
-        self.mines,
-        self.bc_mines
+        self.mines
     )
 end
 
@@ -169,8 +164,8 @@ function Fifties:new()
 end
 
 -- adds a new 50-50 grid to the collection
-function Fifties:add(mines, bc_mines, reflectable, grid, mgrid)
-    add(self.grids, Fifty:new(grid, mgrid, mines, bc_mines, reflectable))
+function Fifties:add(mines, reflectable, grid, mgrid)
+    add(self.grids, Fifty:new(grid, mgrid, mines, reflectable))
 end
 
 
@@ -178,7 +173,7 @@ end
 function Fifties:_init()
 
     -- 2x3
-    self:add(3, 1, true,
+    self:add(3, true,
         {
             {-1, -1},
             {-2, 1},
@@ -190,7 +185,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(4, 1, true,
+    self:add(4, true,
         {
             {-1, -1},
             {-2, -1},
@@ -202,7 +197,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(4, 1, true,
+    self:add(4, true,
         {
             {-1, -1},
             {-2, 1},
@@ -215,7 +210,7 @@ function Fifties:_init()
     )
 
     -- 3x3
-    self:add(3, 2, false,
+    self:add(3, false,
         {
             {1, 1, -1},
             {-2, -2, 1},
@@ -227,7 +222,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(4, 1, true,
+    self:add(4, true,
         {
             {-1, -1, -1},
             {1, -2, 1},
@@ -239,7 +234,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(5, 1, true,
+    self:add(5, true,
         {
             {-1, -1, -1},
             {1, -2, 1},
@@ -251,7 +246,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(5, 1, true,
+    self:add(5, true,
         {
             {-1, -1, -1},
             {1, -2, -1},
@@ -264,7 +259,7 @@ function Fifties:_init()
     )
 
     -- 3x4
-    self:add(5, 3, true, 
+    self:add(5, true, 
         {
             { 1,  1, -1},
             {-2, -2, -1},
@@ -278,7 +273,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(5, 3, true, 
+    self:add(5, true, 
         {
             { 1,  1, -1},
             {-2, -2, -1},
