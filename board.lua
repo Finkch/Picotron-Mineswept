@@ -150,25 +150,14 @@ function Board:place_mines(mines, cells)
 
             -- turns the popped cell into a mine.
             -- ...i forgor lua was 1-index :^(
-            if self:tile(bombify[1], bombify[2], is_flag) then
-                mset(bombify[1], bombify[2], self.bs + 41)
-            else
-                mset(bombify[1], bombify[2], self.bs + 9)
-            end
+            self:mineify(bombify[1], bombify[2])
 
             i += 1
         end
     end
 
     -- adds the false flagged tiles back to cells, reseting their sprite to 0 value
-    for i = 1, #clear do
-        if self:tile(clear[i][1], clear[i][2], is_flag) then
-            mset(clear[i][1], clear[i][2], self.bs + 32)
-        else
-            mset(clear[i][1], clear[i][2], self.bs)
-        end
-        add(cells, clear[i])
-    end
+    self:ify_all(self.falseify, clear, function(x, y) return true end, cells)
 
     -- all cells that do not have a mine
     return cells
@@ -771,11 +760,25 @@ function Board:flagify(x, y)
 end
 
 function Board:falseify(x, y)
-    if self:tile(x, y, is_false) then
-        if self:tile(x, y, is_flag) then
+
+    -- flag case
+    if self:tile(x, y, is_flag) then
+
+        -- false/unfalse
+        if self:tile(x, y, is_false) then
             mset(x, y, self.bs + 32)
         else
+            mset(x, y, self.bs + 11)
+        end
+
+    -- normal case
+    else
+
+        -- false/unfalse
+        if self:tile(x, y, is_false) then
             mset(x, y, self.bs)
+        else
+            mset(x, y, self.bs + 10)
         end
     end
 end
