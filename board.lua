@@ -591,38 +591,13 @@ function Board:reveal_neighbours(x, y)
     end
 end
 
-
--- reveals all tiles
-function Board:reveal_all()
-
-    -- force reveal on all tiles
-    for i = 0, self.w - 1 do
-        for j = 0, self.h - 1 do
-
-            -- do nothing if it's already revealed
-            if not self:tile(i, j, is_reveal) then
-
-                -- if it's an incorrect flag
-                if self:tile(i, j, is_flag) and not self:tile(i, j, is_mine) then
-                    mset(i, j, self.bs + 42)
-                
-                -- otherwise normal reveal
-                elseif not self:tile(i, j, is_flag) then
-                    mset(i, j, mget(i, j) + 16)
-                end
-            end
-        end
-    end
-end
-
 -- reveals remaining bombs
 function Board:reveal_mines()
-
 
     -- in insidious mode, places the final mines in the special zone
     if (self.fairness == 0 and not self.second_gen) self:ensure_insidious()
 
-
+    -- looks for mines
     for i = 0, self.w - 1 do
         for j = 0, self.h - 1 do
 
