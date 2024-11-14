@@ -305,7 +305,8 @@ function Board:generate_insidious(x, y, mines)
             end
         end
 
-        -- top left corner of the grid relative to the board
+        -- top left corner of the grid relative to the board.
+        -- used to snuggly place the 50-50 in the corner
         local t = -1
         local l = -1
 
@@ -356,7 +357,7 @@ function Board:generate_insidious(x, y, mines)
             end
         end
 
-        self:place_mines(mines)
+        self:place_mines(mines - fifty.mines)
         -- end normal generation
 
 
