@@ -474,7 +474,7 @@ function Board:generate_unfair(x, y, mines)
                     add(cells, {flr(self.first_reveal[1] + dx), flr(self.first_reveal[2] + dy)})
 
                     -- resets any lingering false flags
-                    self:trueify(cells)
+                    self:ify_all(self.falseify, cells)
                 end
             end
         end
@@ -814,8 +814,9 @@ end
 
 
 -- applies an -ify function to all cells.
--- 'ify' is a method that ends in the suffix '-ify'
-function Board:ify_all(ify, cells, cellsout)
+-- 'ify' is a method that ends in the suffix '-ify'.
+-- condition is an optional method that accepts (x, y) and returns true/false.
+function Board:ify_all(ify, cells, condition, cellsout)
     
     -- grabs cells if supplied
     if (not cells) cells = self:cells()
@@ -824,35 +825,13 @@ function Board:ify_all(ify, cells, cellsout)
         local x, y = unpack(cells[i])
 
         -- apply the alteration to the given cell
-        ify(x, y)
+        if (not condition or condition(self, x, y)) ify(self, x, y)
 
         -- usefull to track to which cells an alteration has been applied
         if (cellsout) add(cellsout, cells[i])
     end
 
     return cellsout
-end
-
-function Board:trueify(cells, cleared)
-    
-    -- gets a list of cells
-    if (not cells) cells = self:cells()
-
-    -- sets all false flags back to the base sprite.
-    -- or the base flag sprite, if flagged
-    for i = 1, #cells do
-        if self:tile(cells[i][1], cells[i][2], is_false) then
-            if self:tile(cells[i][1], cells[i][2], is_flag) then
-                mset(cells[i][1], cells[i][2], self.bs + 32)
-            else
-                mset(cells[i][1], cells[i][2], self.bs)
-            end
-
-            if (cleared) add(cleared, cells[i])
-        end
-    end
-
-    return cleared
 end
 
 -- draws the map
