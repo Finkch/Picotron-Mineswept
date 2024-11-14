@@ -172,9 +172,38 @@ function Fifties:new()
     return f
 end
 
+-- chooses a random element according to the weights.
+-- the element must satisfy the given function
+function Fifties:rnd(condition)
+
+    local weight = 0            -- running/prefix sum
+    local valid_fifties = {}    -- list of valid choices
+    local cumulatives = {}      -- cumulative weight up to the i-th item
+
+    -- gets valid items and their sum of weights
+    for _, fifty in ipairs(self.grids) do
+        if condition(fifty) then
+            weight += fifty.weight
+            add(cumulatives, weight)
+            add(valid_fifties, fifty)
+        end
+    end
+
+    -- returns an error message if no item has satisfied the condition
+    assert(#valid_fifties > 0, "sorry! i'll cheat better next time (couldn't find valid 50-50).")
+
+    -- gets a random number to select the item
+    local choice = rnd(weight)
+
+    -- finds and returns the corresponding choice
+    for i = 1, #valid_fifties do
+        if (choice <= cumulatives[i]) return valid_fifties[i]
+    end
+end
+
 -- adds a new 50-50 grid to the collection
-function Fifties:add(mines, reflectable, grid, mgrid)
-    add(self.grids, Fifty:new(grid, mgrid, mines, reflectable))
+function Fifties:add(mines, reflectable, weight, grid, mgrid)
+    add(self.grids, Fifty:new(grid, mgrid, mines, reflectable, weight))
 end
 
 
@@ -219,7 +248,7 @@ function Fifties:_init()
     )
 
     -- 3x3
-    self:add(3, false,
+    self:add(3, false, 1,
         {
             {1, 1, -1},
             {-2, -2, 1},
@@ -231,7 +260,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(4, true,
+    self:add(4, true, 1,
         {
             {-1, -1, -1},
             {1, -2, 1},
@@ -243,7 +272,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(5, true,
+    self:add(5, true, 1,
         {
             {-1, -1, -1},
             {1, -2, 1},
@@ -255,7 +284,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(5, true,
+    self:add(5, true, 1,
         {
             {-1, -1, -1},
             {1, -2, -1},
@@ -268,7 +297,7 @@ function Fifties:_init()
     )
 
     -- 3x4
-    self:add(5, true, 
+    self:add(5, true, 1,
         {
             { 1,  1, -1},
             {-2, -2, -1},
@@ -282,7 +311,7 @@ function Fifties:_init()
         }
     )
 
-    self:add(5, true, 
+    self:add(5, true, 1,
         {
             { 1,  1, -1},
             {-2, -2, -1},
