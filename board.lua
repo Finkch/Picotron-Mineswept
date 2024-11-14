@@ -203,29 +203,12 @@ function Board:generate_insidious(x, y, mines)
 
         -- chooses an appropriate 50-50.
         -- largest dimensions must be less than integer half min d
-        local fifty = nil
-
-        local choices = {}
-        for i = 1, #fifties.grids do
-            choices[i] = i
-        end
-
-        -- on small maps, choose small 50s
-        while not fifty do
-
-            -- pops a random grid
-            local choice = del(choices, rnd(choices))
-
-            fifty = fifties.grids[choice]
-
-            assert(fifty != nil, "sorry! i'll cheat better next time.\ncouldn't find valid 50-50 to place.")
-
-            -- checks if the grid is too large
-            if (max(fifty.w, fifty.h) >= min(self.w, self.h) // 2) fifty = nil
-        end
+        local fifty = fifties:rnd(
+            function(f) return max(f.w, f.h) < min(board.w, board.h) // 2 end
+        )
 
         -- if the grid is reflectable, perform a coin flip for the version
-        if (rnd() < 0.5) fifty = fifty:reflect()
+        if (fifty.reflectable and rnd() < 0.5) fifty = fifty:reflect()
 
         -- chooses a random corner.
         -- 0 is bottom left, increasing is clockwise
