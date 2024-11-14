@@ -252,16 +252,27 @@ function Board:generate_insidious(x, y, mines)
     -- on normal board generation
     if self.reveals == 0 then
 
-        -- chooses an appropriate 50-50
+        -- chooses an appropriate 50-50.
+        -- largest dimensions must be less than integer half min d
         local fifty = nil
 
-        -- on small maps, choose small 50s
-        if self.w < 8 or self.h < 8 then
-            fifty = fifties.grids[1]
+        local choices = {}
+        for i = 1, #fifties.grids do
+            choices[i] = i
+        end
 
-        -- otherwise, pick whichever
-        else
-            fifty = rnd(fifties.grids)
+        -- on small maps, choose small 50s
+        while not fifty do
+
+            -- pops a random grid
+            local choice = del(choices, rnd(choices))
+
+            fifty = fifties.grids[choice]
+
+            assert(fifty != nil, "sorry! i'll cheat better next time.\ncouldn't find valid 50-50 to place.")
+
+            -- checks if the grid is too large
+            if (max(fifty.w, fifty.h) >= min(self.w, self.h) // 2) fifty = nil
         end
 
         -- if the grid is reflectable, perform a coin flip for the version
@@ -275,7 +286,7 @@ function Board:generate_insidious(x, y, mines)
 
         -- ensures the chosen corner is sificiently far from the revealed tile
         local d = 0
-        while d < max(fifty.w, fifty.h) + 1 do
+        while d < max(fifty.w, fifty.h) + 2 do
 
             -- picks a random corner
             corner = del(corners, rnd(corners))
@@ -284,7 +295,7 @@ function Board:generate_insidious(x, y, mines)
             -- ensures the initial reveal is not close to
             -- bottom left
             if corner == 0 then
-                d = max(abs(0 - x), abs(self.h - y))
+                d = max(abs(0 - x), abs(self.h - y + 1))
 
             -- top left
             elseif corner == 1 then
@@ -292,15 +303,15 @@ function Board:generate_insidious(x, y, mines)
 
             -- top right
             elseif corner == 2 then
-                d = max(abs(self.w - x), abs(0 - y))
+                d = max(abs(self.w - x + 1), abs(0 - y))
 
             -- bottom right
             elseif corner == 3 then
-                d = max(abs(self.w - x), abs(self.h - y))
+                d = max(abs(self.w - x + 1), abs(self.h - y + 1))
 
             end
 
-            if (#corners == 0) assert(false, "sorry! i'll cheat better next time")
+            if (#corners == 0) assert(false, "sorry! i'll cheat better next time.\ncouldn't find corner in which to place 50-50.")
         end
 
         -- top left corner of the grid relative to the board.
