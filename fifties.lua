@@ -7,7 +7,7 @@ Fifty.__index = Fifty
 Fifty.__type = "fifty"
 
 -- all grids will face the bottom left corner by default.
---  n > 0   = normal cell; n = count of adjacent quantum mines
+--  n >= 0   = normal cell; n = count of adjacent quantum mines
 --  -1      = mine
 --  -2      = false flag
 --
@@ -176,6 +176,8 @@ end
 
 -- edit this to add 50-50s
 function Fifties:_init()
+
+    -- 2x3
     self:add(3, 1, true,
         {
             {-1, -1},
@@ -188,6 +190,31 @@ function Fifties:_init()
         }
     )
 
+    self:add(4, 1, true,
+        {
+            {-1, -1},
+            {-2, -1},
+            {-2, 1}
+        }, {
+            {0, 0},
+            {1, 0},
+            {2, 0}
+        }
+    )
+
+    self:add(4, 1, true,
+        {
+            {-1, -1},
+            {-2, 1},
+            {-2, -1}
+        }, {
+            {0, 0},
+            {1, 0},
+            {2, 0}
+        }
+    )
+
+    -- 3x3
     self:add(3, 2, false,
         {
             {1, 1, -1},
@@ -197,6 +224,71 @@ function Fifties:_init()
             {0, 0, 0},
             {1, 2, 0},
             {2, 1, 0}
+        }
+    )
+
+    self:add(4, 1, true,
+        {
+            {-1, -1, -1},
+            {1, -2, 1},
+            {1, -2, 1}
+        }, {
+            {0, 0, 0},
+            {0, 2, 0},
+            {0, 1, 0}
+        }
+    )
+
+    self:add(5, 1, true,
+        {
+            {-1, -1, -1},
+            {1, -2, 1},
+            {1, -2, -1}
+        }, {
+            {0, 0, 0},
+            {0, 2, 0},
+            {0, 1, 0}
+        }
+    )
+
+    self:add(5, 1, true,
+        {
+            {-1, -1, -1},
+            {1, -2, -1},
+            {1, -2, 1}
+        }, {
+            {0, 0, 0},
+            {0, 2, 0},
+            {0, 1, 0}
+        }
+    )
+
+    -- 3x4
+    self:add(5, 3, true, 
+        {
+            { 1,  1, -1},
+            {-2, -2, -1},
+            {-2,  2, -1},
+            {-2,  1, 0}
+        }, {
+            {0, 0, 0},
+            {1, 2, 0},
+            {2, 0, 0},
+            {1, 0, 0}
+        }
+    )
+
+    self:add(5, 3, true, 
+        {
+            { 1,  1, -1},
+            {-2, -2, -1},
+            {-2,  2, -1},
+            {-2,  1, 0}
+        }, {
+            {0, 0, 0},
+            {1, 2, 0},
+            {1, 0, 0},
+            {2, 0, 0}
         }
     )
 end
