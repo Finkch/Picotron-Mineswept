@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-11 22:17:09",revision=7]]
+--[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-14 20:14:15",revision=8]]
 --[[
     the board is an wxh grid. each tile is an object that encodes
     the state of that tile; whether its a bomb or its value.
@@ -113,29 +113,6 @@ function Board:empty()
     end
 end
 
--- resets all false flags to normal cells
-function Board:trueify(cells, cleared)
-    
-    -- gets a list of cells
-    if (not cells) cells = self:cells()
-
-    -- sets all false flags back to the base sprite.
-    -- or the base flag sprite, if flagged
-    for i = 1, #cells do
-        if self:tile(cells[i][1], cells[i][2], is_false) then
-            if self:tile(cells[i][1], cells[i][2], is_flag) then
-                mset(cells[i][1], cells[i][2], self.bs + 32)
-            else
-                mset(cells[i][1], cells[i][2], self.bs)
-            end
-
-            if (cleared) add(cleared, cells[i])
-        end
-    end
-
-    return cleared
-end
-
 -- creates a 1d list of all cells.
 function Board:cells()
     local cells = {}
@@ -206,29 +183,10 @@ function Board:count(cells)
     -- for each cell, count its neighbours
     for i = 1, #cells do
 
+        local x, y = unpack(cells[i])
+
         -- don't set count it tile is already revealed or is a mine
-        if not self:tile(cells[i][1], cells[i][2], is_reveal) and not self:tile(cells[i][1], cells[i][2], is_mine) then
-
-            -- counts neighbours
-            local count = 0
-
-            for dx = -1, 1 do
-                for dy = -1, 1 do
-                    if not (dx == 0 and dy == 0) then   -- don't consider self
-
-                        -- check if neighbour is a mine; if so, increment count
-                        if (self:tile(cells[i][1] + dx, cells[i][2] + dy, is_mine)) count += 1
-                    end
-                end
-            end
-
-            -- sets the value of the tile
-            if self:tile(cells[i][1], cells[i][2], is_flag) then
-                mset(cells[i][1], cells[i][2], self.bs + count + 32)
-            else
-                mset(cells[i][1], cells[i][2], self.bs + count)
-            end
-        end
+        if (not self:tile(x, y, is_reveal) and not self:tile(x, y, is_mine)) self:countify(x, y)
     end
 end
 
@@ -789,6 +747,113 @@ function Board:inbounds(x, y)
 end
 
 
+-- methods for altering with a cell
+function Board:countify(x, y)
+
+    -- counts neighbours
+    local count = 0
+
+    -- counts neighbouring mines
+    for dx = -1, 1 do
+        for dy = -1, 1 do
+            if (not (dx == 0 and dy == 0) and self:tile(x + dx, y + dy, is_mine)) count += 1
+        end
+    end
+
+    -- sets the value of the tile
+    if self:tile(x, y, is_flag) then
+        mset(x, y, self.bs + count + 32)
+    else
+        mset(x, y, self.bs + count)
+    end
+end
+
+function Board:mineify(x, y)
+
+    -- mine/unmine
+    if self:tile(x, y, is_mine) then
+        mset(x, y, self.bs)
+    else
+        mset(x, y, self.bs + 9)
+    end
+end
+
+function Board:flagify(x, y)
+
+    -- false flag case
+    if self:tile(x, y, is_false) then
+
+        -- flag/unflag
+        if self:tile(x, y, is_flag) then
+            mset(x, y, mget(x, y) - 1)
+        else
+            mset(x, y, mget(x, y) + 1)
+        end
+
+    -- normal cell case
+    else
+
+        -- flag/unflag
+        if self:tile(x, y, is_flag) then
+            mset(x, y, mget(x, y) - 32)
+        else
+            mset(x, y, mget(x, y) + 32)
+        end
+    end
+end
+
+function Board:falseify(x, y)
+    if self:tile(x, y, is_false) then
+        if self:tile(x, y, is_flag) then
+            mset(x, y, self.bs + 32)
+        else
+            mset(x, y, self.bs)
+        end
+    end
+end
+
+
+-- applies an -ify function to all cells.
+-- 'ify' is a method that ends in the suffix '-ify'
+function Board:ify_all(ify, cells, cellsout)
+    
+    -- grabs cells if supplied
+    if (not cells) cells = self:cells()
+
+    for i = 1, #cells do
+        local x, y = unpack(cells[i])
+
+        -- apply the alteration to the given cell
+        ify(x, y)
+
+        -- usefull to track to which cells an alteration has been applied
+        if (cellsout) add(cellsout, cells[i])
+    end
+
+    return cellsout
+end
+
+function Board:trueify(cells, cleared)
+    
+    -- gets a list of cells
+    if (not cells) cells = self:cells()
+
+    -- sets all false flags back to the base sprite.
+    -- or the base flag sprite, if flagged
+    for i = 1, #cells do
+        if self:tile(cells[i][1], cells[i][2], is_false) then
+            if self:tile(cells[i][1], cells[i][2], is_flag) then
+                mset(cells[i][1], cells[i][2], self.bs + 32)
+            else
+                mset(cells[i][1], cells[i][2], self.bs)
+            end
+
+            if (cleared) add(cleared, cells[i])
+        end
+    end
+
+    return cleared
+end
 
 -- draws the map
 function Board:draw()
