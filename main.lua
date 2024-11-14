@@ -50,8 +50,8 @@
     x   * secret fairness 2 needs to reset to menu fairness upon returning to menu
     x   * menu button prompts change depending on current input method
     x       > menu mouse inputs
-    * hide cursor on menu
-    * start in mouse false mode
+    x   * hide cursor on menu
+    -   * start in mouse false mode
     x   * fix cruel mode deleting flags adjacent to first reveal
     x   * on insidious, game over also runs second gen
     * allow insidious gens not in corners
@@ -155,7 +155,7 @@ function _init()
     -- default values
     state.data.mi = 0   -- menu index
     state.data.ml = 4   -- menu length
-    state.data.mind = 6
+    state.data.mind = 8     -- min and max board dimensions
     state.data.maxd = 32
     state.data.minmines = 6
     state.data.maxmines = -1 -- will be update to match board dimensions
