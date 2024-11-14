@@ -13,7 +13,7 @@ Fifty.__type = "fifty"
 --
 -- a mine grid, or mgrid, is a fifty that is a specific placement of mines.
 -- the active bits represent which variants in which that cell contains a mine.
-function Fifty:new(grid, mgrid, mines, reflectable)
+function Fifty:new(grid, mgrid, mines, reflectable, weight)
 
     local f = {
         grid = grid,
@@ -21,12 +21,26 @@ function Fifty:new(grid, mgrid, mines, reflectable)
         w = #grid[1],
         h = #grid,
         mines = mines,              -- mines needed for this grid
-        reflectable = reflectable   -- whether or not it can be usefully reflected about the diagonal
+        reflectable = reflectable,  -- whether or not it can be usefully reflected about the diagonal
+        weight = weight             -- how common this pattern appears
     }
     setmetatable(f, Fifty)
     return f
 end
 
+-- returns a potentially modified copy
+function Fifty:copy(grid, mgrid)
+    if (not grid) grid = self.grid
+    if (not mgrid) mgrid = self.mgrid
+
+    return Fifty:new(
+        grid,
+        mgrid,
+        self.mines,
+        self.reflectable,
+        self.weight
+    )
+end
 
 
 -- rotates the fifty's grid to fit in other corners.
@@ -34,10 +48,9 @@ end
 -- methods that begin with an '_' were made by ChatGPT
 
 function Fifty:rotate90()
-    return Fifty:new(
+    return self:copy(
         self:_rotate90(self.grid), 
-        self:_rotate90(self.mgrid),
-        self.mines
+        self:_rotate90(self.mgrid)
     )
 end
 
@@ -57,10 +70,9 @@ function Fifty:_rotate90(grid)
 end
 
 function Fifty:rotate180()
-    return Fifty:new(
+    return self:copy(
         self:_rotate180(self.grid), 
-        self:_rotate180(self.mgrid),
-        self.mines
+        self:_rotate180(self.mgrid)
     )
 end
 
@@ -80,10 +92,9 @@ function Fifty:_rotate180(grid)
 end
 
 function Fifty:rotate270()
-    return Fifty:new(
+    return self:copy(
         self:_rotate270(self.grid), 
-        self:_rotate270(self.mgrid),
-        self.mines
+        self:_rotate270(self.mgrid)
     )
 end
 
@@ -103,10 +114,9 @@ function Fifty:_rotate270(grid)
 end
 
 function Fifty:reflect()
-    return Fifty:new(
+    return self:copy(
         self:_reflect(self.grid), 
-        self:_reflect(self.mgrid),
-        self.mines
+        self:_reflect(self.mgrid)
     )
 end
 
