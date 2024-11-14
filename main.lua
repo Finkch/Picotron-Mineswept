@@ -21,9 +21,9 @@
     x   * sprites
     x       > 16x16 sprites
     x       > 8x8 sprites
-    * board generation
+    x   * board generation
     x       > fair
-        > insidious
+    x       > insidious
     x       > unfair
     x   * gui (use necrodancer gui?); no.
     x       > timer
@@ -50,6 +50,11 @@
     x   * secret fairness 2 needs to reset to menu fairness upon returning to menu
     x   * menu button prompts change depending on current input method
     x       > menu mouse inputs
+    * hide cursor on menu
+    * start in mouse false mode
+    x   * fix cruel mode deleting flags adjacent to first reveal
+    x   * on insidious, game over also runs second gen
+    * allow insidious gens not in corners
 
 ]]
 
@@ -150,14 +155,17 @@ function _init()
     state.data.maxd = 32
     state.data.minmines = 6
     state.data.maxmines = -1 -- will be update to match board dimensions
-    state.data.fairness = 1  -- tracking fairness here, not board, for interround continuity
-    state.data.menu_fairness = 1
+    state.data.fairness = 0  -- tracking fairness here, not board, for interround continuity
+    state.data.menu_fairness = 0
 
     -- moves state to menu
     state:change("menu")
 
     -- initialises list of possible 50-50s
-    init_fifties()
+    fifties = Fifties:new()
+
+    -- do debug printout
+    debug = false
 end
 
 
@@ -174,6 +182,12 @@ function _update()
 
     -- updates based on the current state
     gamestate(state)
+
+    if debug then
+        q:add(cursor:posm())
+        q:add(Vec:new(cursor:map(board.d)))
+        q:add(board:value(cursor:map(board.d)))
+    end
 end
 
 function _draw()
