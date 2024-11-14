@@ -673,7 +673,7 @@ function Board:cord(x, y)
     local flags = 0
     for dx = -1, 1 do
         for dy = -1, 1 do
-            if (self:tile(x + dx, y + dy, 6)) flags += 1
+            if (self:tile(x + dx, y + dy, is_flag)) flags += 1
         end
     end
 
