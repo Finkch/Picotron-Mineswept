@@ -66,7 +66,7 @@ end
 function Cursor:input()
 
     -- don't accept input while panning
-    if not kbm:held("space") then
+    if not (kbm:held("space") or kbm:held("lshift")) then
     
         -- updates cursor's position
         if self.mouse then
