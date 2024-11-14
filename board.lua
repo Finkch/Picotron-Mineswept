@@ -257,12 +257,84 @@ function Board:generate_insidious(x, y, mines)
     if self.reveals == 0 then
 
         -- chooses an appropriate 50-50
-        local fifty = fifties.grids[flr(rnd(#fifties.grids)) + 1]
+        local fifty = nil
 
-        -- chooses a location on the board
-        --      todo!
-        local t = self.h - fifty.h
-        local l = 0
+        -- on small maps, choose small 50s
+        if self.w < 8 or self.h < 8 then
+            fifty = fifties.grids[1]
+
+        -- otherwise, pick whichever
+        else
+            fifty = rnd(fifties.grids)
+        end
+
+        -- if the grid is reflectable, perform a coin flip for the version
+        if (rnd() < 0.5) fifty = fifty:reflect()
+
+
+        -- chooses a random corner.
+        -- 0 is bottom left, increasing is clockwise
+        local corners = {0, 1, 2, 3}
+        local corner
+
+        -- ensures the chosen corner is sificiently far from the revealed tile
+        local d = 0
+        while d < max(fifty.w, fifty.h) + 2 do
+
+            -- picks a random corner
+            corner = del(corners, rnd(corners))
+
+
+            -- ensures the initial reveal is not close to
+            -- bottom left
+            if corner == 0 then
+                d = max(abs(0 - x), abs(self.h - y))
+
+            -- top left
+            elseif corner == 1 then
+                d = max(abs(0 - x), abs(0 - y))
+
+            -- top right
+            elseif corner == 2 then
+                d = max(abs(self.w - x), abs(0 - y))
+
+            -- bottom right
+            elseif corner == 3 then
+                d = max(abs(self.w - x), abs(self.h - y))
+
+            end
+        end
+
+        -- top left corner of the grid relative to the board
+        local t = -1
+        local l = -1
+
+        -- moves the grid.
+        -- bottom left
+        if corner == 0 then
+            t = self.h - fifty.h
+            l = 0
+
+            -- no rotation needed
+
+        -- top left
+        elseif corner == 1 then
+            fifty = fifty:rotate90()
+            t = 0
+            l = 0
+
+        -- top right
+        elseif corner == 2 then
+            fifty = fifty:rotate180()
+            t = 0
+            l = self.w - fifty.w
+
+        -- bottom right
+        elseif corner == 3 then
+            fifty = fifty:rotate270()
+            t = self.h - fifty.h
+            l = self.w - fifty.w
+        end
 
         -- stores the data for second gen
         self.fifty = fifty
