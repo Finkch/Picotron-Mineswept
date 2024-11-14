@@ -55,7 +55,7 @@
     x   * fix cruel mode deleting flags adjacent to first reveal
     x   * on insidious, game over also runs second gen
     * allow insidious gens not in corners
-    * lshift also pans/speeds up cursor
+    x   * lshift also pans/speeds up cursor
 
 ]]
 
