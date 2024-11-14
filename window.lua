@@ -158,17 +158,17 @@ function Window:draw()
     -- well, board is in another step
     elseif state:__eq("play") then
 
-        -- more relative draws
-        cam:focus(-self.focal)
-        cam()
-
-        cursor:draw()
-
     -- menus
     elseif state:__eq("gameover") then
 
         self:draw_gameover()
     end
+
+    -- more relative draws
+    cam:focus(-self.focal)
+    cam()
+
+    cursor:draw()
     
 
     cam(true)

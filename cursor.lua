@@ -128,13 +128,14 @@ function Cursor:draw()
     if not self.mouse then
         window({cursor = 0})
         local x, y = self:posm():u()
-        spr(59, x - 8, y - 8)
+
+        if (state:__eq("play")) spr(59, x - 8, y - 8)
     else
         window({cursor = 1})
     end
 
     -- shows which tile the cursor would select
-    if (kbm:held("space") or kbm:held("lshift")) return
+    if (kbm:held("space") or kbm:held("lshift") or state:__eq("menu") or state:__eq("gameover")) return
 
     local x, y = self:map(board.d)
 
