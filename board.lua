@@ -137,6 +137,8 @@ function Board:place_mines(mines, cells)
     local i = 0
     while i < mines do
 
+        assert(#cells > 0, string.format("cannot find tiles to place %d remaining mines", mines - i))
+
         -- pops a random item from the list
         local bombify = del(cells, rnd(cells))
 
@@ -422,16 +424,15 @@ function Board:generate_unfair(x, y, mines)
 
         self.second_gen = true
 
-        -- places false flags around the first reveal.
-        -- later, we'll place these mines to ensure they match the fake initial reveal
+        -- grabs the x, y, and count data of the initial reveal
+        local fx, fy, fc = unpack(self.first_reveal)
+
+        -- places false flags about the first reveal.
+        -- we'll generate these mines after the regular board mines
         for dx = -1, 1 do
             for dy = -1, 1 do
-                if not (dx == 0 and dy == 0) and self:inbounds(self.first_reveal[1] + dx, self.first_reveal[2] + dy) then
-                    if self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_flag) then
-                        mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 11)
-                    else
-                        mset(self.first_reveal[1] + dx, self.first_reveal[2] + dy, self.bs + 10)
-                    end
+                if not (dx == 0 and dy == 0) and self:inbounds(fx + dx, fy + dy) then
+                    self:falseify(fx + dx, fy + dy)
                 end
             end
         end
@@ -441,13 +442,13 @@ function Board:generate_unfair(x, y, mines)
 
         -- checks if the mine placed was adjacent to the first reveal
         local adj = false
-        if (abs(x - self.first_reveal[1]) <= 1 and abs(y - self.first_reveal[2]) <= 1) adj = true
+        if (abs(x - fx) <= 1 and abs(y - fy) <= 1) adj = true
 
         -- places most mines
         if adj then
-            self:place_mines(mines - self.first_reveal[3])
+            self:place_mines(mines - fc)
         else
-            self:place_mines(mines - self.first_reveal[3] - 1)
+            self:place_mines(mines - fc - 1)
         end
 
         -- places a mine under the cursor
@@ -457,22 +458,22 @@ function Board:generate_unfair(x, y, mines)
         local cells = {}
         for dx = -1, 1 do
             for dy = -1, 1 do
-                if not (dx == 0 and dy == 0) and self:inbounds(self.first_reveal[1] + dx, self.first_reveal[2] + dy) and not self:tile(self.first_reveal[1] + dx, self.first_reveal[2] + dy, is_mine) then
+                if not (dx == 0 and dy == 0) and self:inbounds(fx + dx, fy + dy) and not self:tile(fx + dx, fy + dy, is_mine) then
 
                     -- if the cell doesn't have a mine, add it to choices
-                    add(cells, {flr(self.first_reveal[1] + dx), flr(self.first_reveal[2] + dy)})
+                    add(cells, {fx + dx, fy + dy})
 
                     -- resets any lingering false flags
-                    self:ify_all(self.falseify, cells)
+                    self:falseify(fx + dx, fy + dy)
                 end
             end
         end
 
-        -- places the final mines
+        -- places the final mines about the initial reveal
         if adj then
-            self:place_mines(self.first_reveal[3] - 1, cells)
+            self:place_mines(fc - 1, cells)
         else
-            self:place_mines(self.first_reveal[3], cells)
+            self:place_mines(fc, cells)
         end
 
         -- updates the counts around the board.
@@ -615,7 +616,7 @@ function Board:ensure_insidious()
     for i = 0, fifty.w - 1 do
         for j = 0, fifty.h - 1 do
             local x, y = i + 1, j + 1
-            if (fifty.mgrid[y][x] > maxi) maxi = fifty.mgrid[x][y]
+            if (fifty.mgrid[y][x] > maxi) maxi = fifty.mgrid[y][x]
         end
     end
 
