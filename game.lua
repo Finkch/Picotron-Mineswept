@@ -12,6 +12,7 @@ function State:new(states)
 
     local s = {
         state = nil,
+        previous = nil,
         states = states,
         data = {}           -- misc data that doesn't fit elsewhere
     }
@@ -21,6 +22,7 @@ function State:new(states)
 end
 
 function State:change(state)
+    self.previous = self.state
     self.state = state
 
     self:_change()
