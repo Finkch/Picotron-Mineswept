@@ -56,7 +56,7 @@
     x   * on insidious, game over also runs second gen
     * allow insidious gens not in corners
     x   * lshift also pans/speeds up cursor
-    * get tighter bounds for insidious through smart reflection of 3x2
+    x   * get tighter bounds for insidious through smart reflection of 3x2
     * insidious loses on the n + mth move (allow moves that result in further 50-50s)
     * demo game with set board to showcase colours...but it's actually insiidous
     * show win-loss ratio on gameover screen
@@ -65,10 +65,10 @@
     * title on menu screen?
     x   * don't reset cursor to centre screen if playing again
     x       > track previous gamestate
-    * move random 50-50 selection into fifties
-        > add weight to given types
+    x   * move random 50-50 selection into fifties
+    x        > add weight to given types
         > find clever way of compressing similar layouts
-    * fix insidious gen starting on non-0 due to inideal 50-50 placement
+    xxxx   * fix insidious gen starting on non-0 due to inideal 50-50 placement
 
     * refactor board
     x       > better tile manipulation logic (clean functions, no if tile(is_flag_false) lying about)
@@ -187,7 +187,7 @@ function _init()
     -- default values
     state.data.mi = 0   -- menu index
     state.data.ml = 4   -- menu length
-    state.data.mind = 8     -- min and max board dimensions
+    state.data.mind = 6     -- min and max board dimensions
     state.data.maxd = 32
     state.data.minmines = 6
     state.data.maxmines = -1 -- will be update to match board dimensions
@@ -201,7 +201,7 @@ function _init()
     fifties = Fifties:new()
 
     -- do debug printout
-    debug = false
+    debug = true
 end
 
 
@@ -223,8 +223,6 @@ function _update()
         q:add(cursor:posm())
         q:add(Vec:new(cursor:map(board.d)))
         q:add(board:value(cursor:map(board.d)))
-        q:add(state.state)
-        q:add(state.previous)
     end
 end
 
