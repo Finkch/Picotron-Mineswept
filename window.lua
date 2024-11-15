@@ -130,6 +130,30 @@ function Window:box(l, t, r, b, two_wide, background)
 
 end
 
+-- prints text with a shadow
+function Window:text(text, m, t)
+
+    -- gets text width
+    local pw = print(text, 500, 500) - 500
+
+    -- text shadow
+    print(text, m - pw / 2    , t + 1, 5)
+    print(text, m - pw / 2 + 1, t    , 5)
+    print(text, m - pw / 2 + 1, t + 1, 5)
+
+    -- text
+    print(text, m - pw / 2    , t    , 7)
+end
+
+-- draws box around some shadowed text
+function Window:box_text(text, m, t)
+
+    local pw = print(text, 500, 500) - 500
+
+    self:box(m - pw / 2 - 4, t - 4, m + pw / 2 + 3, t + 12, true, 6)
+    self:text(text, m, t)
+end
+
 -- draws window
 function Window:draw()
     cls()
@@ -159,6 +183,7 @@ function Window:draw()
     if state:__eq("menu") then
 
         self:draw_menu()
+        self:draw_wl()
 
     -- all play draws were performed earlier
     elseif state:__eq("play") then
@@ -167,6 +192,7 @@ function Window:draw()
     elseif state:__eq("gameover") then
 
         self:draw_gameover()
+        self:draw_wl()
     end
 
     -- more relative draws
@@ -371,29 +397,38 @@ function Window:draw_menu()
     end
     
 
-
-    -- draws box
+    -- text box with start instructions
     if cursor.mouse then
-        pw = print("right click to start", 500, 500) - 500
-        self:box(wm - pw / 2 - 4, t + 4 * b, wm + pw / 2 + 3, t + 4 * b + 16, true, 6)
-
-        -- text shadow
-        print("right click to start", wm - pw / 2, t + 4 * b + 5, 5)
-        print("right click to start", wm - pw / 2 + 1, t + 4 * b + 4, 5)
-        print("right click to start", wm - pw / 2 + 1, t + 4 * b + 5, 5)
-
-        -- text
-        print("right click to start", wm - pw / 2, t + 4 * b + 4, 7)
+        self:box_text("right click to start", wm, t + 4 * b + 4)
     else
-        pw = print("press x to start", 500, 500) - 500
-        self:box(wm - pw / 2 - 4, t + 4 * b, wm + pw / 2 + 3, t + 4 * b + 16, true, 6)
-
-        -- text shadow
-        print("press x to start", wm - pw / 2, t + 4 * b + 5, 5)
-        print("press x to start", wm - pw / 2 + 1, t + 4 * b + 4, 5)
-        print("press x to start", wm - pw / 2 + 1, t + 4 * b + 5, 5)
-
-        -- text
-        print("press x to start", wm - pw / 2, t + 4 * b + 4, 7)
+        self:box_text("press x to start", wm, t + 4 * b + 4)
     end
+end
+
+-- shows win:loss ratio
+function Window:draw_wl()
+    
+    local loss_message = string.format("losses: %03d", min(999, winlosser.l))
+    local pw = print(loss_message, 500, 500) - 500
+
+    -- precalcs
+    local b = 8
+    local ib = 12
+    local w = pw + b + 2
+    local h = 28
+    
+    -- bounds of the boxes
+    local l = self.wr - b - w
+    local r = l + w
+    local t = self.wt + b
+    local b = t + h
+
+    -- box around the text
+    self:box(l, t, r, b, true, 6)
+
+    -- wins text
+    self:text(string.format("  wins: %03d", min(999, winlosser.w)), l + w / 2, t + 4)
+
+    -- losses text
+    self:text(loss_message, l + w / 2, t + 4 + ib)
 end
