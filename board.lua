@@ -338,13 +338,50 @@ function Board:generate_insidious(x, y, mines)
         for i = 0, fifty.w - 1 do
             for j = 0, fifty.h - 1 do
 
+                local ix, iy = i + 1, j + 1
+
                 -- sets false flag
-                if fifty.grid[j + 1][i + 1] == -2 then
+                if fifty.grid[iy][ix] == -2 then
                     mset(l + i, t + j, self.bs + 10)
 
                 -- counts quantum mines
                 elseif fifty.grid[j + 1][i + 1] > 0 then
-                    mset(l + i, t + j, mget(l + i, t + j) + fifty.grid[j + 1][i + 1])
+                    mset(l + i, t + j, mget(l + i, t + j) + fifty.grid[iy][ix])
+
+                -- counts fair gen quantum mines
+                elseif fifty.grid[iy][ix] == 0 and not self:tile(l + i, t + j, is_mine) then
+
+                    -- chooses the first adjacent non-zero number it finds on the mgrid.
+                    -- by counting the adjacent quantum mines of that variant, it will
+                    -- know what it would need to add to its count.
+                    -- a random adjacent quantum mine variant is guaranteed to be the
+                    -- same as all adjacent others, since otherwise it wouldn't be quantum.
+                    local first = nil
+                    local count = 0
+                    for dx = -1, 1 do
+                        for dy = -1, 1 do
+
+                            -- ensures all accesses lie on the (m)grid.
+                            -- strictly speaking, no need to prevent dx == 0 and dy == 0,
+                            -- since such a tile is guaranteed to not be a qmine variant
+                            if 1 <= ix + dx and ix + dx <= fifty.w and 1 <= iy + dy and iy + dy <= fifty.h and not (dx == 0 and dy == 0) then
+
+                                -- check for quantum mine
+                                if fifty.mgrid[iy + dy][ix + dx] != 0 then
+
+                                    -- finds the first variant
+                                    if (not first) first = fifty.mgrid[iy + dy][ix + dx] -- 10 deep!
+
+                                    -- counts occurances of that variant
+                                    if (fifty.mgrid[iy + dy][ix + dx] == first) count += 1
+
+                                end
+                            end -- 8 deep nested statements |:^(
+                        end
+                    end
+
+                    -- adds the count of adjacnet quantum mines to the cell
+                    mset(l + i, t + j, mget(l + i, t + j) + count)
                 end
             end
         end

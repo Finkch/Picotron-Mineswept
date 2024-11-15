@@ -71,6 +71,7 @@
     xxxx   * fix insidious gen starting on non-0 due to inideal 50-50 placement
     * draw a border around the board
     x   * insidious 50 cell that is included in fair gen; a zero?
+    x       > fix the count not working
 
     * refactor board
     x       > better tile manipulation logic (clean functions, no if tile(is_flag_false) lying about)
