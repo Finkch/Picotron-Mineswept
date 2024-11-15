@@ -59,9 +59,9 @@
     x   * get tighter bounds for insidious through smart reflection of 3x2
     -   * insidious loses on the n + mth move (allow moves that result in further 50-50s)
     * demo game with set board to showcase colours...but it's actually insiidous
-    * show win-loss ratio on gameover screen
-        > write to appdata
-        > reset by through grave on menu/gameover?
+    x   * show win-loss ratio on gameover screen
+    x       > write to appdata
+    x       > reset by through grave on menu/gameover?
     * title on menu screen?
     x   * don't reset cursor to centre screen if playing again
     x       > track previous gamestate
@@ -75,6 +75,7 @@
     -   * better 50 choice by allowing larger boards depending on first reveal location;
     -     actually, that would go poorly for very large 50s on small board.
     -     the board would be overwhelmed by the 50 if cursor was in the corner
+    x   * key bind to lose game
 
     * refactor board
     x       > better tile manipulation logic (clean functions, no if tile(is_flag_false) lying about)
@@ -222,7 +223,7 @@ function _init()
     winlosser = Winlosser:new()
 
     -- do debug printout
-    debug = true
+    debug = false
 end
 
 
