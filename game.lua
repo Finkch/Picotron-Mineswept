@@ -68,6 +68,10 @@ function menu_input()
     board.bombs = mid(state.data.minmines, board.bombs, state.data.maxmines)
 
 
+    -- reset score
+    if (kbm:pressed("`")) winlosser:clear()
+
+    
     -- starts the game
     if kbm:released("x") or kbm:released("rmb") then
 
