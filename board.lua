@@ -198,7 +198,7 @@ end
 -- generates a guaranteed loss, that will take a while to uncover
 function Board:generate_insidious(x, y, mines)
 
-    local do_log = false
+    local do_log = true
     
     -- on normal board generation
     if self.reveals == 0 then
@@ -224,14 +224,24 @@ function Board:generate_insidious(x, y, mines)
             logger(string.format("cursor: (%d, %d)\n", x, y), "fd.txt")
         end
 
-        -- ensures the chosen corner is sificiently far from the revealed tile
-        local d = 0
+        
+        -- whether or not the cursor's cell overlaps with the grid
+        local overlap = true
+
+        -- top left corner of the grid relative to the baord
+        local t = -1
+        local l = -1
+
+        -- allows rotation without affecting the original
+        local try_fifty = nil
+
+        -- in case current reflection cannot allow it to fit, reflect and try again
         local second_try = false
-        while d < min(fifty.w, fifty.h) + 2 do
 
-            if (do_log and d != 0) logger(string.format("invalid corner. trying again...\n"), "fd.txt")
+        -- ensures the chosen corner is sificiently far from the revealed tile
+        while overlap do
 
-            -- if we can't fit the 50-50, try reflecting it
+            -- if we can't fit the 50-50, try reflecting it and starting again
             if #corners == 0 then
                 fifty = fifty:reflect()
                 corners = {0, 1, 2, 3}
@@ -245,76 +255,51 @@ function Board:generate_insidious(x, y, mines)
             -- picks a random corner
             corner = del(corners, rnd(corners))
 
-            -- x and y distances
-            local dx, dy = 0, 0
-
             -- ensures the initial reveal is not close.
-            -- otherwise, initial reveal would not be guaranteed
-            -- to be a zero.
+            -- otherwise, initial reveal would not be guaranteed to be a zero.
+
             -- bottom left
             if corner == 0 then
-                dx = x
-                dy = self.h - y
+                try_fifty = fifty:copy()
+
+                -- top left corner
+                l = 0
+                t = self.h - try_fifty.h
 
             -- top left
             elseif corner == 1 then
-                dx = x
-                dy = y
+                try_fifty = fifty:rotate90()
+
+                l = 0
+                t = 0
+
 
             -- top right
             elseif corner == 2 then
-                dx = self.w - x
-                dy = y
+                try_fifty = fifty:rotate180()
+
+                l = self.w - try_fifty.w
+                t = 0
+
 
             -- bottom right
             elseif corner == 3 then
-                dx = self.w - x
-                dy = self.h - y
+                try_fifty = fifty:rotate270()
+
+                l = self.w - try_fifty.w
+                t = self.h - try_fifty.h
             end
 
-            -- distance from cursor to prospective corner
-            d = max(abs(dx), abs(dy))
-
-            if do_log then
-                logger(string.format("corner:\t%d", corner), "fd.txt")
-                logger(string.format("max d(%d, %d) = %d", dx, dy, d), "fd.txt")
-                logger(string.format("min f(%d, %d) + 2 = %d", fifty.w, fifty.h, min(fifty.w, fifty.h) + 2), "fd.txt")
-                logger(string.format("\t%d < %d? -> %s", d, min(fifty.w, fifty.h) + 2, d < min(fifty.w, fifty.h) + 2), "fd.txt")
-                --logger(string.format("", ), "fd.txt")
-            end
+            -- checks if the corner is valid.
+            -- it is valid if the cursor doesn't overlap the grid's region.
+            -- this ensures the initial reveal is a zero
+            overlap = self:overlap(x, y, l, t, try_fifty)
         end
 
-        -- top left corner of the grid relative to the board.
-        -- used to snuggly place the 50-50 in the corner
-        local t = -1
-        local l = -1
+        -- grabs the orientation that was deemed to fit
+        fifty = try_fifty
 
-        -- moves the grid.
-        -- bottom left
-        if corner == 0 then
-            t = self.h - fifty.h
-            l = 0
 
-            -- no rotation needed
-
-        -- top left
-        elseif corner == 1 then
-            fifty = fifty:rotate90()
-            t = 0
-            l = 0
-
-        -- top right
-        elseif corner == 2 then
-            fifty = fifty:rotate180()
-            t = 0
-            l = self.w - fifty.w
-
-        -- bottom right
-        elseif corner == 3 then
-            fifty = fifty:rotate270()
-            t = self.h - fifty.h
-            l = self.w - fifty.w
-        end
 
         -- stores the data for second gen
         self.fifty = fifty
@@ -384,6 +369,11 @@ function Board:generate_insidious(x, y, mines)
         -- places mines according to that variant
         self:place_variant(variant)
     end
+end
+
+-- checks for a collision between cursor and a grid position
+function Board:overlap(x, y, l, t, fifty)
+    return l - 1 <= x and x <= l + fifty.w and t - 1 <= y and y <= t + fifty.h
 end
 
 function Board:place_variant(v)
