@@ -251,7 +251,12 @@ function play_input()
 
     -- flag
     if (cursor.action == "flag") board:rclick(cursor)
-    
+
+    -- lose game
+    if (board.reveals > 0 and kbm:pressed("`")) then
+        board:reveal_mines()
+        state:change("gameover")
+    end
 end
 
 
