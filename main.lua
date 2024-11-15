@@ -67,11 +67,12 @@
     x       > track previous gamestate
     x   * move random 50-50 selection into fifties
     x        > add weight to given types
-        > find clever way of compressing similar layouts
+    x   * find clever way of compressing similar layouts
     xxxx   * fix insidious gen starting on non-0 due to inideal 50-50 placement
     * draw a border around the board
     x   * insidious 50 cell that is included in fair gen; a zero?
     x       > fix the count not working
+    * better 50 choice by allowing larger boards depending on first reveal location
 
     * refactor board
     x       > better tile manipulation logic (clean functions, no if tile(is_flag_false) lying about)

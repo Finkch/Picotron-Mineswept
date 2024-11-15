@@ -694,18 +694,22 @@ end
 function Board:ensure_insidious()
 
     local fifty = self.fifty
+    local l = self.l
+    local t = self.t
 
-    -- looks for that largest value in the grid
-    local maxi = 0
+    -- gets a list of all cells containing quantum mines
+    local cells = {}
     for i = 0, fifty.w - 1 do
         for j = 0, fifty.h - 1 do
-            local x, y = i + 1, j + 1
-            if (fifty.mgrid[y][x] > maxi) maxi = fifty.mgrid[y][x]
+            if (fifty.mgrid[j + 1][i + 1] > 0) add(cells, {l + i, t + j})
         end
     end
 
-    -- randomly selects a variant
-    local variant = flr(rnd(maxi)) + 1
+   -- chooses a random cell with a quantum mine
+   local x, y = unpack(rnd(cells))
+
+    -- randomly selects a variant from the given cell
+    local variant = self:choose_variant(x, y)
 
     -- places the mines for that variant
     self:place_variant(variant)
