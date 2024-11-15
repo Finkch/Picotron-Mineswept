@@ -159,6 +159,9 @@ function _init()
 
         elseif self:__eq("gameover") then
 
+            -- reveals mines
+            board:reveal_mines()
+
             -- update w:l ratio
             if self.data.win then
                 winlosser.w += 1

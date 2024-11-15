@@ -239,9 +239,7 @@ function play()
 
     -- updates the clock after the first reveal
     if (board.reveals > 0) clock()
-
-    -- check if the game has ended to reveal mines
-    if (state:__eq("gameover")) board:reveal_mines()
+    
 end
 
 function play_input()
@@ -253,10 +251,7 @@ function play_input()
     if (cursor.action == "flag") board:rclick(cursor)
 
     -- lose game
-    if (board.reveals > 0 and kbm:pressed("`")) then
-        board:reveal_mines()
-        state:change("gameover")
-    end
+    if (board.reveals > 0 and kbm:pressed("`")) state:change("gameover")
 end
 
 
