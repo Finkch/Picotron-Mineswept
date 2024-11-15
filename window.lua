@@ -137,7 +137,13 @@ function Window:draw()
     -- relative draws
     cam()
 
-    if (not state:__eq("menu")) board:draw()
+    if not state:__eq("menu") then 
+        
+        -- border around board
+        self:draw_border()
+       
+        board:draw()
+    end
 
     cam(true)
 
@@ -154,11 +160,10 @@ function Window:draw()
 
         self:draw_menu()
 
-    -- board and cursor
-    -- well, board is in another step
+    -- all play draws were performed earlier
     elseif state:__eq("play") then
 
-    -- menus
+    -- gameover
     elseif state:__eq("gameover") then
 
         self:draw_gameover()
@@ -281,6 +286,15 @@ function Window:draw_gameover()
         print("press z to return to menu", wm - pw / 2, tl + 24, 8)
     end
 
+end
+
+function Window:draw_border()
+
+    -- a thin boarder
+    self:box(-1, -1, board.w * board.d, board.h * board.d, false, 6)
+
+    -- a smaller black box to allow mines to appear
+    self:box(0, 0, board.w * board.d - 1, board.h * board.d - 1)
 end
 
 function Window:draw_menu()
