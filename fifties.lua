@@ -7,7 +7,8 @@ Fifty.__index = Fifty
 Fifty.__type = "fifty"
 
 -- all grids will face the bottom left corner by default.
---  n >= 0   = normal cell; n = count of adjacent quantum mines
+--  n > 0   = quantum count; n = count of adjacent quantum mines
+--  0       = obeys fair generation rules
 --  -1      = mine
 --  -2      = false flag
 --
@@ -265,8 +266,8 @@ function Fifties:_init()
     self:add(4, true, 1,
         {
             {-1, -1, -1},
-            {1, -2, 1},
-            {1, -2, 1}
+            {0, -2, 1},
+            {0, -2, 1}
         }, {
             {0, 0, 0},
             {0, 2, 0},
@@ -277,8 +278,8 @@ function Fifties:_init()
     self:add(5, true, 1,
         {
             {-1, -1, -1},
-            {1, -2, 1},
-            {1, -2, -1}
+            {0, -2, 1},
+            {0, -2, -1}
         }, {
             {0, 0, 0},
             {0, 2, 0},
@@ -289,8 +290,8 @@ function Fifties:_init()
     self:add(5, true, 1,
         {
             {-1, -1, -1},
-            {1, -2, -1},
-            {1, -2, 1}
+            {0, -2, -1},
+            {0, -2, 1}
         }, {
             {0, 0, 0},
             {0, 2, 0},

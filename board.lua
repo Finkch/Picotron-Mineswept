@@ -299,6 +299,9 @@ function Board:generate_insidious(x, y, mines)
         -- grabs the orientation that was deemed to fit
         fifty = try_fifty
 
+        fifty = fifties.grids[#fifties.grids]
+        l = 0
+        t = self.h - fifty.h
 
 
         -- stores the data for second gen
@@ -309,7 +312,7 @@ function Board:generate_insidious(x, y, mines)
         -- sets false flags on the 50-50
         for i = 0, fifty.w - 1 do
             for j = 0, fifty.h - 1 do
-                mset(l + i, t + j, self.bs + 10)
+                if (fifty.grid[j + 1][i + 1] != 0) mset(l + i, t + j, self.bs + 10)
             end
         end
 
