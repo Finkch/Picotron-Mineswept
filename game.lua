@@ -239,7 +239,7 @@ function play()
 
     -- updates the clock after the first reveal
     if (board.reveals > 0) clock()
-    
+
 end
 
 function play_input()
@@ -250,7 +250,8 @@ function play_input()
     -- flag
     if (cursor.action == "flag") board:rclick(cursor)
 
-    -- lose game
+    -- lose game.
+    -- must be after reveal, otherwise no board has been generated
     if (board.reveals > 0 and kbm:pressed("`")) state:change("gameover")
 end
 
