@@ -670,6 +670,8 @@ function Board:reveal_mines()
     -- in insidious mode, places the final mines in the special zone
     if (self.fairness == 0 and not self.second_gen) self:ensure_insidious()
 
+    if (self.fairness == 1 and not self.second_gen) self:ensure_cruel()
+
     -- looks for mines
     for i = 0, self.w - 1 do
         for j = 0, self.h - 1 do
@@ -714,6 +716,30 @@ function Board:ensure_insidious()
 
     -- places the mines for that variant
     self:place_variant(variant)
+end
+
+-- if the player pressed the lose-game button, this is called
+-- to place the mines to the board looks fair.
+function Board:ensure_cruel()
+
+    local cells = self:cells()
+
+    -- choose a random, non-revealed cell as the second "revealed" 
+    -- cell for cruel generation.
+    -- now, maybe this should also not work on flagged cells, but it
+    -- should be fine as is, and appear marginally more fiar
+    while #cells > 0 do
+
+        -- chooses a random cell
+        local cell = del(cells, rnd(cells))
+        local x, y = cell[1], cell[2]
+
+        -- if the spot is valid, start cruel gen
+        if not self:tile(x, y, is_reveal) then
+            self:generate(x, y, self.bombs)
+            return
+        end
+    end
 end
 
 
