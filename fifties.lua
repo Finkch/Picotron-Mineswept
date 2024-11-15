@@ -253,7 +253,7 @@ function Fifties:_init()
 
 
     -- 3x4
-    self:add(5, true, 1000,
+    self:add(5, true, 1,
         {
             { 0,  0, -1},
             {-2, -2, -1},
