@@ -201,7 +201,7 @@ function _init()
     fifties = Fifties:new()
 
     -- do debug printout
-    debug = true
+    debug = false
 end
 
 
