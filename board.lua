@@ -400,7 +400,7 @@ function Board:generate_insidious(x, y, mines)
 
         -- figures out which variant supports this mine placement.
         -- i.e., which variant has an active bit in this tile
-        local variant = fifty.mgrid[y - t + 1][x - l + 1]
+        local variant = self:choose_variant(x, y)
 
         -- places mines according to that variant
         self:place_variant(variant)
@@ -412,15 +412,50 @@ function Board:overlap(x, y, l, t, fifty)
     return l - 1 <= x and x <= l + fifty.w and t - 1 <= y and y <= t + fifty.h
 end
 
+-- given the flags on a cell, choose one at random
+function Board:choose_variant(x, y)
+
+    local fifty = self.fifty
+    local t = self.t
+    local l = self.l
+
+    local variants = fifty.mgrid[y - t + 1][x - l + 1]
+
+    -- finds the present variants of the given cell
+    local flags = {}
+    local i = 0
+    local pow = 1
+
+    -- checks each bit
+    while pow <= variants do
+
+        -- checks if this flag is active
+        if ((variants // pow) & 1 == 1) add(flags, pow)
+
+        -- checks the next power
+        i += 1
+        pow = 2 ^ i
+    end
+
+    -- returns a random variant from the cell's possible variants
+    return rnd(flags)
+end
+
+
+-- collapses a mine wave function into a specific variant
 function Board:place_variant(v)
 
+    -- for whatever reason, we can't pass these value since
+    -- i guess they're local when this is called from insidious?
+    -- that makes no sense because otherwise 'v,' too, would be nil.
+    -- nevertheless, fifty is nil if passed in
     local fifty = self.fifty
     local t = self.t
     local l = self.l
 
     for i = 0, fifty.w - 1 do
         for j = 0, fifty.h - 1 do
-            if fifty.mgrid[j + 1][i + 1] & v > 0 then
+            if fifty.mgrid[j + 1][i + 1] & v != 0 then
 
                 -- in case flagged
                 if self:tile(l + i, t + j, is_flag) then
@@ -654,6 +689,8 @@ function Board:reveal_mines()
     end
 end
 
+-- if the player has not revealed a false flag during insidious,
+-- this is called to place a random varaint.
 function Board:ensure_insidious()
 
     local fifty = self.fifty
