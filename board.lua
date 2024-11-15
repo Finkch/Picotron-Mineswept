@@ -299,10 +299,6 @@ function Board:generate_insidious(x, y, mines)
         -- grabs the orientation that was deemed to fit
         fifty = try_fifty
 
-        fifty = fifties.grids[#fifties.grids]
-        l = 0
-        t = self.h - fifty.h
-
 
         -- stores the data for second gen
         self.fifty = fifty
