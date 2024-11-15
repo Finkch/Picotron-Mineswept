@@ -57,7 +57,7 @@
     * allow insidious gens not in corners
     x   * lshift also pans/speeds up cursor
     x   * get tighter bounds for insidious through smart reflection of 3x2
-    * insidious loses on the n + mth move (allow moves that result in further 50-50s)
+    -   * insidious loses on the n + mth move (allow moves that result in further 50-50s)
     * demo game with set board to showcase colours...but it's actually insiidous
     * show win-loss ratio on gameover screen
         > write to appdata
@@ -69,10 +69,12 @@
     x        > add weight to given types
     x   * find clever way of compressing similar layouts
     xxxx   * fix insidious gen starting on non-0 due to inideal 50-50 placement
-    * draw a border around the board
+    x   * draw a border around the board
     x   * insidious 50 cell that is included in fair gen; a zero?
     x       > fix the count not working
-    * better 50 choice by allowing larger boards depending on first reveal location
+    -   * better 50 choice by allowing larger boards depending on first reveal location;
+    -     actually, that would go poorly for very large 50s on small board.
+    -     the board would be overwhelmed by the 50 if cursor was in the corner
 
     * refactor board
     x       > better tile manipulation logic (clean functions, no if tile(is_flag_false) lying about)
