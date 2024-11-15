@@ -123,7 +123,7 @@ function _init()
     logger = Logger:new("appdata/mineswept/logs")
 
     -- keyboard and mouse
-    kbm = KBM:new({"lmb", "rmb", "x", "z", "left", "right", "up", "down", "space", "lshift"})
+    kbm = KBM:new({"lmb", "rmb", "x", "z", "left", "right", "up", "down", "space", "lshift", "`"})
 
     -- tracks time
     clock = Clock:new()

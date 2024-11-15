@@ -251,6 +251,7 @@ function play_input()
 
     -- flag
     if (cursor.action == "flag") board:rclick(cursor)
+    
 end
 
 
@@ -267,5 +268,8 @@ function gameover_input()
 
     -- return to menu
     if (cursor.action == "flag") state:change("menu")
+
+    -- reset score
+    if (kbm:pressed("`")) winlosser:clear()
 
 end
