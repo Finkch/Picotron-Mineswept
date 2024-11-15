@@ -2,7 +2,6 @@
     writes to a file to track user's win-loss ratio
 ]]
 
-include("lib/logger.lua")
 include("lib/log.lua")
 
 Winlosser = {}
@@ -14,7 +13,6 @@ function Winlosser:new()
     local d = "appdata/mineswept"
 
     local w = {
-        logger = Logger:new(d, false),  -- used to write to file
         d = d,                  -- directory to which to write
         f = "wl.txt",           -- file to which to write
         w = 0,                  -- number of wins
@@ -32,7 +30,7 @@ end
 
 -- writes to the file
 function Winlosser:write(data)
-    self.logger(data, self.f)
+    log(self.f, data, {"-d " .. self.d})
 end
 
 -- reads from file
@@ -41,6 +39,13 @@ function Winlosser:read()
     -- fetches the file contents
     local contents = unlog(self.f, self.d)
 
+    -- creates new file in case one does not exist
+    if (not contents) then
+        self:clear()
+        contents = unlog(self.f, self.d)
+    end
+
+    -- gets the number of wins and losses.
     -- thanks, chatgpt, for doing the regex for me
     local w, l = contents:match("w:(%d+)%s*l:(%d+)")
 
