@@ -106,6 +106,7 @@ include("window.lua")
 include("cursor.lua")
 include("game.lua")
 include("fifties.lua")
+include("winloss.lua")
 
 include("lib/queue.lua")
 include("lib/logger.lua")
@@ -158,7 +159,15 @@ function _init()
 
         elseif self:__eq("gameover") then
 
-            -- do nothing special
+            -- update w:l ratio
+            if self.data.win then
+                winlosser.w += 1
+            else
+                winlosser.l += 1
+            end
+
+            -- push data to file
+            winlosser:update()
 
         -- when starting a game...
         elseif self:__eq("play") then
@@ -206,8 +215,11 @@ function _init()
     -- initialises list of possible 50-50s
     fifties = Fifties:new()
 
+    -- used to read/write win:loss ratio
+    winlosser = Winlosser:new()
+
     -- do debug printout
-    debug = false
+    debug = true
 end
 
 
@@ -229,6 +241,7 @@ function _update()
         q:add(cursor:posm())
         q:add(Vec:new(cursor:map(board.d)))
         q:add(board:value(cursor:map(board.d)))
+        q:add(string.format("w: %d,\tl: %d", winlosser.w, winlosser.l))
     end
 end
 

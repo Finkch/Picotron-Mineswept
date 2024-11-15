@@ -630,10 +630,11 @@ function Board:reveal(x, y)
 
     -- if the final tile was revealed, and it isn't a gameover, win the game
     if not state:__eq("gameover") and self.w * self.h - self.bombs == self.reveals then
-        state:change("gameover")
         
         -- push win to state
         state.data.win = true
+        
+        state:change("gameover")
     end
 end
 
