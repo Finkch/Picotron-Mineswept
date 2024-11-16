@@ -134,10 +134,9 @@ end
 
 -- like a regular cell, but tracks all its possible states at once.
 -- reverts to a normal cell when observed
-QuantumCell = {}
+QuantumCell = setmetatable({}, Cell)
 QuantumCell.__index = QuantumCell
 quantumCell.__type = "quantumcell"
-setmetatable(QuantumCellCell, Cell)
 
 function QuantumCell:new(base_sprite)
 
@@ -162,7 +161,7 @@ function QuantumCell:infer()
 
     -- finds all possible eigenstates
     while eigenstate <= self.superposition do
-        if (self.superposition & eigenstate > 0) add(eigenstates, eigenstate)
+        if (self:is_entangled(eigenstate)) add(eigenstates, eigenstate)
         eigenstate = eigenstate << 1
     end
 
@@ -171,10 +170,8 @@ function QuantumCell:infer()
 end
 
 
-
-
 -- given an eigenstate or superposition, return whether this cell is entangled
-function QuantumCell:entangled(supereigen)
+function QuantumCell:is_entangled(supereigen)
     return self.superposition & supereigen > 0
 end
 
@@ -185,7 +182,7 @@ end
 function QuantumCell:resolve(eigenstate)
 
     -- not entangled to this state
-    if (not self:entangled(eigenstate)) return 0
+    if (not self:is_entangled(eigenstate)) return 0
 
     -- is a mine
     if (self.eigenvalues & eigenstate > 0) return -1
@@ -203,20 +200,19 @@ function QuantumCell:observe(eigenstate)
     eigenstate = eigenstate or self:infer()
 
     -- ensures valid eigenstate
-    assert(self:entangled(eigenstate), string.format("cannot observe non-entagled eigenstate; eigenstate '%s' for superposition '%s'", eigenstate, self.superposition))
-
-    -- collapses the wavefunciton, becoming a classical cell
-    self.mine = self:resolve(eigenstate) < 0
-
-    self.quantum = false
-    self.superposition = nil
-    self.eigenvalues = nil
+    assert(self:is_entangled(eigenstate), string.format("cannot observe non-entagled eigenstate; eigenstate '%s' for superposition '%s'", eigenstate, self.superposition))
 
     --[[ nyi
-    for _, cell in pairs(self.entangle) do
+    for _, cell in pairs(self.entangled) do
         cell:observe(eigenstate)
     end
     ]]
+
+    -- checks if in this state, there is mine
+    self.mine = self:resolve(eigenstate) < 0
+
+    -- collapses the wavefunciton, becoming a classical cell
+    setmetatable(self, Cell)    
 
     -- when not a mine, update count
     if (not self.mine) self:count()
