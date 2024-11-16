@@ -34,6 +34,33 @@ function Cell:new(base_sprite)
 end
 
 
+-- updates the value of this cell based on the count of adjacent mines
+function Cell:count()
+    self.value = 0
+    local eigenstate = nil
+
+    -- checks all neighbours for whether they are a mine
+    for _, cell in ipairs(self.adj) do
+
+        -- counts classical mines
+        if (cell.mine) self.value += 1
+
+        -- counts quantum mines
+        if (cell.quantum) then
+
+            -- finds a random eigenstate.
+            -- use this eigenstate for all adjacent quantum cells
+            if (not eigenstate) eigenstate = cell:infer()
+
+            -- counts occurnaces of the previously found eigenstate.
+            -- by requirement, all possible eigenstates as observed from
+            -- any given cell must all have the same count. hence, we can
+            -- simply use any random eigenstate
+            if (cell.superposition & eigenstate > 0) self.value += 1
+        end
+    end
+end
+
 -- returns a random possible eigenstate given the cell's superposition.
 -- this does not collapse the wavefunction
 function Cell:infer()
