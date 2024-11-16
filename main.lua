@@ -70,8 +70,7 @@
     x   * find clever way of compressing similar layouts
     xxxx   * fix insidious gen starting on non-0 due to inideal 50-50 placement
     x   * draw a border around the board
-    x   * insidious 50 cell that is included in fair gen; a zero?
-    x       > fix the count not working
+    xx   * insidious 50 cell that is included in fair gen; a zero?
     -   * better 50 choice by allowing larger boards depending on first reveal location;
     -     actually, that would go poorly for very large 50s on small board.
     -     the board would be overwhelmed by the 50 if cursor was in the corner
@@ -116,6 +115,12 @@
         > how to maintain an 'infinite' grid
             - policy for very distant, isolated reveals
         > minimum desnity to guarantee finite (and sensible) first reveal
+        > how the heck do i generate any frontier? what happens on the initial reveal?
+
+    * observations about quantum mines...
+        > imagine each possible variation was tracked
+            - no matter the variation, every revealed cell would see the same number
+              of mines in each variation
 
 ]]
 
@@ -244,7 +249,7 @@ function _init()
     winlosser = Winlosser:new()
 
     -- do debug printout
-    debug = false
+    debug = true
 end
 
 

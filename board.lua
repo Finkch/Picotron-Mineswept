@@ -370,10 +370,10 @@ function Board:generate_insidious(x, y, mines)
                                 if fifty.mgrid[iy + dy][ix + dx] != 0 then
 
                                     -- finds the first variant
-                                    if (not first) first = fifty.mgrid[iy + dy][ix + dx] -- 10 deep!
+                                    if (not first) first = self:choose_variant(l + i + dx, t + j + dy) -- 10 deep!
 
                                     -- counts occurances of that variant
-                                    if (fifty.mgrid[iy + dy][ix + dx] == first) count += 1
+                                    if (fifty.mgrid[iy + dy][ix + dx] & first > 0) count += 1
 
                                 end
                             end -- 8 deep nested statements |:^(
