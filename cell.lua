@@ -107,6 +107,32 @@ function Cell:resolve(eigenstate)
 end
 
 
+-- observes the cell, collapsing the wavefunction and choosing an eigenstate.
+--      !! todo !! this observation must affect entangled cells
+function Cell:observe(eigenstate)
+
+    -- if no eigenstate was provided, choose one at random
+    eigenstate = eigenstate or self:infer()
+
+    -- ensures valid eigenstate
+    assert(self:entangled(eigenstate), string.format("cannot observe non-entagled eigenstate; eigenstate '%s' for superposition '%s'", eigenstate, self.superposition))
+
+    -- collapses the wavefunciton, becoming a classical cell
+    self.mine = self:resolve(eigenstate) < 0
+
+    self.quantum = false
+    self.superposition = nil
+    self.eigenvalues = nil
+
+    --[[ nyi
+    for _, cell in pairs(self.entangle) do
+        cell:observe(eigenstate)
+    end
+    ]]
+
+    -- when not a mine, update count
+    if (not self.mine) self:count()
+end
 
 
 
