@@ -83,6 +83,33 @@ function Cell:infer()
 end
 
 
+
+
+-- given an eigenstate or superposition, return whether this cell is entangled
+function Cell:entangled(supereigen)
+    return self.superposition & supereigen > 0
+end
+
+-- given an eigenstate returns..
+--  .. 1  if the cell is not a mine
+--  .. 0  if the cell is not entangled to that eigenstate
+--  .. -1 if the cell is a mine
+function Cell:resolve(eigenstate)
+
+    -- not entangled to this state
+    if (not self:entangled(eigenstate)) return 0
+
+    -- is a mine
+    if (self.eigenvalues & eigenstate > 0) return -1
+
+    -- is not a mine
+    return 1
+end
+
+
+
+
+
 -- methods to toggle cell state
 function Cell:reveal()
     self.revealed = not self.revealed
