@@ -13,8 +13,9 @@ function Cell:new(base_sprite)
         x = 0,              -- grid coordinates of cell
         y = 0,
         value = 0,          -- count of adjacent mines
-        flag = false,       -- is a flag
+        revealed = false,   -- is revealed
         mine = false,       -- is a mine
+        flag = false,       -- is a flag
         falsy = false,      -- is a false cell (aka, special flag)
         adj = {}            -- list of adjacent cells
     }
@@ -23,4 +24,6 @@ function Cell:new(base_sprite)
     return c
 end
 
-function 
+-- reveals a cell on the map
+function Cell:reveal()
+end
