@@ -2,6 +2,7 @@
     represents a cell: one item on the game board.
     quick quantum mechanics recap:
         * eigenstate: a realised state out of all possible states
+        * eigenvalue: a scalar factor representing the eigenstate's relation to the superposition
         * superposition: a (linear) combination of all eigenstates
 ]]
 
@@ -26,6 +27,7 @@ function Cell:new(base_sprite)
         falsy = false,      -- is a false cell (aka, special flag)
         quantum = false,    -- whether the cell is a superposition of mine and not mine
         superposition = nil,-- the superposition state (aka variants)
+        eigenvalues = nil   -- whether an eigenstate resolves to be a mine or no mine
         adj = {}            -- list of adjacent cells
     }
 
@@ -55,8 +57,9 @@ function Cell:count()
             -- counts occurnaces of the previously found eigenstate.
             -- by requirement, all possible eigenstates as observed from
             -- any given cell must all have the same count. hence, we can
-            -- simply use any random eigenstate
-            if (cell.superposition & eigenstate > 0) self.value += 1
+            -- simply use any random eigenstate.
+            -- '& eigenvalue' ensures that the state corresponds to a mine
+            if (cell.superposition & cell.eigenvalues & eigenstate > 0) self.value += 1
         end
     end
 end
@@ -64,19 +67,19 @@ end
 -- returns a random possible eigenstate given the cell's superposition.
 -- this does not collapse the wavefunction
 function Cell:infer()
-    local variants = {}
+    local eigenstates = {}
 
     -- the current eigenstate being checked
     local eigenstate = 1
 
     -- finds all possible eigenstates
-    while inference <= self.superposition do
-        if (self.superposition & inference > 0) add(variants, inference)
+    while eigenstate <= self.superposition do
+        if (self.superposition & eigenstate > 0) add(eigenstates, eigenstate)
         eigenstate = eigenstate << 1
     end
 
     -- return a random variant
-    return rnd(variants)
+    return rnd(eigenstates)
 end
 
 
