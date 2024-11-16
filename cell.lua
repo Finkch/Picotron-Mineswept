@@ -21,11 +21,28 @@ function Cell:new(base_sprite)
         mine = false,       -- is a mine
         flag = false,       -- is a flag
         falsy = false,      -- is a false cell (aka, special flag)
+        quantum = false,    -- whether the cell is a superposition of mine and not mine
+        superposition = nil,-- the superposition state (aka variants)
         adj = {}            -- list of adjacent cells
     }
 
     setmetatable(c, Cell)
     return c
+end
+
+
+-- updates the value of this cell based on the count of adjacent mines
+function Cell:count()
+    self.value = 0
+    local first = nil
+    for _, cell in ipairs(self.adj) do
+        if (cell.mine) self.value += 1
+
+        if (cell.quantum) then
+            if (not first) first = cell.superposition
+
+        end
+    end
 end
 
 
