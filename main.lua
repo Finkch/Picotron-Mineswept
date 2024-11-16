@@ -76,6 +76,7 @@
     -     actually, that would go poorly for very large 50s on small board.
     -     the board would be overwhelmed by the 50 if cursor was in the corner
     x   * key bind to lose game
+    - adjustable window size
 
     * refactor board
     x       > better tile manipulation logic (clean functions, no if tile(is_flag_false) lying about)
@@ -95,6 +96,26 @@
             - hard:     guaranteed loss (where possible)
         > victory is tracked through tiles revealed
         > what is minimum density to prevent an infinite reveal?
+
+        > the whole idea behind quantum mineswept arose when i notices a similarity
+          between qm and insidious 50-50 mine placement.
+          the mines exist in all possible variants until the user chooses;
+          by observing a cell, the wav function collapses.
+          plus, it's quantised! there is not continuous amount of mines.
+          that said, there's no analogue for the uncertainty principle, as far as i see.
+        > it turns out, there are at least 4 other projects out there
+          that call themselves "quantum minesweeper". i'm not a genius after all
+
+    * quantum mineswept issues that need to be solved...
+        > general quantum mines
+            - place a mine if...
+                + the mine is guaranteed
+                + the user observes the cell (and fails the probability check)
+            - kicks the question back: how to tell if a mine is guaranteed?
+                + just place mines and reset until it is invalid, lol
+        > how to maintain an 'infinite' grid
+            - policy for very distant, isolated reveals
+        > minimum desnity to guarantee finite (and sensible) first reveal
 
 ]]
 
