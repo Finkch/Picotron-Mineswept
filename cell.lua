@@ -29,6 +29,36 @@ function Cell:new(base_sprite)
 end
 
 
+-- methods to toggle cell state
+function Cell:reveal()
+    self.revealed = not self.revealed
+    self:set()
+end
+
+function Cell:mine()
+    if self.mine then
+        self.value = -1
+        self.mine = true
+    else
+        self.value = 0
+        self.mine = false
+        self:count()
+    end
+
+    self:set()
+end
+
+function Cell:flag()
+    self.flag = not self.flag
+    self:set()
+end
+
+function Cell:falsy()
+    self.falsly = not self.falsly
+    self:set()
+end
+
+
 -- sets the sprite for the cell
 function Cell:set()
 
