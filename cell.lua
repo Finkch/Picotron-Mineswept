@@ -1,5 +1,8 @@
 --[[
-    represents a cell: one item on the game board
+    represents a cell: one item on the game board.
+    quick quantum mechanics recap:
+        * eigenstate: a realised state out of all possible states
+        * superposition: a (linear) combination of all eigenstates
 ]]
 
 Cell = {}
@@ -31,18 +34,22 @@ function Cell:new(base_sprite)
 end
 
 
--- updates the value of this cell based on the count of adjacent mines
-function Cell:count()
-    self.value = 0
-    local first = nil
-    for _, cell in ipairs(self.adj) do
-        if (cell.mine) self.value += 1
+-- returns a random possible eigenstate given the cell's superposition.
+-- this does not collapse the wavefunction
+function Cell:infer()
+    local variants = {}
 
-        if (cell.quantum) then
-            if (not first) first = cell.superposition
+    -- the current eigenstate being checked
+    local eigenstate = 1
 
-        end
+    -- finds all possible eigenstates
+    while inference <= self.superposition do
+        if (self.superposition & inference > 0) add(variants, inference)
+        eigenstate = eigenstate << 1
     end
+
+    -- return a random variant
+    return rnd(variants)
 end
 
 
