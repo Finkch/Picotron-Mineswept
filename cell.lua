@@ -6,6 +6,9 @@
         * superposition: a (linear) combination of all eigenstates
 ]]
 
+-- a cell is an item on the gameboard.
+-- classic cells, or just cells, are as one would expact form minesweeper,
+-- quantum cells track all possible states they could be in
 Cell = {}
 Cell.__index = Cell
 Cell.__type = "cell"
@@ -26,8 +29,6 @@ function Cell:new(base_sprite)
         flag = false,       -- is a flag
         falsy = false,      -- is a false cell (aka, special flag)
         quantum = false,    -- whether the cell is a superposition of mine and not mine
-        superposition = nil,-- the superposition state (aka variants)
-        eigenvalues = nil   -- whether an eigenstate resolves to be a mine or no mine
         adj = {}            -- list of adjacent cells
     }
 
@@ -62,76 +63,6 @@ function Cell:count()
             if (cell.superposition & cell.eigenvalues & eigenstate > 0) self.value += 1
         end
     end
-end
-
--- returns a random possible eigenstate given the cell's superposition.
--- this does not collapse the wavefunction
-function Cell:infer()
-    local eigenstates = {}
-
-    -- the current eigenstate being checked
-    local eigenstate = 1
-
-    -- finds all possible eigenstates
-    while eigenstate <= self.superposition do
-        if (self.superposition & eigenstate > 0) add(eigenstates, eigenstate)
-        eigenstate = eigenstate << 1
-    end
-
-    -- return a random variant
-    return rnd(eigenstates)
-end
-
-
-
-
--- given an eigenstate or superposition, return whether this cell is entangled
-function Cell:entangled(supereigen)
-    return self.superposition & supereigen > 0
-end
-
--- given an eigenstate returns..
---  .. 1  if the cell is not a mine
---  .. 0  if the cell is not entangled to that eigenstate
---  .. -1 if the cell is a mine
-function Cell:resolve(eigenstate)
-
-    -- not entangled to this state
-    if (not self:entangled(eigenstate)) return 0
-
-    -- is a mine
-    if (self.eigenvalues & eigenstate > 0) return -1
-
-    -- is not a mine
-    return 1
-end
-
-
--- observes the cell, collapsing the wavefunction and choosing an eigenstate.
---      !! todo !! this observation must affect entangled cells
-function Cell:observe(eigenstate)
-
-    -- if no eigenstate was provided, choose one at random
-    eigenstate = eigenstate or self:infer()
-
-    -- ensures valid eigenstate
-    assert(self:entangled(eigenstate), string.format("cannot observe non-entagled eigenstate; eigenstate '%s' for superposition '%s'", eigenstate, self.superposition))
-
-    -- collapses the wavefunciton, becoming a classical cell
-    self.mine = self:resolve(eigenstate) < 0
-
-    self.quantum = false
-    self.superposition = nil
-    self.eigenvalues = nil
-
-    --[[ nyi
-    for _, cell in pairs(self.entangle) do
-        cell:observe(eigenstate)
-    end
-    ]]
-
-    -- when not a mine, update count
-    if (not self.mine) self:count()
 end
 
 
@@ -191,4 +122,102 @@ end
 
 function Cell:draw()
     spr(self.s, self.px, self.py)
+end
+
+
+
+
+
+
+
+
+
+-- like a regular cell, but tracks all its possible states at once.
+-- reverts to a normal cell when observed
+QuantumCell = {}
+QuantumCell.__index = QuantumCell
+quantumCell.__type = "quantumcell"
+setmetatable(QuantumCellCell, Cell)
+
+function QuantumCell:new(base_sprite)
+
+    local qc = Cell:new(base_sprite)
+
+    qc["quantum"]       = true  -- whether the cell is quantum or not
+    qc["superposition"] = 0     -- the superposition state (aka variants)
+    qc["eigenvalues"]   = 0     -- whether an eigenstate resolves to be a mine or no mine
+
+    setmetatable(qc, QuantumCell)
+    return qc
+end
+
+
+-- returns a random possible eigenstate given the cell's superposition.
+-- this does not collapse the wavefunction
+function QuantumCell:infer()
+    local eigenstates = {}
+
+    -- the current eigenstate being checked
+    local eigenstate = 1
+
+    -- finds all possible eigenstates
+    while eigenstate <= self.superposition do
+        if (self.superposition & eigenstate > 0) add(eigenstates, eigenstate)
+        eigenstate = eigenstate << 1
+    end
+
+    -- return a random variant
+    return rnd(eigenstates)
+end
+
+
+
+
+-- given an eigenstate or superposition, return whether this cell is entangled
+function QuantumCell:entangled(supereigen)
+    return self.superposition & supereigen > 0
+end
+
+-- given an eigenstate returns..
+--  .. 1  if the cell is not a mine
+--  .. 0  if the cell is not entangled to that eigenstate
+--  .. -1 if the cell is a mine
+function QuantumCell:resolve(eigenstate)
+
+    -- not entangled to this state
+    if (not self:entangled(eigenstate)) return 0
+
+    -- is a mine
+    if (self.eigenvalues & eigenstate > 0) return -1
+
+    -- is not a mine
+    return 1
+end
+
+
+-- observes the cell, collapsing the wavefunction and choosing an eigenstate.
+--      !! todo !! this observation must affect entangled cells
+function QuantumCell:observe(eigenstate)
+
+    -- if no eigenstate was provided, choose one at random
+    eigenstate = eigenstate or self:infer()
+
+    -- ensures valid eigenstate
+    assert(self:entangled(eigenstate), string.format("cannot observe non-entagled eigenstate; eigenstate '%s' for superposition '%s'", eigenstate, self.superposition))
+
+    -- collapses the wavefunciton, becoming a classical cell
+    self.mine = self:resolve(eigenstate) < 0
+
+    self.quantum = false
+    self.superposition = nil
+    self.eigenvalues = nil
+
+    --[[ nyi
+    for _, cell in pairs(self.entangle) do
+        cell:observe(eigenstate)
+    end
+    ]]
+
+    -- when not a mine, update count
+    if (not self.mine) self:count()
 end
