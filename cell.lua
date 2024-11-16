@@ -176,8 +176,8 @@ function QuantumCell:is_entangled(supereigen)
 end
 
 -- given an eigenstate returns..
---  .. 1  if the cell is not a mine
---  .. 0  if the cell is not entangled to that eigenstate
+--  ..  1 if the cell is not a mine
+--  ..  0 if the cell is not entangled to that eigenstate
 --  .. -1 if the cell is a mine
 function QuantumCell:resolve(eigenstate)
 
