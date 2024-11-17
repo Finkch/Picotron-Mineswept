@@ -65,12 +65,15 @@ function Cell:count()
     end
 end
 
+-- this, er, uh...what does it do again?
 function Cell:count_flags()
     local flags = 0
 
     for _, cell in ipairs(self.adj) do
-        if (cell.is_flag)
+        if (cell.is_flag) flags += 1
     end
+
+    return flags
 end
 
 
@@ -81,9 +84,9 @@ function Cell:reveal()
     -- can't reveal a flagged cell
     if (self.is_flag) return
 
-    -- if the cell is revealed, try to cord, then return
-    if self.is_reveal then
-    
+    -- if the cell is revealed, try to cord then return
+    if self.is_reveal and self.value == self:count_flags() then
+        self:reveal_neighbours()
         return
     end
     
@@ -117,13 +120,17 @@ function Cell:reveal_neighbours()
     local adjs = {}
     for _, adj in ipairs(self.adj) do
 
-        -- if the cell is a mine, reveal it and back out
-        if adj.is_mine then
-            adj:reveal()
-            return
-        end
+        -- don't bother if the cell is revealed or flagged
+        if not (adj.is_reveal or adj.is_flag) then
 
-        add(adjs, adj)
+            -- if the cell is a mine, reveal it and back out
+            if adj.is_mine then
+                adj:reveal()
+                return
+            end
+
+            add(adjs, adj)
+        end
     end
 
     -- pops adjacent cells until there are none left, or until it reveals a mine
