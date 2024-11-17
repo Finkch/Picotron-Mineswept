@@ -24,11 +24,11 @@ function Cell:new(base_sprite)
         py = 0,
         d = board.d,        -- board dimension
         value = 0,          -- count of adjacent mines
-        revealed = false,   -- is revealed
-        mine = false,       -- is a mine
-        flag = false,       -- is a flag
-        falsy = false,      -- is a false cell (aka, special flag)
-        quantum = false,    -- whether the cell is a superposition of mine and not mine
+        is_reveal = false,  -- is revealed
+        is_mine = false,    -- is a mine
+        is_flag = false,    -- is a flag
+        is_false = false,   -- is a false cell (aka, special flag)
+        is_quantum = false, -- whether the cell is a superposition of mine and not mine
         adj = {}            -- list of adjacent cells
     }
 
@@ -46,10 +46,10 @@ function Cell:count()
     for _, cell in ipairs(self.adj) do
 
         -- counts classical mines
-        if (cell.mine) self.value += 1
+        if (cell.is_mine) self.value += 1
 
         -- counts quantum mines
-        if (cell.quantum) then
+        if (cell.is_quantum) then
 
             -- finds a random eigenstate.
             -- use this eigenstate for all adjacent quantum cells
@@ -65,22 +65,44 @@ function Cell:count()
     end
 end
 
+function Cell:count_flags()
+    local flags = 0
+
+    for _, cell in ipairs(self.adj) do
+        if (cell.is_flag)
+    end
+end
+
 
 
 -- methods to toggle cell state
 function Cell:reveal()
 
-    -- can't unreveal a cell or reveal a flagged cell
-    if (self.revealed or self.flag) return
+    -- can't reveal a flagged cell
+    if (self.is_flag) return
+
+    -- if the cell is revealed, try to cord, then return
+    if self.is_reveal then
+    
+        return
+    end
+    
 
     -- reveals
-    self.revealed = true
+    self.is_reveal = true
+
+    -- if the cell was revealed and was a mine, change to gameover
+    if self.is_mine then
+        state:change("gameover")
+        self:set()
+        return
+    end
 
     -- updates the cell's value if it's not a mine
-    if (not self.mine) self:count()
+    if self:count()
 
     -- if this cell is zero, reveal neighbours
-    self:reveal_neighbours()
+    if (self.value == 0) self:reveal_neighbours()
 
     -- updates sprite
     self:set()
@@ -96,7 +118,7 @@ function Cell:reveal_neighbours()
     for _, adj in ipairs(self.adj) do
 
         -- if the cell is a mine, reveal it and back out
-        if adj.mine then
+        if adj.is_mine then
             adj:reveal()
             return
         end
@@ -116,25 +138,17 @@ function Cell:reveal_neighbours()
 end
 
 function Cell:mine()
-    if self.mine then
-        self.value = -1
-        self.mine = true
-    else
-        self.value = 0
-        self.mine = false
-        self:count()
-    end
-
+    self.is_mine = not self.is_mine
     self:set()
 end
 
 function Cell:flag()
-    self.flag = not self.flag
+    self.is_flag = not self.is_flag
     self:set()
 end
 
 function Cell:falsy()
-    self.falsly = not self.falsly
+    self.is_false = not self.is_false
     self:set()
 end
 
@@ -143,17 +157,17 @@ end
 function Cell:set()
 
     -- when cell is revealed
-    if self.revealed then
+    if self.is_reveal then
 
         -- either cell is mine or regular cell
-        if self.mine then
+        if self.is_mine then
             self.s = self.bs + 9
         else
             self.s = self.bs + self.value
         end
 
     -- when the cell is flagged
-    elseif self.flag then
+    elseif self.is_flag then
         self.s = self.bs + 32
 
     -- otherwise, unrevealed sprite
@@ -254,8 +268,5 @@ function QuantumCell:observe(eigenstate)
     self.mine = self:resolve(eigenstate) < 0
 
     -- collapses the wavefunciton, becoming a classical cell
-    setmetatable(self, Cell)    
-
-    -- when not a mine, update count
-    if (not self.mine) self:count()
+    setmetatable(self, Cell)
 end
