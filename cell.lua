@@ -24,11 +24,11 @@ function Cell:new(base_sprite)
         py = 0,
         d = board.d,        -- board dimension
         value = 0,          -- count of adjacent mines
-        is_reveal = false,  -- is revealed
-        is_mine = false,    -- is a mine
-        is_flag = false,    -- is a flag
-        is_false = false,   -- is a false cell (aka, special flag)
-        is_quantum = false, -- whether the cell is a superposition of mine and not mine
+        is_reveal   = false,-- is revealed
+        is_mine     = false,-- is a mine
+        is_flag     = false,-- is a flag
+        is_false    = false,-- is a false cell (aka, special flag)
+        is_quantum  = false,-- whether the cell is a superposition of mine and not mine
         adj = {}            -- list of adjacent cells
     }
 
@@ -89,7 +89,6 @@ function Cell:reveal()
         self:reveal_neighbours()
         return
     end
-    
 
     -- reveals
     self.is_reveal = true
@@ -97,7 +96,7 @@ function Cell:reveal()
     -- if the cell was revealed and was a mine, change to gameover
     if self.is_mine then
         state:change("gameover")
-        self:set()
+        self:set() -- update sprite
         return
     end
 
