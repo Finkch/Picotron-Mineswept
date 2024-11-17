@@ -69,8 +69,50 @@ end
 
 -- methods to toggle cell state
 function Cell:reveal()
-    self.revealed = not self.revealed
+
+    -- can't unreveal a cell or reveal a flagged cell
+    if (self.revealed or self.flag) return
+
+    -- reveals
+    self.revealed = true
+
+    -- updates the cell's value if it's not a mine
+    if (not self.mine) self:count()
+
+    -- if this cell is zero, reveal neighbours
+    self:reveal_neighbours()
+
+    -- updates sprite
     self:set()
+end
+
+-- reveals neighbours in a random order, prioritising mines.
+-- random order makes cruel/insidious gens less obvious
+function Cell:reveal_neighbours()
+
+    -- creates a list of indices for adjacent cells.
+    -- list of indices so the actual adjaceny list is not modified
+    local adjs = {}
+    for _, adj in ipairs(self.adj) do
+
+        -- if the cell is a mine, reveal it and back out
+        if adj.mine then
+            adj:reveal()
+            return
+        end
+
+        add(adjs, adj)
+    end
+
+    -- pops adjacent cells until there are none left, or until it reveals a mine
+    while #adjs > 0 and not state:__eq("gameover") do
+
+        -- chooses a random cell
+        local adj = del(adjs, rnd(adjs))
+
+        -- reveals the cell
+        adj:reveal()
+    end
 end
 
 function Cell:mine()
