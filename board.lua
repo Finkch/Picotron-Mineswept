@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-19 20:55:32",revision=14]]
+--[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-19 22:26:20",revision=15]]
 --[[
     the board is an wxh grid. each tile is an object that encodes
     the state of that tile; whether its a bomb or its value.
@@ -83,6 +83,9 @@ end
 -- calling the board returns the given cell
 function Board:__call(x, y)
     if (not x or not y) return self.grid
+
+    assert(x and y, string.format("invalid grid coordinates b(%s, %s)", x, y))
+    assert(self:inbounds(x, y), string.format("grid call out of bounds c(%d, %d), wh(%d, %d)", x, y, self.w, self.h))
 
     return self.grid[x][y]
 end
@@ -282,11 +285,11 @@ end
 -- right click to flag
 function Board:rclick(pos)
 
-    -- can't flag before the first click
-    if (self.reveals == 0) return
-
     -- converts screen coordinates to grid coordinates
     local x, y = cursor:map(self.d)
+
+    -- can't flag before the first click, or flag revealed cell
+    if (self.reveals == 0 or not self:inbounds(x, y) or self(x, y).is_reveal) return
 
     self(x, y):flag()
 end
@@ -331,6 +334,14 @@ end
 
 
 
+
+--[[
+//////////////////////////////////////////////////
+                fair generation
+//////////////////////////////////////////////////
+]]
+
+
 -- creates a regular ol' board of mineswept
 function Board:generate_fair(x, y, mines)
 
@@ -354,6 +365,17 @@ function Board:generate_fair(x, y, mines)
     -- counts the value of all non-mine cells
     self:count(cells)
 end
+
+
+
+
+
+
+--[[
+//////////////////////////////////////////////////
+                insidious generation
+//////////////////////////////////////////////////
+]]
 
 -- generates a guaranteed loss, that will take a while to uncover
 function Board:generate_insidious(x, y, mines)
@@ -628,6 +650,47 @@ function Board:place_variant(v)
     end
 end
 
+
+-- if the player has not revealed a false flag during insidious
+-- by the gameover, this is called to place a random varaint.
+function Board:ensure_insidious()
+
+    local fifty = self.fifty
+    local l = self.l
+    local t = self.t
+
+    -- gets a list of all cells containing quantum mines
+    local cells = {}
+    for i = 0, fifty.w - 1 do
+        for j = 0, fifty.h - 1 do
+            if (fifty.mgrid[j + 1][i + 1] > 0) add(cells, {l + i, t + j})
+        end
+    end
+
+   -- chooses a random cell with a quantum mine
+   local x, y = unpack(rnd(cells))
+
+    -- randomly selects a variant from the given cell
+    local variant = self:choose_variant(x, y)
+
+    -- places the mines for that variant
+    self:place_variant(variant)
+end
+
+
+
+
+
+
+
+
+
+--[[
+//////////////////////////////////////////////////
+                cruel generation
+//////////////////////////////////////////////////
+]]
+
 -- lose in two moves
 function Board:generate_unfair(x, y, mines)
 
@@ -647,7 +710,7 @@ function Board:generate_unfair(x, y, mines)
         nearby = min(nearby, mines - 1)
 
         -- chooses a starting number.
-        -- weights the starting number to be lower,
+        -- weights the starting number to be lower.
         -- this feels marginally more fair, but
         -- more importanatly it obfuscates the cheating
         local start = nearby - flr((rnd(nearby ^ 3)) ^ (1 / 3))
@@ -655,11 +718,18 @@ function Board:generate_unfair(x, y, mines)
         -- tracks the data of the first reveal for the second gen pass
         self.first_reveal = {x, y, start}
 
+
+        -- for easy reference
+        local cell = self(x, y)
+
         -- place a random number under the cursor
-        mset(x, y, self.bs + start)
+        cell.value = start
+
+        -- updates tile's sprite
+        cell:set()
 
         -- reveal the tile
-        self:reveal(x, y)
+        cell:reveal()
 
     -- on second click, force the loss
     elseif self.reveals == 1 then
@@ -729,33 +799,6 @@ function Board:generate_unfair(x, y, mines)
 end
 
 
-
-
--- if the player has not revealed a false flag during insidious,
--- this is called to place a random varaint.
-function Board:ensure_insidious()
-
-    local fifty = self.fifty
-    local l = self.l
-    local t = self.t
-
-    -- gets a list of all cells containing quantum mines
-    local cells = {}
-    for i = 0, fifty.w - 1 do
-        for j = 0, fifty.h - 1 do
-            if (fifty.mgrid[j + 1][i + 1] > 0) add(cells, {l + i, t + j})
-        end
-    end
-
-   -- chooses a random cell with a quantum mine
-   local x, y = unpack(rnd(cells))
-
-    -- randomly selects a variant from the given cell
-    local variant = self:choose_variant(x, y)
-
-    -- places the mines for that variant
-    self:place_variant(variant)
-end
 
 -- if the player pressed the lose-game button, this is called
 -- to place the mines to the board looks fair.
