@@ -83,6 +83,16 @@
             - or simply wrap mg/set functions?
             - infinite board (for quantum) might not work using map
         > small sprites!
+        > classic cells
+        > quantum cells
+        > count during board creation or when revealed?
+        > superposition as a number or a table?
+            - number: 
+                + very fast bitwise operations
+                + cumbersome when lots of states are present
+            - table:
+                + slow operations to check state and whether is entangled
+                + easy to expand to losts of states
 
     * quantum minesweeper
         > infinite board
@@ -249,7 +259,7 @@ function _init()
     winlosser = Winlosser:new()
 
     -- do debug printout
-    debug = true
+    debug = false
 end
 
 
