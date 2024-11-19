@@ -234,6 +234,7 @@ function Board:reveal_mines()
     for _, col in ipairs(self.grid) do
         for _, cell in ipairs(col) do
 
+            -- reveals bad flags and mines
             if not cell.is_reveal and (cell.is_mine or cell.is_flag) then
 
                 cell.is_reveal = true
@@ -241,56 +242,6 @@ function Board:reveal_mines()
                 -- updates sprite
                 cell:set()
             end
-        end
-    end
-end
-
--- if the player has not revealed a false flag during insidious,
--- this is called to place a random varaint.
-function Board:ensure_insidious()
-
-    local fifty = self.fifty
-    local l = self.l
-    local t = self.t
-
-    -- gets a list of all cells containing quantum mines
-    local cells = {}
-    for i = 0, fifty.w - 1 do
-        for j = 0, fifty.h - 1 do
-            if (fifty.mgrid[j + 1][i + 1] > 0) add(cells, {l + i, t + j})
-        end
-    end
-
-   -- chooses a random cell with a quantum mine
-   local x, y = unpack(rnd(cells))
-
-    -- randomly selects a variant from the given cell
-    local variant = self:choose_variant(x, y)
-
-    -- places the mines for that variant
-    self:place_variant(variant)
-end
-
--- if the player pressed the lose-game button, this is called
--- to place the mines to the board looks fair.
-function Board:ensure_cruel()
-
-    local cells = self:cells()
-
-    -- choose a random, non-revealed cell as the second "revealed" 
-    -- cell for cruel generation.
-    -- now, maybe this should also not work on flagged cells, but it
-    -- should be fine as is, and appear marginally more fiar
-    while #cells > 0 do
-
-        -- chooses a random cell
-        local cell = del(cells, rnd(cells))
-        local x, y = cell[1], cell[2]
-
-        -- if the spot is valid, start cruel gen
-        if not self:tile(x, y, is_reveal) then
-            self:generate(x, y, self.bombs)
-            return
         end
     end
 end
@@ -738,3 +689,57 @@ function Board:generate_unfair(x, y, mines)
         assert(false, "how'd you do that?")
     end
 end
+
+
+
+
+-- if the player has not revealed a false flag during insidious,
+-- this is called to place a random varaint.
+function Board:ensure_insidious()
+
+    local fifty = self.fifty
+    local l = self.l
+    local t = self.t
+
+    -- gets a list of all cells containing quantum mines
+    local cells = {}
+    for i = 0, fifty.w - 1 do
+        for j = 0, fifty.h - 1 do
+            if (fifty.mgrid[j + 1][i + 1] > 0) add(cells, {l + i, t + j})
+        end
+    end
+
+   -- chooses a random cell with a quantum mine
+   local x, y = unpack(rnd(cells))
+
+    -- randomly selects a variant from the given cell
+    local variant = self:choose_variant(x, y)
+
+    -- places the mines for that variant
+    self:place_variant(variant)
+end
+
+-- if the player pressed the lose-game button, this is called
+-- to place the mines to the board looks fair.
+function Board:ensure_cruel()
+
+    local cells = self:cells()
+
+    -- choose a random, non-revealed cell as the second "revealed" 
+    -- cell for cruel generation.
+    -- now, maybe this should also not work on flagged cells, but it
+    -- should be fine as is, and appear marginally more fiar
+    while #cells > 0 do
+
+        -- chooses a random cell
+        local cell = del(cells, rnd(cells))
+        local x, y = cell[1], cell[2]
+
+        -- if the spot is valid, start cruel gen
+        if not self:tile(x, y, is_reveal) then
+            self:generate(x, y, self.bombs)
+            return
+        end
+    end
+end
+
