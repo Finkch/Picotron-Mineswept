@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-14 20:14:15",revision=8]]
+--[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-19 20:16:45",revision=10]]
 --[[
     the board is an wxh grid. each tile is an object that encodes
     the state of that tile; whether its a bomb or its value.
@@ -32,6 +32,8 @@
     * place mines in the tracked 50-50 in accordance; otherwise
         reveal the board as per normal
 ]]
+
+include("cell.lua")
 
 -- some constants for the checking flags
 is_mine     = 7
@@ -70,25 +72,17 @@ function Board:new(w, h, bombs, fairness, oldsprites)
         fairness = fairness,    -- 0 = two move, 1 = insidious, 2 = standard
         bs = base_sprite,       -- which sprite represents unrevealed 0
         d = d,                  -- cell side length
-        second_gen = false      -- trackes whether fairness < 2 second generation pass has occured
+        second_gen = false,     -- trackes whether fairness < 2 second generation pass has occured
+        grid = {}
     }
 
     setmetatable(b, Board)
 
     -- creates a grid of unrevealed zeroes
     b:empty()
+    b:adjacify()
 
     return b
-end
-
-
--- clears any existing boards
-function Board:clear()
-    for i = 0, state.data.maxd do
-        for j = 0, state.data.maxd do
-            mset(i, j, 0)
-        end
-    end
 end
 
 -- creates a new board
@@ -104,11 +98,33 @@ function Board:generate(x, y, mines)
     end
 end
 
--- creates an empty board
+-- creates a board of empty cells
 function Board:empty()
-    for i = 0, self.w - 1 do
-        for j = 0, self.h - 1 do
-            mset(i, j, self.bs)
+    for i = 1, self.w do
+        self.grid[i] = {}
+        for j = 1, self.h do
+            self.grid[i][j] = Cell:new(self.bs, i - 1, j - 1, self.d)
+        end
+    end
+end
+
+-- updates the adjacency lists for all cells
+function Board:adjacify()
+
+    -- scans over each cell
+    for x = 1, self.w do
+        for y = 1, self.h do
+            
+            -- gets a list of neighbours
+            local adjs = {}
+            for dx = -1, 1 do
+                for dy = -1, 1 do
+                    if (not (dx == 0 and dy == 0) and self:inbounds(x + dx, y + dy)) add(adjs, self.grid[x + dx][y + dy])
+                end
+            end
+            
+            -- assigns neighbours
+            self.grid[x][y].adj = adjs
         end
     end
 end
@@ -116,9 +132,9 @@ end
 -- creates a 1d list of all cells.
 function Board:cells()
     local cells = {}
-    for i = 0, self.w - 1 do
-        for j = 0, self.h - 1 do
-            add(cells, {i, j})
+    for _, col in ipairs(self.grid) do
+        for _, cell in ipairs(col) do
+            add(cells, cell)
         end
     end
     return cells
@@ -816,7 +832,7 @@ end
 
 -- checks if x,y is in bounds
 function Board:inbounds(x, y)
-    return x >= 0 and y >= 0 and x < self.w and y < self.h
+    return x >= 1 and y >= 1 and x <= self.w and y <= self.h
 end
 
 
@@ -924,18 +940,9 @@ end
 -- draws the map
 function Board:draw()
 
-    -- is sprites are 16x16 (new sprite set), draw normally
-    if self.bs == 8 then
-        map(0, 0)
-
-    else
-
-        -- when using old sprites, must draw each sprite since map assumes
-        -- sprites are 16x16
-        for i = 0, self.w do
-            for j = 0, self.h do
-                map(i, j, i * self.d, j * self.d, 1, 1)
-            end
+    for _, col in ipairs(self.grid) do
+        for _, cell in ipairs(col) do
+            cell:draw()
         end
     end
 end
