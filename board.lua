@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-19 20:16:45",revision=10]]
+--[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-19 20:39:13",revision=13]]
 --[[
     the board is an wxh grid. each tile is an object that encodes
     the state of that tile; whether its a bomb or its value.
@@ -159,23 +159,28 @@ function Board:place_mines(mines, cells)
         local bombify = del(cells, rnd(cells))
 
         -- if the tile has a false flag, mulligan
-        if self:tile(bombify[1], bombify[2], is_false) then
+        if bombify.is_false then
 
-            if (self:inbounds(bombify[1], bombify[2])) add(clear, bombify)
+            add(clear, bombify)
         
         -- places a mine, if the tile isn't already revealed
-        elseif not self:tile(bombify[1], bombify[2], is_reveal) then
+        elseif not bombify.is_reveal then
 
             -- turns the popped cell into a mine.
             -- ...i forgor lua was 1-index :^(
-            self:mineify(bombify[1], bombify[2])
+            bombify:mine()
 
             i += 1
         end
     end
 
     -- adds the false flagged tiles back to cells, reseting their sprite to 0 value
-    self:ify_all(self.falseify, clear, function(x, y) return true end, cells)
+    --self:ify_all(self.falseify, clear, function(x, y) return true end, cells)
+    for _, cell in ipairs(clear) do
+        cell:falsy()
+
+        add(cells, cell)
+    end
 
     -- all cells that do not have a mine
     return cells
@@ -203,12 +208,12 @@ function Board:generate_fair(x, y, mines)
     -- sets false flags ensure first click reveals a zero
     for dx = -1, 1 do
         for dy = -1, 1 do
-            if (self:inbounds(x + dx, y + dy)) mset(x + dx, y + dy, self.bs + 10)
+            if (self:inbounds(x + dx, y + dy)) self.grid[x][y]:falsy()
         end
     end
 
     local cells = self:place_mines(mines)
-    self:count(cells)
+    --self:count(cells)
 end
 
 -- generates a guaranteed loss, that will take a while to uncover
@@ -597,6 +602,11 @@ function Board:lclick(cursor)
     -- if this is the first click, also generate the board
     if (self.reveals == 0) self:generate(x, y, self.bombs)
 
+    -- otherwise, reveal a cell
+    self.grid[x][y]:reveal()
+
+
+    --[[
     -- if the tile is revealed, attempt to cord
     if self:tile(x, y, is_reveal) then
         self:cord(x, y)
@@ -605,7 +615,7 @@ function Board:lclick(cursor)
     else
         self:reveal(x, y)
     end
-
+    ]]
 end
 
 -- right click to flag
