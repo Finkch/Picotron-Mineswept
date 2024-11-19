@@ -256,7 +256,7 @@ function Board:value(x, y)
     if (self(x, y).is_mine) return -1
     if (self(x, y).is_false) return -2
 
-    return self.grid[x][y].value
+    return self(x, y).value
 end
 
 
@@ -309,7 +309,7 @@ function Board:generate_fair(x, y, mines)
     -- sets false flags ensure first click reveals a zero
     for dx = -1, 1 do
         for dy = -1, 1 do
-            if (self:inbounds(x + dx, y + dy)) self.grid[x][y]:falsy()
+            if (self:inbounds(x + dx, y + dy)) self(x, y):falsy()
         end
     end
 
