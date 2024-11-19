@@ -213,7 +213,7 @@ function _init()
         elseif self:__eq("play") then
 
             -- clears any previous boards
-            board:clear()
+            --board:clear()
 
             -- create a new board
             board = Board:new(board.w, board.h, board.bombs, self.data.fairness, board.oldsprites)
@@ -224,7 +224,7 @@ function _init()
             -- focus the camera to the centre of the board
             if self.previous == "menu" then
                 cursor.pos = Vec:new(480 / 2, 270 / 2)
-                wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
+                wind:refocus()
             end
 
             -- updates the window to show the board immediately
@@ -247,7 +247,7 @@ function _init()
     state.data.minmines = 6
     state.data.maxmines = -1 -- will be update to match board dimensions
     state.data.fairness = 0  -- tracking fairness here, not board, for interround continuity
-    state.data.menu_fairness = 0
+    state.data.menu_fairness = 1
 
     -- moves state to menu
     state:change("menu")
@@ -259,7 +259,7 @@ function _init()
     winlosser = Winlosser:new()
 
     -- do debug printout
-    debug = false
+    debug = true
 end
 
 
@@ -278,10 +278,11 @@ function _update()
     gamestate(state)
 
     if debug then
+        local x, y = cursor:map(board.d)
+
         q:add(cursor:posm())
-        q:add(Vec:new(cursor:map(board.d)))
-        q:add(board:value(cursor:map(board.d)))
-        q:add(string.format("w: %d,\tl: %d", winlosser.w, winlosser.l))
+        q:add(Vec:new(x, y))
+        q:add(board:value(x, y))
     end
 end
 
