@@ -238,8 +238,8 @@ end
 
 -- finds the ratio of eigenstates that are a mine to those that are not
 function QuantumCell:ratio()
-    local _, mineable = self:hilbert(self.superposition & self.eigenvalues)
-    local _, cellable = self:hilbert(self.superposition & not self.eigenvalues)
+    local _, mineable = self:mineable()
+    local _, cellable = self:cellable()
 
     return len(mineable) / len(cellable)
 end
