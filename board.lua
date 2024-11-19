@@ -818,11 +818,10 @@ function Board:ensure_cruel()
 
         -- chooses a random cell
         local cell = del(cells, rnd(cells))
-        local x, y = cell[1], cell[2]
 
         -- if the spot is valid, start cruel gen
-        if not self:tile(x, y, is_reveal) then
-            self:generate(x, y, self.bombs)
+        if not cell.is_reveal then
+            self:generate(cell.x, cell.y, self.bombs)
             return
         end
     end
