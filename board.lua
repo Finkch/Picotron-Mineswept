@@ -97,7 +97,7 @@ function Board:empty()
     for i = 1, self.w do
         self.grid[i] = {}
         for j = 1, self.h do
-            self.grid[i][j] = Cell:new(self.bs, i - 1, j - 1, self.d)
+            self.grid[i][j] = Cell:new(self.bs, i, j, self.d)
         end
     end
 end
@@ -139,8 +139,8 @@ function Board:place_mines(mines, cells)
         if bombify.is_false then
             add(clear, bombify)
         
-        -- places a mine, if the tile isn't already revealed
-        elseif not bombify.is_reveal then
+        -- places a mine, if the tile isn't already revealed or a mine
+        elseif not bombify.is_reveal and not bombify.is_mine then
 
             -- turns the popped cell into a mine.
             -- ...i forgor lua was 1-index :^(.
@@ -752,8 +752,8 @@ function Board:generate_unfair(x, y, mines)
             end
         end
         
-        -- also a false flag under the cursor
-        if (not self(x, y).is_false) self(x, y):falsly()
+        -- places a mine under the cursor
+        self(x, y):mine()
 
         -- checks if the mine placed was adjacent to the first reveal
         local adj = false
@@ -765,9 +765,7 @@ function Board:generate_unfair(x, y, mines)
         else
             self:place_mines(mines - fc - 1)
         end
-
-        -- places a mine under the cursor
-        self(x, y):mine()
+        
 
         -- creates a list of cells about the start
         local cells = {}
@@ -782,7 +780,7 @@ function Board:generate_unfair(x, y, mines)
                     add(cells, self(u, v))
 
                     -- resets any lingering false flags
-                    if (self(u, v).is_false) self(u, v):falsly()
+                    if (self(u, v).is_false) self(u, v):falsy()
                 end
             end
         end
