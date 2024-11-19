@@ -87,6 +87,17 @@ function Cell:reveal()
     -- can't reveal a flagged or revealed cell
     if (self.is_flag or self.is_reveal) return
 
+
+
+    -- performs the second generation, for those that need it
+    -- cruel
+    if (board.fairness == 1 and board.reveals > 0 and not board.second_gen) board:generate(self.x, self.y, board.bombs)
+
+    -- insidious
+    if (board.fairness == 0 and self.is_false and not board.second_gen) board:generate(self.x, self.y, board.bombs)
+
+
+    
     -- reveals
     self.is_reveal = true
     board.reveals += 1
