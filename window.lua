@@ -54,10 +54,10 @@ end
 
 -- updates the window bounds based on the board
 function Window:edges()
-    self.sl = 1
-    self.sr = board.w * board.d
-    self.st = 1
-    self.sb = board.h * board.d
+    self.sl = board.d + 1
+    self.sr = (board.w + 1) * board.d - 1
+    self.st = board.d + 1
+    self.sb = (board.h + 1) * board.d - 1
 end
 
 -- moves camera to the centre of the board
