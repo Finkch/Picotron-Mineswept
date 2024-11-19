@@ -98,6 +98,21 @@ function Board:empty()
     end
 end
 
+-- applies some function to all cells
+function Board:apply_all(apply, cells, condition)
+
+    -- gets the defaults
+    cells = cells or self:cells()
+    condition = condition or function() return true end
+
+    -- performs the application to all cells meeting the condition
+    for _, col in ipairs(self()) do
+        for _, cell in ipairs(col) do
+            if (condition(cell)) apply(cell)
+        end
+    end
+end
+
 -- updates the adjacency lists for all cells
 function Board:adjacify()
 
@@ -164,8 +179,10 @@ function Board:place_mines(mines, cells)
         end
     end
 
+
     -- adds the false flagged tiles back to cells, reseting their sprite to 0 value
     for _, cell in ipairs(clear) do
+
         cell:falsy()
 
         add(cells, cell)
@@ -287,7 +304,8 @@ end
 ]]
 
 
--- creates a new board
+
+-- selects correct generation schema
 function Board:generate(x, y, mines)
 
     -- generates the board according to fairness value
@@ -313,7 +331,17 @@ function Board:generate_fair(x, y, mines)
         end
     end
 
+    -- places mines
     local cells = self:place_mines(mines)
+
+    -- clears false flags
+    self:apply_all(
+        function(c) return c:falsy() end,
+        cells,
+        function(c) return c.is_false end
+    )
+
+    -- counts the value of all non-mine cells
     self:count(cells)
 end
 
