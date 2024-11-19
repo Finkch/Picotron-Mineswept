@@ -64,7 +64,7 @@ end
 
 -- checks whether the cursor should pan
 function Cursor:pan()
-    return kbm:held("space") or kbm:held("lshift") or kbm.keys["lmb"].down > 5
+    return kbm:held("space") or kbm:held("lshift") or kbm.keys["lmb"].down > 10
 end
 
 
