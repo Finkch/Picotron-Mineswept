@@ -99,9 +99,6 @@ function Cell:reveal()
         return
     end
 
-    -- updates the cell's value if it's not a mine
-    self:count()
-
     -- if this cell is zero, reveal neighbours
     if (self.value == 0) self:reveal_neighbours()
 
