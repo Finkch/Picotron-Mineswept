@@ -23,7 +23,6 @@ function Cell:new(base_sprite, x, y, d)
         y = y,
         px = x * d,         -- pixel coordinates of the cell
         py = y * d,
-        d = d,              -- board dimension
         value = 0,          -- count of adjacent mines
         is_reveal   = false,-- is revealed
         is_mine     = false,-- is a mine
