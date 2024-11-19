@@ -1,3 +1,4 @@
+--[[pod_format="raw",created="2024-11-19 20:08:51",modified="2024-11-19 20:08:51",revision=0]]
 --[[
     represents a cell: one item on the game board.
     quick quantum mechanics recap:
@@ -13,16 +14,16 @@ Cell = {}
 Cell.__index = Cell
 Cell.__type = "cell"
 
-function Cell:new(base_sprite, x, y)
+function Cell:new(base_sprite, x, y, d)
 
     local c = {
         bs = base_sprite,   -- index of the first sprite in this sprite set
         s = base_sprite,    -- current sprite used by cell
         x = x,              -- grid coordinates of cell
         y = y,
-        px = x * board.d,   -- pixel coordinates of the cell
-        py = y * board.d,
-        d = board.d,        -- board dimension
+        px = x * d,         -- pixel coordinates of the cell
+        py = y * d,
+        d = d,              -- board dimension
         value = 0,          -- count of adjacent mines
         is_reveal   = false,-- is revealed
         is_mine     = false,-- is a mine
@@ -101,7 +102,7 @@ function Cell:reveal()
     end
 
     -- updates the cell's value if it's not a mine
-    if self:count()
+    self:count()
 
     -- if this cell is zero, reveal neighbours
     if (self.value == 0) self:reveal_neighbours()
@@ -198,7 +199,7 @@ end
 -- reverts to a normal cell when observed
 QuantumCell = setmetatable({}, Cell)
 QuantumCell.__index = QuantumCell
-quantumCell.__type = "quantumcell"
+QuantumCell.__type = "quantumcell"
 
 function QuantumCell:new(base_sprite)
 
