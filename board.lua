@@ -34,6 +34,7 @@
 ]]
 
 include("cell.lua")
+include("generation.lua")
 
 -- some constants for the checking flags
 is_mine     = 7
@@ -83,19 +84,6 @@ function Board:new(w, h, bombs, fairness, oldsprites)
     b:adjacify()
 
     return b
-end
-
--- creates a new board
-function Board:generate(x, y, mines)
-
-    -- generates the board according to fairness value
-    if self.fairness == 0 then
-        self:generate_insidious(x, y, mines)
-    elseif self.fairness == 1 then
-        self:generate_unfair(x, y, mines)
-    else
-        self:generate_fair(x, y, mines)
-    end
 end
 
 -- creates a board of empty cells
@@ -199,6 +187,170 @@ function Board:count(cells)
         if (not cell.is_reveal and not cell.is_mine) cell:count()
     end
 end
+
+
+
+
+-- left click to reveal or cord
+function Board:lclick(cursor)
+
+    -- converts screen coordinates to grid coordinates
+    local x, y = cursor:map(self.d)
+
+    -- makes sure the click is inbounds
+    if (not self:inbounds(x, y)) return
+
+    -- if this is the first click, also generate the board
+    if (self.reveals == 0) self:generate(x, y, self.bombs)
+
+    -- otherwise, reveal a cell
+    self.grid[x][y]:reveal()
+
+end
+
+-- right click to flag
+function Board:rclick(pos)
+
+    -- can't flag before the first click
+    if (self.reveals == 0) return
+
+    -- converts screen coordinates to grid coordinates
+    local x, y = cursor:map(self.d)
+
+    self.grid[x][y]:flag()
+end
+
+
+
+-- reveals remaining bombs
+function Board:reveal_mines()
+
+    -- in insidious mode, places the final mines in the special zone
+    if (self.fairness == 0 and not self.second_gen) self:ensure_insidious()
+
+    if (self.fairness == 1 and not self.second_gen) self:ensure_cruel()
+
+    -- looks for mines
+    for _, col in ipairs(self.grid) do
+        for _, cell in ipairs(col) do
+
+            if not cell.is_reveal and (cell.is_mine or cell.is_flag) then
+
+                cell.is_reveal = true
+
+                -- updates sprite
+                cell:set()
+            end
+        end
+    end
+end
+
+-- if the player has not revealed a false flag during insidious,
+-- this is called to place a random varaint.
+function Board:ensure_insidious()
+
+    local fifty = self.fifty
+    local l = self.l
+    local t = self.t
+
+    -- gets a list of all cells containing quantum mines
+    local cells = {}
+    for i = 0, fifty.w - 1 do
+        for j = 0, fifty.h - 1 do
+            if (fifty.mgrid[j + 1][i + 1] > 0) add(cells, {l + i, t + j})
+        end
+    end
+
+   -- chooses a random cell with a quantum mine
+   local x, y = unpack(rnd(cells))
+
+    -- randomly selects a variant from the given cell
+    local variant = self:choose_variant(x, y)
+
+    -- places the mines for that variant
+    self:place_variant(variant)
+end
+
+-- if the player pressed the lose-game button, this is called
+-- to place the mines to the board looks fair.
+function Board:ensure_cruel()
+
+    local cells = self:cells()
+
+    -- choose a random, non-revealed cell as the second "revealed" 
+    -- cell for cruel generation.
+    -- now, maybe this should also not work on flagged cells, but it
+    -- should be fine as is, and appear marginally more fiar
+    while #cells > 0 do
+
+        -- chooses a random cell
+        local cell = del(cells, rnd(cells))
+        local x, y = cell[1], cell[2]
+
+        -- if the spot is valid, start cruel gen
+        if not self:tile(x, y, is_reveal) then
+            self:generate(x, y, self.bombs)
+            return
+        end
+    end
+end
+
+
+
+-- gets the numeric value of a tile.
+-- bombs have a value of -1
+function Board:value(x, y)
+    if (not self.grid or not self.grid[x] or not self.grid[x][y]) return -3
+    if (self.grid[x][y].is_mine) return -1
+    if (self.grid[x][y].is_false) return -2
+
+    return self.grid[x][y].value
+end
+
+
+-- checks if x,y is in bounds
+function Board:inbounds(x, y)
+    return x >= 1 and y >= 1 and x <= self.w and y <= self.h
+end
+
+
+-- draws the map
+function Board:draw()
+
+    for _, col in ipairs(self.grid) do
+        for _, cell in ipairs(col) do
+            cell:draw()
+        end
+    end
+end
+
+
+
+
+
+
+--[[
+//////////////////////////////////////////////////
+                generation methods
+//////////////////////////////////////////////////
+]]
+
+
+-- creates a new board
+function Board:generate(x, y, mines)
+
+    -- generates the board according to fairness value
+    if self.fairness == 0 then
+        self:generate_insidious(x, y, mines)
+    elseif self.fairness == 1 then
+        self:generate_unfair(x, y, mines)
+    else
+        self:generate_fair(x, y, mines)
+    end
+end
+
+
+
 
 -- creates a regular ol' board of mineswept
 function Board:generate_fair(x, y, mines)
@@ -584,300 +736,5 @@ function Board:generate_unfair(x, y, mines)
     -- it should be impossible to reach this far
     else
         assert(false, "how'd you do that?")
-    end
-end
-
-
--- left click to reveal or cord
-function Board:lclick(cursor)
-
-    -- converts screen coordinates to grid coordinates
-    local x, y = cursor:map(self.d)
-
-    -- makes sure the click is inbounds
-    if (not self:inbounds(x, y)) return
-
-    -- if this is the first click, also generate the board
-    if (self.reveals == 0) self:generate(x, y, self.bombs)
-
-    -- otherwise, reveal a cell
-    self.grid[x][y]:reveal()
-
-end
-
--- right click to flag
-function Board:rclick(pos)
-
-    -- can't flag before the first click
-    if (self.reveals == 0) return
-
-    -- converts screen coordinates to grid coordinates
-    local x, y = cursor:map(self.d)
-
-    self.grid[x][y]:flag()
-end
-
-
-
--- reveals remaining bombs
-function Board:reveal_mines()
-
-    -- in insidious mode, places the final mines in the special zone
-    if (self.fairness == 0 and not self.second_gen) self:ensure_insidious()
-
-    if (self.fairness == 1 and not self.second_gen) self:ensure_cruel()
-
-    -- looks for mines
-    for _, col in ipairs(self.grid) do
-        for _, cell in ipairs(col) do
-
-            if not cell.is_reveal and (cell.is_mine or cell.is_flag) then
-
-                cell.is_reveal = true
-
-                -- updates sprite
-                cell:set()
-            end
-        end
-    end
-end
-
--- if the player has not revealed a false flag during insidious,
--- this is called to place a random varaint.
-function Board:ensure_insidious()
-
-    local fifty = self.fifty
-    local l = self.l
-    local t = self.t
-
-    -- gets a list of all cells containing quantum mines
-    local cells = {}
-    for i = 0, fifty.w - 1 do
-        for j = 0, fifty.h - 1 do
-            if (fifty.mgrid[j + 1][i + 1] > 0) add(cells, {l + i, t + j})
-        end
-    end
-
-   -- chooses a random cell with a quantum mine
-   local x, y = unpack(rnd(cells))
-
-    -- randomly selects a variant from the given cell
-    local variant = self:choose_variant(x, y)
-
-    -- places the mines for that variant
-    self:place_variant(variant)
-end
-
--- if the player pressed the lose-game button, this is called
--- to place the mines to the board looks fair.
-function Board:ensure_cruel()
-
-    local cells = self:cells()
-
-    -- choose a random, non-revealed cell as the second "revealed" 
-    -- cell for cruel generation.
-    -- now, maybe this should also not work on flagged cells, but it
-    -- should be fine as is, and appear marginally more fiar
-    while #cells > 0 do
-
-        -- chooses a random cell
-        local cell = del(cells, rnd(cells))
-        local x, y = cell[1], cell[2]
-
-        -- if the spot is valid, start cruel gen
-        if not self:tile(x, y, is_reveal) then
-            self:generate(x, y, self.bombs)
-            return
-        end
-    end
-end
-
-
-
-
--- cords a tile.
--- if a revealed tile is clicked and the number of flags neighbouring
--- the tile equals it's value, reveal all unrevealed neighbours
-function Board:cord(x, y)
-
-    -- counts flags around tile
-    local flags = 0
-    for dx = -1, 1 do
-        for dy = -1, 1 do
-            if (self:tile(x + dx, y + dy, is_flag)) flags += 1
-        end
-    end
-
-    -- if the number of flags matches the revealed tile, reveal neighbours
-    if (flags == self:value(x, y)) self:reveal_neighbours(x, y)
-end
-
-
-
--- flags a tile
-function Board:flag(x, y)
-
-    -- does nothing if tile is already revealed or out of bounds
-    if (self:tile(x, y, is_reveal) or not self:inbounds(x, y)) return
-
-    -- if the tile is flagged, unflag it
-    if self:tile(x, y, is_flag) then
-
-        self:flagify(x, y)
-
-        self.flags -= 1
-    
-    -- otherwise, unless it would cause more flags than bombs, flag tile
-    elseif self.flags < self.bombs then
-        
-        self:flagify(x, y)
-
-        self.flags += 1
-    end
-end
-
-
-
--- checks whether a given flag is set.
--- if the cell is out-of-bounds, return false
-function Board:tile(x, y, f)
-
-    -- if out of bounds, return false
-    if (not self:inbounds(x, y)) return false
-
-    -- return whether the flag is set.
-    -- huh, there's a bug in picotron! fget(n, f) should return the
-    -- state of flag f when f is specified. currently, it ingores the
-    -- f parameter and returns the flag bitmap regardless.
-    -- here, i unpack the flag and check it
-    return (fget(mget(x, y)) >> f) & 1 == 1
-end
-
--- gets the numeric value of a tile.
--- bombs have a value of -1
-function Board:value(x, y)
-    if (not self.grid or not self.grid[x] or not self.grid[x][y]) return -3
-    if (self.grid[x][y].is_mine) return -1
-    if (self.grid[x][y].is_false) return -2
-
-    -- uses mask to obtain value bits
-    return self.grid[x][y].value
-end
-
-
--- checks if x,y is in bounds
-function Board:inbounds(x, y)
-    return x >= 1 and y >= 1 and x <= self.w and y <= self.h
-end
-
-
--- methods for altering with a cell
-function Board:countify(x, y)
-
-    -- counts neighbours
-    local count = 0
-
-    -- counts neighbouring mines
-    for dx = -1, 1 do
-        for dy = -1, 1 do
-            if (not (dx == 0 and dy == 0) and self:tile(x + dx, y + dy, is_mine)) count += 1
-        end
-    end
-
-    -- sets the value of the tile
-    if self:tile(x, y, is_flag) then
-        mset(x, y, self.bs + count + 32)
-    else
-        mset(x, y, self.bs + count)
-    end
-end
-
-function Board:mineify(x, y)
-
-    -- mine/unmine
-    if self:tile(x, y, is_mine) then
-        mset(x, y, self.bs)
-    else
-        mset(x, y, self.bs + 9)
-    end
-end
-
-function Board:flagify(x, y)
-
-    -- false flag case
-    if self:tile(x, y, is_false) then
-
-        -- flag/unflag
-        if self:tile(x, y, is_flag) then
-            mset(x, y, mget(x, y) - 1)
-        else
-            mset(x, y, mget(x, y) + 1)
-        end
-
-    -- normal cell case
-    else
-
-        -- flag/unflag
-        if self:tile(x, y, is_flag) then
-            mset(x, y, mget(x, y) - 32)
-        else
-            mset(x, y, mget(x, y) + 32)
-        end
-    end
-end
-
-function Board:falseify(x, y)
-
-    -- flag case
-    if self:tile(x, y, is_flag) then
-
-        -- false/unfalse
-        if self:tile(x, y, is_false) then
-            mset(x, y, self.bs + 32)
-        else
-            mset(x, y, self.bs + 11)
-        end
-
-    -- normal case
-    else
-
-        -- false/unfalse
-        if self:tile(x, y, is_false) then
-            mset(x, y, self.bs)
-        else
-            mset(x, y, self.bs + 10)
-        end
-    end
-end
-
-
--- applies an -ify function to all cells.
--- 'ify' is a method that ends in the suffix '-ify'.
--- condition is an optional method that accepts (x, y) and returns true/false.
-function Board:ify_all(ify, cells, condition, cellsout)
-    
-    -- grabs cells if supplied
-    if (not cells) cells = self:cells()
-
-    for i = 1, #cells do
-        local x, y = unpack(cells[i])
-
-        -- apply the alteration to the given cell
-        if (not condition or condition(self, x, y)) ify(self, x, y)
-
-        -- usefull to track to which cells an alteration has been applied
-        if (cellsout) add(cellsout, cells[i])
-    end
-
-    return cellsout
-end
-
--- draws the map
-function Board:draw()
-
-    for _, col in ipairs(self.grid) do
-        for _, cell in ipairs(col) do
-            cell:draw()
-        end
     end
 end
