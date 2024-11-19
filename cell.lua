@@ -13,15 +13,15 @@ Cell = {}
 Cell.__index = Cell
 Cell.__type = "cell"
 
-function Cell:new(base_sprite)
+function Cell:new(base_sprite, x, y)
 
     local c = {
         bs = base_sprite,   -- index of the first sprite in this sprite set
         s = base_sprite,    -- current sprite used by cell
-        x = 0,              -- grid coordinates of cell
-        y = 0,
-        px = 0,             -- pixel coordinates of the cell
-        py = 0,
+        x = x,              -- grid coordinates of cell
+        y = y,
+        px = x * board.d,   -- pixel coordinates of the cell
+        py = y * board.d,
         d = board.d,        -- board dimension
         value = 0,          -- count of adjacent mines
         is_reveal   = false,-- is revealed
