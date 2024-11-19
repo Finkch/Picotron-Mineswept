@@ -88,6 +88,7 @@ function Board:__call(x, y)
 end
 
 
+
 -- creates a board of empty cells
 function Board:empty()
     for i = 1, self.w do
@@ -98,41 +99,8 @@ function Board:empty()
     end
 end
 
--- applies some function to all cells
-function Board:apply_all(apply, cells, condition)
 
-    -- gets the defaults
-    cells = cells or self:cells()
-    condition = condition or function() return true end
 
-    -- performs the application to all cells meeting the condition
-    for _, col in ipairs(self()) do
-        for _, cell in ipairs(col) do
-            if (condition(cell)) apply(cell)
-        end
-    end
-end
-
--- updates the adjacency lists for all cells
-function Board:adjacify()
-
-    -- scans over each cell
-    for x = 1, self.w do
-        for y = 1, self.h do
-            
-            -- gets a list of neighbours
-            local adjs = {}
-            for dx = -1, 1 do
-                for dy = -1, 1 do
-                    if (not (dx == 0 and dy == 0) and self:inbounds(x + dx, y + dy)) add(adjs, self(x + dx, y + dy))
-                end
-            end
-            
-            -- assigns neighbours
-            self(x, y).adj = adjs
-        end
-    end
-end
 
 -- creates a 1d list of all cells.
 function Board:cells()
@@ -158,6 +126,7 @@ function Board:place_mines(mines, cells)
     local i = 0
     while i < mines do
 
+        -- in case of bad gen
         assert(#cells > 0, string.format("cannot find tiles to place %d remaining mines", mines - i))
 
         -- pops a random item from the list
@@ -165,22 +134,23 @@ function Board:place_mines(mines, cells)
 
         -- if the tile has a false flag, mulligan
         if bombify.is_false then
-
             add(clear, bombify)
         
         -- places a mine, if the tile isn't already revealed
         elseif not bombify.is_reveal then
 
             -- turns the popped cell into a mine.
-            -- ...i forgor lua was 1-index :^(
+            -- ...i forgor lua was 1-index :^(.
+            -- aha!, refactor prevents bad practice!
             bombify:mine()
 
+            -- increments mine count
             i += 1
         end
     end
 
 
-    -- adds the false flagged tiles back to cells, reseting their sprite to 0 value
+    -- adds the cell back to the list, so that it's value is updated
     for _, cell in ipairs(clear) do
 
         cell:falsy()
@@ -207,36 +177,27 @@ function Board:count(cells)
 end
 
 
+-- updates the adjacency lists for all cells
+function Board:adjacify()
 
-
--- left click to reveal or cord
-function Board:lclick(cursor)
-
-    -- converts screen coordinates to grid coordinates
-    local x, y = cursor:map(self.d)
-
-    -- makes sure the click is inbounds
-    if (not self:inbounds(x, y)) return
-
-    -- if this is the first click, also generate the board
-    if (self.reveals == 0) self:generate(x, y, self.bombs)
-
-    -- otherwise, reveal a cell
-    self(x, y):reveal()
-
+    -- scans over each cell
+    for x = 1, self.w do
+        for y = 1, self.h do
+            
+            -- gets a list of neighbours
+            local adjs = {}
+            for dx = -1, 1 do
+                for dy = -1, 1 do
+                    if (not (dx == 0 and dy == 0) and self:inbounds(x + dx, y + dy)) add(adjs, self(x + dx, y + dy))
+                end
+            end
+            
+            -- assigns neighbours
+            self(x, y).adj = adjs
+        end
+    end
 end
 
--- right click to flag
-function Board:rclick(pos)
-
-    -- can't flag before the first click
-    if (self.reveals == 0) return
-
-    -- converts screen coordinates to grid coordinates
-    local x, y = cursor:map(self.d)
-
-    self(x, y):flag()
-end
 
 
 
@@ -281,6 +242,55 @@ end
 function Board:inbounds(x, y)
     return x >= 1 and y >= 1 and x <= self.w and y <= self.h
 end
+
+
+
+-- applies some function to all cells
+function Board:apply_all(apply, cells, condition)
+
+    -- gets the defaults
+    cells = cells or self:cells()
+    condition = condition or function() return true end
+
+    -- performs the application to all cells meeting the condition
+    for _, col in ipairs(self()) do
+        for _, cell in ipairs(col) do
+            if (condition(cell)) apply(cell)
+        end
+    end
+end
+
+
+
+-- left click to reveal or cord
+function Board:lclick(cursor)
+
+    -- converts screen coordinates to grid coordinates
+    local x, y = cursor:map(self.d)
+
+    -- makes sure the click is inbounds
+    if (not self:inbounds(x, y)) return
+
+    -- if this is the first click, also generate the board
+    if (self.reveals == 0) self:generate(x, y, self.bombs)
+
+    -- otherwise, reveal a cell
+    self(x, y):reveal()
+
+end
+
+-- right click to flag
+function Board:rclick(pos)
+
+    -- can't flag before the first click
+    if (self.reveals == 0) return
+
+    -- converts screen coordinates to grid coordinates
+    local x, y = cursor:map(self.d)
+
+    self(x, y):flag()
+end
+
 
 
 -- draws the map
