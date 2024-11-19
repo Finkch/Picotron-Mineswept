@@ -743,14 +743,17 @@ function Board:generate_unfair(x, y, mines)
         -- we'll generate these mines after the regular board mines
         for dx = -1, 1 do
             for dy = -1, 1 do
-                if not (dx == 0 and dy == 0) and self:inbounds(fx + dx, fy + dy) then
-                    self:falseify(fx + dx, fy + dy)
+
+                local u, v = fx + dx, fy + dy
+
+                if not (dx == 0 and dy == 0) and self:inbounds(u, v) then
+                    self(u, v):falsy()
                 end
             end
         end
         
         -- also a false flag under the cursor
-        mset(x, y, self.bs + 10)
+        if (not self(x, y).is_false) self(x, y):falsly()
 
         -- checks if the mine placed was adjacent to the first reveal
         local adj = false
@@ -764,19 +767,22 @@ function Board:generate_unfair(x, y, mines)
         end
 
         -- places a mine under the cursor
-        mset(x, y, self.bs + 9)
+        self(x, y):mine()
 
         -- creates a list of cells about the start
         local cells = {}
         for dx = -1, 1 do
             for dy = -1, 1 do
-                if not (dx == 0 and dy == 0) and self:inbounds(fx + dx, fy + dy) and not self:tile(fx + dx, fy + dy, is_mine) then
+
+                local u, v = fx + dx, fy + dy
+
+                if not (dx == 0 and dy == 0) and self:inbounds(u, v) and not self(u, v).is_mine then
 
                     -- if the cell doesn't have a mine, add it to choices
-                    add(cells, {fx + dx, fy + dy})
+                    add(cells, self(u, v))
 
                     -- resets any lingering false flags
-                    self:falseify(fx + dx, fy + dy)
+                    if (self(u, v).is_false) self(u, v):falsly()
                 end
             end
         end
