@@ -81,22 +81,21 @@ end
 -- methods to toggle cell state
 function Cell:reveal()
 
-    -- can't reveal a flagged cell
-    if (self.is_flag) return
-
     -- if the cell is revealed, try to cord then return
-    if self.is_reveal and self.value == self:count_flags() then
-        self:reveal_neighbours()
-        return
-    end
+    if (self.is_reveal and self.value == self:count_flags()) self:reveal_neighbours()
+
+    -- can't reveal a flagged or revealed cell
+    if (self.is_flag or self.is_reveal) return
 
     -- reveals
     self.is_reveal = true
+    board.reveals += 1
 
     -- if the cell was revealed and was a mine, change to gameover
     if self.is_mine then
         state:change("gameover")
         self:set() -- update sprite
+
         return
     end
 
@@ -108,6 +107,16 @@ function Cell:reveal()
 
     -- updates sprite
     self:set()
+
+    -- if the final tile was revealed, and it isn't a gameover, win the game
+    --      todo: push to board, or at least elsewhere?
+    if board.w * board.h - board.bombs == board.reveals then
+    
+        -- push win to state
+        state.data.win = true
+        
+        state:change("gameover")
+    end
 end
 
 -- reveals neighbours in a random order, prioritising mines.
@@ -165,14 +174,22 @@ function Cell:set()
     -- when cell is revealed
     if self.is_reveal then
 
-        -- either cell is mine or regular cell
+        -- is a mine that is not flagged
         if self.is_mine then
-            self.s = self.bs + 9
+            if not self.is_flag then
+                self.s = self.bs + 25
+            end
+
+        -- an incorrect flag
+        elseif self.is_flag then
+            self.s = self.bs + 42
+
+        -- normal reveal
         else
-            self.s = self.bs + self.value
+            self.s = self.bs + 16 + self.value
         end
 
-    -- when the cell is flagged
+    -- normal flag
     elseif self.is_flag then
         self.s = self.bs + 32
 
