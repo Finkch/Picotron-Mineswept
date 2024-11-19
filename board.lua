@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-19 20:39:13",revision=13]]
+--[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-19 20:55:32",revision=14]]
 --[[
     the board is an wxh grid. each tile is an object that encodes
     the state of that tile; whether its a bomb or its value.
@@ -193,12 +193,10 @@ function Board:count(cells)
     if (not cells) cells = self:cells()
 
     -- for each cell, count its neighbours
-    for i = 1, #cells do
-
-        local x, y = unpack(cells[i])
+    for _, cell in ipairs(cells) do
 
         -- don't set count it tile is already revealed or is a mine
-        if (not self:tile(x, y, is_reveal) and not self:tile(x, y, is_mine)) self:countify(x, y)
+        if (not cell.is_reveal and not cell.is_mine) cell:count()
     end
 end
 
@@ -213,7 +211,7 @@ function Board:generate_fair(x, y, mines)
     end
 
     local cells = self:place_mines(mines)
-    --self:count(cells)
+    self:count(cells)
 end
 
 -- generates a guaranteed loss, that will take a while to uncover
@@ -605,17 +603,6 @@ function Board:lclick(cursor)
     -- otherwise, reveal a cell
     self.grid[x][y]:reveal()
 
-
-    --[[
-    -- if the tile is revealed, attempt to cord
-    if self:tile(x, y, is_reveal) then
-        self:cord(x, y)
-        
-    -- otherwise, attempt to reveal
-    else
-        self:reveal(x, y)
-    end
-    ]]
 end
 
 -- right click to flag
@@ -627,68 +614,10 @@ function Board:rclick(pos)
     -- converts screen coordinates to grid coordinates
     local x, y = cursor:map(self.d)
 
-    self:flag(x, y)
+    self.grid[x][y]:flag()
 end
 
 
-
--- reveals a tile
-function Board:reveal(x, y)
-
-    -- don't reveal if it is a flag or out of bounds
-    if (self:tile(x, y, is_reveal) or self:tile(x, y, is_flag) or not self:inbounds(x, y)) return
-
-    -- on insidious mode, generate again when clicking on a false flag
-    if (self.fairness == 0 and self.reveals > 0 and self:tile(x, y, is_false) and not self.second_gen) self:generate(x, y, self.bombs)
-
-    -- on cruel mode, generate again on the second click
-    if (self.fairness == 1 and self.reveals > 0 and not self.second_gen) self:generate(x, y, self.bombs)
-    
-    -- reveals tile
-    mset(x, y, mget(x, y) + 16)
-    self.reveals += 1
-
-    -- if the value of a tile is zero, reveal its neighbours
-    if (self:value(x, y) == 0) self:reveal_neighbours(x, y)
-
-    -- if the tile is a bomb, change to gameover state
-    if (self:tile(x, y, is_mine)) state:change("gameover")
-
-    -- if the final tile was revealed, and it isn't a gameover, win the game
-    if not state:__eq("gameover") and self.w * self.h - self.bombs == self.reveals then
-        
-        -- push win to state
-        state.data.win = true
-        
-        state:change("gameover")
-    end
-end
-
--- reveals neighbours in a random order.
--- random order makes cording in cruel mode look more real
-function Board:reveal_neighbours(x, y)
-    
-    -- list of neighbouring cells
-    local adjs = {}
-    for dx = -1, 1 do
-        for dy = -1, 1 do
-            if (not (dx == 0 and dy == 0)) add(adjs, {dx, dy})
-        end
-    end
-
-    -- pops random neighbours until no neighbours remain
-    while #adjs > 0 do
-
-        -- exit should this lead to a gameover
-        if (state:__eq("gameover")) return
-
-        -- choose a random item
-        local adj = del(adjs, rnd(adjs))
-
-        -- reveal the neighbour
-        self:reveal(x + adj[1], y + adj[2])
-    end
-end
 
 -- reveals remaining bombs
 function Board:reveal_mines()
@@ -699,20 +628,15 @@ function Board:reveal_mines()
     if (self.fairness == 1 and not self.second_gen) self:ensure_cruel()
 
     -- looks for mines
-    for i = 0, self.w - 1 do
-        for j = 0, self.h - 1 do
+    for _, col in ipairs(self.grid) do
+        for _, cell in ipairs(col) do
 
-            -- do nothing if it's already revealed
-            if not self:tile(i, j, is_reveal) then
+            if not cell.is_reveal and (cell.is_mine or cell.is_flag) then
 
-                -- if it's an incorrect flag
-                if self:tile(i, j, is_flag) and not self:tile(i, j, is_mine) then
-                    mset(i, j, self.bs + 42)
-                
-                -- otherwise, reveal if it's a mine
-                elseif self:tile(i, j, is_mine) and not self:tile(i, j, is_reveal) and not self:tile(i, j, is_flag) then
-                    mset(i, j, mget(i, j) + 16)
-                end
+                cell.is_reveal = true
+
+                -- updates sprite
+                cell:set()
             end
         end
     end
@@ -832,11 +756,12 @@ end
 -- gets the numeric value of a tile.
 -- bombs have a value of -1
 function Board:value(x, y)
-    if (self:tile(x, y, is_mine)) return -1
-    if (self:tile(x, y, is_false)) return -2
+    if (not self.grid or not self.grid[x] or not self.grid[x][y]) return -3
+    if (self.grid[x][y].is_mine) return -1
+    if (self.grid[x][y].is_false) return -2
 
     -- uses mask to obtain value bits
-    return fget(mget(x, y)) & 15
+    return self.grid[x][y].value
 end
 
 
