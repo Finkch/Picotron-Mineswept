@@ -213,22 +213,25 @@ function QuantumCell:new(base_sprite)
 end
 
 
--- returns a random possible eigenstate given the cell's superposition.
--- this does not collapse the wavefunction
-function QuantumCell:infer()
+-- obtains the collection of all eigenstates, state by state.
+-- not really a hilbert space, but the closest analogue i could find
+function QuantumCell:hilbert()
     local eigenstates = {}
-
-    -- the current eigenstate being checked
     local eigenstate = 1
 
-    -- finds all possible eigenstates
     while eigenstate <= self.superposition do
         if (self:is_entangled(eigenstate)) add(eigenstates, eigenstate)
         eigenstate = eigenstate << 1
     end
 
-    -- return a random variant
-    return rnd(eigenstates)
+    return eigenstates
+end
+
+
+-- returns a random possible eigenstate given the cell's superposition.
+-- this does not collapse the wavefunction
+function QuantumCell:infer()
+    return rnd(self:hilbert())
 end
 
 
@@ -275,4 +278,5 @@ function QuantumCell:observe(eigenstate)
 
     -- collapses the wavefunciton, becoming a classical cell
     setmetatable(self, Cell)
+    self.quantum = false
 end
