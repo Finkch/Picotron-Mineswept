@@ -215,17 +215,52 @@ end
 
 -- obtains the collection of all eigenstates, state by state.
 -- not really a hilbert space, but the closest analogue i could find
-function QuantumCell:hilbert()
+function QuantumCell:hilbert(space)
+
+    -- default set of eigenstates are the superposition eigenstates
+    space = space or self.superposition
+    
+    -- tracks data
     local eigenstates = {}
     local eigenstate = 1
 
+    -- probes each possible eigenstate of the system that could exist
     while eigenstate <= self.superposition do
-        if (self:is_entangled(eigenstate)) add(eigenstates, eigenstate)
+        if (self:is_entangled(eigenstate, space)) add(eigenstates, eigenstate)
         eigenstate = eigenstate << 1
     end
 
     return eigenstates
 end
+
+
+
+
+-- finds the ratio of eigenstates that are a mine to those that are not
+function QuantumCell:ratio()
+    local _, mineable = self:hilbert(self.superposition & self.eigenvalues)
+    local _, cellable = self:hilbert(self.superposition & not self.eigenvalues)
+
+    return len(mineable) / len(cellable)
+end
+
+-- returns whether this cell can be a mine, and a list of mineable variants
+function QuantumCell:mineable()
+
+    -- we don't need the '&,' but i'm keeping it for clarity
+    local cells = self:hilbert(self.superposition & self.eigenvalues)
+
+    return #cells > 0, cells
+end
+
+
+-- returns whether this cell can be a mineless cell, and a list of mineless variants
+function QuantumCell:cellable()
+    local cells = self:hilbert(self.superposition & not self.eigenvalues)
+    return #cells > 0, cells
+end
+
+
 
 
 -- returns a random possible eigenstate given the cell's superposition.
@@ -235,9 +270,12 @@ function QuantumCell:infer()
 end
 
 
--- given an eigenstate or superposition, return whether this cell is entangled
-function QuantumCell:is_entangled(supereigen)
-    return self.superposition & supereigen > 0
+-- given an eigenstate or superposition, return whether 
+-- this cell is entangled in the given space.
+-- default space is entire superposition space
+function QuantumCell:is_entangled(supereigen, space)
+    space = space or self.superposition
+    return space & supereigen > 0
 end
 
 -- given an eigenstate returns..
