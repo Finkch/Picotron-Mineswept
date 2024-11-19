@@ -34,13 +34,6 @@
 ]]
 
 include("cell.lua")
-include("generation.lua")
-
--- some constants for the checking flags
-is_mine     = 7
-is_flag     = 6
-is_reveal   = 5
-is_false    = 4
 
 
 -- board object
@@ -86,6 +79,15 @@ function Board:new(w, h, bombs, fairness, oldsprites)
     return b
 end
 
+
+-- calling the board returns the given cell
+function Board:__call(x, y)
+    if (not x or not y) return self.grid
+
+    return self.grid[x][y]
+end
+
+
 -- creates a board of empty cells
 function Board:empty()
     for i = 1, self.w do
@@ -107,12 +109,12 @@ function Board:adjacify()
             local adjs = {}
             for dx = -1, 1 do
                 for dy = -1, 1 do
-                    if (not (dx == 0 and dy == 0) and self:inbounds(x + dx, y + dy)) add(adjs, self.grid[x + dx][y + dy])
+                    if (not (dx == 0 and dy == 0) and self:inbounds(x + dx, y + dy)) add(adjs, self(x + dx, y + dy))
                 end
             end
             
             -- assigns neighbours
-            self.grid[x][y].adj = adjs
+            self(x, y).adj = adjs
         end
     end
 end
@@ -120,7 +122,7 @@ end
 -- creates a 1d list of all cells.
 function Board:cells()
     local cells = {}
-    for _, col in ipairs(self.grid) do
+    for _, col in ipairs(self()) do
         for _, cell in ipairs(col) do
             add(cells, cell)
         end
@@ -163,7 +165,6 @@ function Board:place_mines(mines, cells)
     end
 
     -- adds the false flagged tiles back to cells, reseting their sprite to 0 value
-    --self:ify_all(self.falseify, clear, function(x, y) return true end, cells)
     for _, cell in ipairs(clear) do
         cell:falsy()
 
@@ -204,7 +205,7 @@ function Board:lclick(cursor)
     if (self.reveals == 0) self:generate(x, y, self.bombs)
 
     -- otherwise, reveal a cell
-    self.grid[x][y]:reveal()
+    self(x, y):reveal()
 
 end
 
@@ -217,7 +218,7 @@ function Board:rclick(pos)
     -- converts screen coordinates to grid coordinates
     local x, y = cursor:map(self.d)
 
-    self.grid[x][y]:flag()
+    self(x, y):flag()
 end
 
 
@@ -231,7 +232,7 @@ function Board:reveal_mines()
     if (self.fairness == 1 and not self.second_gen) self:ensure_cruel()
 
     -- looks for mines
-    for _, col in ipairs(self.grid) do
+    for _, col in ipairs(self()) do
         for _, cell in ipairs(col) do
 
             -- reveals bad flags and mines
@@ -252,8 +253,8 @@ end
 -- bombs have a value of -1
 function Board:value(x, y)
     if (not self.grid or not self.grid[x] or not self.grid[x][y]) return -3
-    if (self.grid[x][y].is_mine) return -1
-    if (self.grid[x][y].is_false) return -2
+    if (self(x, y).is_mine) return -1
+    if (self(x, y).is_false) return -2
 
     return self.grid[x][y].value
 end
@@ -267,8 +268,7 @@ end
 
 -- draws the map
 function Board:draw()
-
-    for _, col in ipairs(self.grid) do
+    for _, col in ipairs(self()) do
         for _, cell in ipairs(col) do
             cell:draw()
         end
