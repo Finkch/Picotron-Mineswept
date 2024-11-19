@@ -309,7 +309,7 @@ function Board:generate_fair(x, y, mines)
     -- sets false flags ensure first click reveals a zero
     for dx = -1, 1 do
         for dy = -1, 1 do
-            if (self:inbounds(x + dx, y + dy)) self(x, y):falsy()
+            if (self:inbounds(x + dx, y + dy)) self(x + dx, y + dy):falsy()
         end
     end
 
