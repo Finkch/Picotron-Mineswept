@@ -68,7 +68,7 @@
     x   * move random 50-50 selection into fifties
     x        > add weight to given types
     x   * find clever way of compressing similar layouts
-    xxxx   * fix insidious gen starting on non-0 due to inideal 50-50 placement
+    xxxxx   * fix insidious gen starting on non-0 due to inideal 50-50 placement
     x   * draw a border around the board
     xx   * insidious 50 cell that is included in fair gen; a zero?
     -   * better 50 choice by allowing larger boards depending on first reveal location;
@@ -83,16 +83,17 @@
             - or simply wrap mg/set functions?
             - infinite board (for quantum) might not work using map
         > small sprites!
-        > classic cells
-        > quantum cells
-        > count during board creation or when revealed?
-        > superposition as a number or a table?
-            - number: 
-                + very fast bitwise operations
-                + cumbersome when lots of states are present
-            - table:
-                + slow operations to check state and whether is entangled
-                + easy to expand to losts of states
+    x       > classic cells
+    x       > quantum cells
+    -       > count during board creation or when revealed?
+    -           - creation is easier since it allows debug peeks
+    x       > superposition as a number or a table?
+    x           - number: 
+    x               + very fast bitwise operations
+    x               + cumbersome when lots of states are present
+    -           - table:
+    -               + slow operations to check state and whether is entangled
+    -               + easy to expand to losts of states
 
     * quantum minesweeper
         > infinite board
@@ -212,9 +213,6 @@ function _init()
         -- when starting a game...
         elseif self:__eq("play") then
 
-            -- clears any previous boards
-            --board:clear()
-
             -- create a new board
             board = Board:new(board.w, board.h, board.bombs, self.data.fairness, board.oldsprites)
 
@@ -247,7 +245,7 @@ function _init()
     state.data.minmines = 6
     state.data.maxmines = -1 -- will be update to match board dimensions
     state.data.fairness = 0  -- tracking fairness here, not board, for interround continuity
-    state.data.menu_fairness = 1
+    state.data.menu_fairness = 0
 
     -- moves state to menu
     state:change("menu")
@@ -259,7 +257,7 @@ function _init()
     winlosser = Winlosser:new()
 
     -- do debug printout
-    debug = true
+    debug = false
 end
 
 
@@ -283,6 +281,7 @@ function _update()
         q:add(cursor:posm())
         q:add(Vec:new(x, y))
         q:add(board:value(x, y))
+        q:add(board.corner or -1)
     end
 end
 
