@@ -271,15 +271,14 @@ function QuantumCell:ratio()
     return string.format("mines/cells = %s/%s", #self:mineable(), #self:cellable())
 end
 
--- returns whether this cell can be a mine, and a list of mineable variants
+-- returns a list of eigenstates where this cell is a mine
 function QuantumCell:mineable()
 
     -- we don't need the '&,' but i'm keeping it for clarity
     return self:hilbert(self.superposition & self.eigenvalues)
 end
 
-
--- returns whether this cell can be a mineless cell, and a list of mineless variants
+-- returns a list of eigenstates where this cell is not a mine
 function QuantumCell:cellable()
     return self:hilbert(self.superposition & ~self.eigenvalues)
 end
