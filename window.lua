@@ -54,10 +54,15 @@ end
 
 -- updates the window bounds based on the board
 function Window:edges()
-    self.sl = 0
-    self.sr = board.w * board.d - 1
-    self.st = 0
-    self.sb = board.h * board.d - 1
+    self.sl = board.d + 1
+    self.sr = (board.w + 1) * board.d - 1
+    self.st = board.d + 1
+    self.sb = (board.h + 1) * board.d - 1
+end
+
+-- moves camera to the centre of the board
+function Window:refocus()
+    self.focal = -Vec:new(board.w / 2 * board.d + board.d, board.h / 2 * board.d + board.d)
 end
 
 -- moves camera
@@ -317,10 +322,10 @@ end
 function Window:draw_border()
 
     -- a thin boarder
-    self:box(-1, -1, board.w * board.d, board.h * board.d, false, 6)
+    self:box(-1 + board.d, -1 + board.d, (board.w + 1) * board.d, (board.h + 1) * board.d, false, 6)
 
     -- a smaller black box to allow mines to appear
-    self:box(0, 0, board.w * board.d - 1, board.h * board.d - 1)
+    self:box(board.d, board.d, (board.w + 1) * board.d - 1, (board.h + 1) * board.d - 1)
 end
 
 function Window:draw_menu()

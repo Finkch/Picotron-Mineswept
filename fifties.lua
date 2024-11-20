@@ -25,7 +25,18 @@ function Fifty:new(grid, mgrid, mines, reflectable, weight)
         weight = weight or 1        -- how common this pattern appears
     }
     setmetatable(f, Fifty)
+
     return f
+end
+
+-- calling a fifty returns the grid at that position
+function Fifty:__call(x, y, m)
+
+    -- instead, use the mgrid
+    m = m or false
+    if (m) return self.mgrid[y][x]
+
+    return self.grid[y][x]
 end
 
 -- returns a potentially modified copy
@@ -40,6 +51,27 @@ function Fifty:copy(grid, mgrid)
         self.reflectable,
         self.weight
     )
+end
+
+-- finds the number of eigenstates present
+function Fifty:find_superposition()
+
+    -- finds the largest value present in the mgrid
+    local maxi = 0
+    for i = 1, self.w do
+        for j = 1, self.h do
+            if (self(i, j, true) > maxi) maxi = self(i, j, true)
+        end
+    end
+
+    -- finds the first power of two larger than the maximum value
+    local superposition = 1
+    while superposition <= maxi do
+        superposition = superposition << 1
+    end
+
+    -- a number whose bits are one up to the largest non-zero bit in the mgrid
+    return superposition - 1
 end
 
 
@@ -229,9 +261,9 @@ function Fifties:_init()
     -- 3x3
     self:add(3, false, 1,
         {
-            {1, 1, -1},
-            {-2, -2, 1},
-            {-2, -2, 1}
+            {0, 0, -1},
+            {-2, -2, 0},
+            {-2, -2, 0}
         }, {
             {0, 0, 0},
             {1, 2, 0},

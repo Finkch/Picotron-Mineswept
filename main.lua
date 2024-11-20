@@ -68,10 +68,9 @@
     x   * move random 50-50 selection into fifties
     x        > add weight to given types
     x   * find clever way of compressing similar layouts
-    xxxx   * fix insidious gen starting on non-0 due to inideal 50-50 placement
+    xxxxx   * fix insidious gen starting on non-0 due to inideal 50-50 placement
     x   * draw a border around the board
-    x   * insidious 50 cell that is included in fair gen; a zero?
-    x       > fix the count not working
+    xx   * insidious 50 cell that is included in fair gen; a zero?
     -   * better 50 choice by allowing larger boards depending on first reveal location;
     -     actually, that would go poorly for very large 50s on small board.
     -     the board would be overwhelmed by the 50 if cursor was in the corner
@@ -84,6 +83,17 @@
             - or simply wrap mg/set functions?
             - infinite board (for quantum) might not work using map
         > small sprites!
+    x       > classic cells
+    x       > quantum cells
+    -       > count during board creation or when revealed?
+    -           - creation is easier since it allows debug peeks
+    x       > superposition as a number or a table?
+    x           - number: 
+    x               + very fast bitwise operations
+    x               + cumbersome when lots of states are present
+    -           - table:
+    -               + slow operations to check state and whether is entangled
+    -               + easy to expand to losts of states
 
     * quantum minesweeper
         > infinite board
@@ -116,6 +126,17 @@
         > how to maintain an 'infinite' grid
             - policy for very distant, isolated reveals
         > minimum desnity to guarantee finite (and sensible) first reveal
+        > how the heck do i generate any frontier? what happens on the initial reveal?
+
+    * observations about quantum mines...
+        > imagine each possible variation was tracked
+            - no matter the variation, every revealed cell would see the same number
+              of mines in each variation
+
+    * quantum mine: how to observe?
+        > currently, observe one and all entangled are observed
+        > need an intermediate observation that removes the observed state but
+          only collaspses if there remains one state
 
 ]]
 
@@ -197,9 +218,6 @@ function _init()
         -- when starting a game...
         elseif self:__eq("play") then
 
-            -- clears any previous boards
-            board:clear()
-
             -- create a new board
             board = Board:new(board.w, board.h, board.bombs, self.data.fairness, board.oldsprites)
 
@@ -209,7 +227,7 @@ function _init()
             -- focus the camera to the centre of the board
             if self.previous == "menu" then
                 cursor.pos = Vec:new(480 / 2, 270 / 2)
-                wind.focal = -Vec:new(board.w / 2 * board.d, board.h / 2 * board.d)
+                wind:refocus()
             end
 
             -- updates the window to show the board immediately
@@ -263,10 +281,12 @@ function _update()
     gamestate(state)
 
     if debug then
+        local x, y = cursor:map(board.d)
+
         q:add(cursor:posm())
-        q:add(Vec:new(cursor:map(board.d)))
-        q:add(board:value(cursor:map(board.d)))
-        q:add(string.format("w: %d,\tl: %d", winlosser.w, winlosser.l))
+        q:add(Vec:new(x, y))
+        q:add(board:value(x, y))
+        q:add(board.corner or -1)
     end
 end
 
