@@ -237,6 +237,8 @@ function Board:value(x, y)
     if (self(x, y).is_mine) return -1
     if (self(x, y).is_false) return -2
 
+    if (self(x, y).quantum) return self(x, y):ratio()
+
     return self(x, y).value
 end
 
@@ -440,6 +442,9 @@ function Board:generate_insidious(x, y, mines)
             -- ensures the initial reveal is not close.
             -- otherwise, initial reveal would not be guaranteed to be a zero.
 
+
+            --      !! right/bottom plus 1? !!
+
             -- bottom left
             if corner == 0 then
                 try_fifty = fifty:copy()
@@ -486,88 +491,64 @@ function Board:generate_insidious(x, y, mines)
         self.fifty = fifty
         self.t = t
         self.l = l
+        self.corner = corner
 
-        -- sets false flags on the 50-50
-        for i = 0, fifty.w - 1 do
-            for j = 0, fifty.h - 1 do
-                if (fifty.grid[j + 1][i + 1] != 0) mset(l + i, t + j, self.bs + 10)
-            end
-        end
+        
+        -- places false flags over the no-gen zone of the fifty
+        for i = 1, fifty.w do
+            for j = 1, fifty.h do
 
-        -- normal generation
-        -- sets false flags ensure first click reveals a zero
-        for dx = -1, 1 do
-            for dy = -1, 1 do
-                if (self:inbounds(x + dx, y + dy)) mset(x + dx, y + dy, self.bs + 10)
-            end
-        end
+                -- places false flags
+                if fifty(i, j) == -2 then
+                    self(l + i, t + j):falsy()
 
-        self:place_mines(mines - fifty.mines)
-        -- end normal generation
-
-
-        -- generates 50-50 boundary
-        for i = 0, fifty.w - 1 do
-            for j = 0, fifty.h - 1 do
-                if (fifty.grid[j + 1][i + 1] == -1) mset(l + i, t + j, self.bs + 9)
-            end
-        end
-
-        -- counts board
-        self:count()
-
-        -- introduces quantum information
-        for i = 0, fifty.w - 1 do
-            for j = 0, fifty.h - 1 do
-
-                local ix, iy = i + 1, j + 1
-
-                -- sets false flag
-                if fifty.grid[iy][ix] == -2 then
-                    mset(l + i, t + j, self.bs + 10)
-
-                -- counts quantum mines
-                elseif fifty.grid[j + 1][i + 1] > 0 then
-                    mset(l + i, t + j, mget(l + i, t + j) + fifty.grid[iy][ix])
-
-                -- counts fair gen quantum mines
-                elseif fifty.grid[iy][ix] == 0 and not self:tile(l + i, t + j, is_mine) then
-
-                    -- chooses the first adjacent non-zero number it finds on the mgrid.
-                    -- by counting the adjacent quantum mines of that variant, it will
-                    -- know what it would need to add to its count.
-                    -- a random adjacent quantum mine variant is guaranteed to be the
-                    -- same as all adjacent others, since otherwise it wouldn't be quantum.
-                    local first = nil
-                    local count = 0
-                    for dx = -1, 1 do
-                        for dy = -1, 1 do
-
-                            -- ensures all accesses lie on the (m)grid.
-                            -- strictly speaking, no need to prevent dx == 0 and dy == 0,
-                            -- since such a tile is guaranteed to not be a qmine variant
-                            if 1 <= ix + dx and ix + dx <= fifty.w and 1 <= iy + dy and iy + dy <= fifty.h and not (dx == 0 and dy == 0) then
-
-                                -- check for quantum mine
-                                if fifty.mgrid[iy + dy][ix + dx] != 0 then
-
-                                    -- finds the first variant
-                                    if (not first) first = self:choose_variant(l + i + dx, t + j + dy) -- 10 deep!
-
-                                    -- counts occurances of that variant
-                                    if (fifty.mgrid[iy + dy][ix + dx] & first > 0) count += 1
-
-                                end
-                            end -- 8 deep nested statements |:^(
-                        end
-                    end
-
-                    -- adds the count of adjacnet quantum mines to the cell
-                    mset(l + i, t + j, mget(l + i, t + j) + count)
+                -- places mines
+                elseif (fifty(i, j) == -1) then
+                    self(l + i, t + j):mine()
                 end
             end
         end
 
+
+        -- applies fair generation to place mines outside of fifty's no-gen
+        self:generate_fair(x, y, mines - fifty.mines)
+
+        
+
+        -- precalc
+        local superposition = fifty:find_superposition()
+        
+        local entangled = {}
+
+
+        -- places quantum cells in the fifty
+        for i = 1, fifty.w do
+            for j = 1, fifty.h do
+                if fifty(i, j, true) != 0 then
+
+                    -- creates the quantum cell
+                    local cq = QuantumCell:new(board.bs, l + i, t + j, board.d)
+
+                    -- gives the cell a superposition
+                    cq.superposition = superposition
+                    cq.eigenvalues = fifty(i, j, true)
+                    cq.quantum = true
+
+                    -- gives this cell a list of entangled cells
+                    cq.entangled = entangled
+                    add(entangled, cq)
+
+                    -- assigns the cell to the grid
+                    self.grid[l + i][t + j] = cq
+                end
+            end
+        end
+
+        -- reconsideres adjacency due to updated cells
+        self:adjacify()
+
+        -- updates the board's counts
+        self:count()
 
     -- on finding the special 50-50.
     -- i.e., when revealing a false flag tile
@@ -575,79 +556,20 @@ function Board:generate_insidious(x, y, mines)
 
         self.second_gen = true
 
-        -- retrieves some handy info
-        local fifty = self.fifty
-        local t = self.t
-        local l = self.l
+        -- obtains the cell being flipped
+        local cell = self(x, y)
 
-        -- figures out which variant supports this mine placement.
-        -- i.e., which variant has an active bit in this tile
-        local variant = self:choose_variant(x, y)
+        -- obtains states where the quantum cell resolves to a mine
+        local _, eigenstates = cell:mineable()
 
-        -- places mines according to that variant
-        self:place_variant(variant)
+        -- observes a quantum cell to an ill favoured state
+        cell:observe(rnd(eigenstates))
     end
 end
 
 -- checks for a collision between cursor and a grid position
 function Board:overlap(x, y, l, t, fifty)
-    return l - 1 <= x and x <= l + fifty.w and t - 1 <= y and y <= t + fifty.h
-end
-
--- given the flags on a cell, choose one at random
-function Board:choose_variant(x, y)
-
-    local fifty = self.fifty
-    local t = self.t
-    local l = self.l
-
-    local variants = fifty.mgrid[y - t + 1][x - l + 1]
-
-    -- finds the present variants of the given cell
-    local flags = {}
-    local i = 0
-    local pow = 1
-
-    -- checks each bit
-    while pow <= variants do
-
-        -- checks if this flag is active
-        if ((variants // pow) & 1 == 1) add(flags, pow)
-
-        -- checks the next power
-        i += 1
-        pow = 2 ^ i
-    end
-
-    -- returns a random variant from the cell's possible variants
-    return rnd(flags)
-end
-
-
--- collapses a mine wave function into a specific variant
-function Board:place_variant(v)
-
-    -- for whatever reason, we can't pass these value since
-    -- i guess they're local when this is called from insidious?
-    -- that makes no sense because otherwise 'v,' too, would be nil.
-    -- nevertheless, fifty is nil if passed in
-    local fifty = self.fifty
-    local t = self.t
-    local l = self.l
-
-    for i = 0, fifty.w - 1 do
-        for j = 0, fifty.h - 1 do
-            if fifty.mgrid[j + 1][i + 1] & v != 0 then
-
-                -- in case flagged
-                if self:tile(l + i, t + j, is_flag) then
-                    mset(l + i, t + j, self.bs + 41)
-                else
-                    mset(l + i, t + j, self.bs + 9)
-                end
-            end
-        end
-    end
+    return l <= x and x <= l + fifty.w and t <= y and y <= t + fifty.h
 end
 
 
@@ -661,20 +583,20 @@ function Board:ensure_insidious()
 
     -- gets a list of all cells containing quantum mines
     local cells = {}
-    for i = 0, fifty.w - 1 do
-        for j = 0, fifty.h - 1 do
-            if (fifty.mgrid[j + 1][i + 1] > 0) add(cells, {l + i, t + j})
+    for i = 1, fifty.w do
+        for j = 1, fifty.h do
+            if (self(l + i, t + j).quantum) add(cells, self(l + i, t + j))
         end
     end
 
    -- chooses a random cell with a quantum mine
-   local x, y = unpack(rnd(cells))
+   local cell = rnd(cells)
 
-    -- randomly selects a variant from the given cell
-    local variant = self:choose_variant(x, y)
+    -- gets the eigenstates corresponding to mines
+    local _, eigenstates = cell:mineable()
 
-    -- places the mines for that variant
-    self:place_variant(variant)
+    -- selects a random mine-eigenstate and observes it 
+    cell:observe(rnd(eigenstates))
 end
 
 
