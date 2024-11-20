@@ -39,6 +39,10 @@ end
 
 -- updates the value of this cell based on the count of adjacent mines
 function Cell:count()
+
+    -- quantum cells don't have a value
+    if (self.quantum) return
+
     self.value = 0
     local eigenstate = nil
 
@@ -49,7 +53,7 @@ function Cell:count()
         if (cell.is_mine) self.value += 1
 
         -- counts quantum mines
-        if (cell.is_quantum) then
+        if (cell.quantum) then
 
             -- finds a random eigenstate.
             -- use this eigenstate for all adjacent quantum cells
@@ -60,7 +64,7 @@ function Cell:count()
             -- any given cell must all have the same count. hence, we can
             -- simply use any random eigenstate.
             -- '& eigenvalue' ensures that the state corresponds to a mine
-            if (cell.superposition & cell.eigenvalues & eigenstate > 0) self.value += 1
+            if (cell:resolve(eigenstate) < 0) self.value += 1
         end
     end
 end
@@ -94,10 +98,10 @@ function Cell:reveal()
     if (board.fairness == 1 and board.reveals > 0 and not board.second_gen) board:generate(self.x, self.y, board.bombs)
 
     -- insidious
-    if (board.fairness == 0 and self.is_false and not board.second_gen) board:generate(self.x, self.y, board.bombs)
+    if (board.fairness == 0 and self.quantum and not board.second_gen) board:generate(self.x, self.y, board.bombs)
 
 
-    
+
     -- reveals
     self.is_reveal = true
     board.reveals += 1
@@ -225,9 +229,9 @@ QuantumCell = setmetatable({}, Cell)
 QuantumCell.__index = QuantumCell
 QuantumCell.__type = "quantumcell"
 
-function QuantumCell:new(base_sprite)
+function QuantumCell:new(base_sprite, x, y, d)
 
-    local qc = Cell:new(base_sprite)
+    local qc = Cell:new(base_sprite, x, y, d)
 
     qc["quantum"]       = true  -- whether the cell is quantum or not
     qc["superposition"] = 0     -- the superposition state (aka variants)
@@ -266,7 +270,7 @@ function QuantumCell:ratio()
     local _, mineable = self:mineable()
     local _, cellable = self:cellable()
 
-    return len(mineable) / len(cellable)
+    return string.format("mines/cells = %s/%s", #mineable, #cellable)
 end
 
 -- returns whether this cell can be a mine, and a list of mineable variants
@@ -281,7 +285,7 @@ end
 
 -- returns whether this cell can be a mineless cell, and a list of mineless variants
 function QuantumCell:cellable()
-    local cells = self:hilbert(self.superposition & not self.eigenvalues)
+    local cells = self:hilbert(self.superposition & ~self.eigenvalues)
     return #cells > 0, cells
 end
 
@@ -330,16 +334,17 @@ function QuantumCell:observe(eigenstate)
     -- ensures valid eigenstate
     assert(self:is_entangled(eigenstate), string.format("cannot observe non-entagled eigenstate; eigenstate '%s' for superposition '%s'", eigenstate, self.superposition))
 
-    --[[ nyi
-    for _, cell in pairs(self.entangled) do
-        cell:observe(eigenstate)
-    end
-    ]]
-
     -- checks if in this state, there is mine
-    self.mine = self:resolve(eigenstate) < 0
+    self.is_mine = self:resolve(eigenstate) < 0
 
     -- collapses the wavefunciton, becoming a classical cell
     setmetatable(self, Cell)
     self.quantum = false
+
+    for _, cell in ipairs(self.entangled) do
+        if (cell.quantum) cell:observe(eigenstate)
+    end
+
+    -- updates count after the resolution
+    self:count()
 end
