@@ -551,12 +551,12 @@ function Board:generate_insidious(x, y, mines)
         self:count()
 
     -- on finding the special 50-50.
-    -- i.e., when revealing a false flag tile
+    -- i.e., when revealing a quantum cell
     else
 
         self.second_gen = true
 
-        -- obtains the cell being flipped
+        -- obtains the cell being revealed
         local cell = self(x, y)
 
         -- obtains states where the quantum cell resolves to a mine
