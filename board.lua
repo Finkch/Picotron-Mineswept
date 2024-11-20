@@ -569,7 +569,7 @@ end
 
 -- checks for a collision between cursor and a grid position
 function Board:overlap(x, y, l, t, fifty)
-    return l <= x and x <= l + fifty.w and t <= y and y <= t + fifty.h
+    return l <= x and x <= l + fifty.w + 1 and t <= y and y <= t + fifty.h + 1
 end
 
 
