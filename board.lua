@@ -295,6 +295,7 @@ function Board:rclick(pos)
 
     self(x, y):flag()
 
+    -- tracks number of flags
     if self(x, y).is_flag then
         self.flags += 1
     else
