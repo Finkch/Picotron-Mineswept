@@ -290,10 +290,16 @@ function Board:rclick(pos)
     -- converts screen coordinates to grid coordinates
     local x, y = cursor:map(self.d)
 
-    -- can't flag before the first click, or flag revealed cell
-    if (self.reveals == 0 or not self:inbounds(x, y) or self(x, y).is_reveal) return
+    -- can't flag before the first click, revealed cell, or when there's too many flags
+    if (self.reveals == 0 or not self:inbounds(x, y) or self(x, y).is_reveal or self.flags >= self.bombs) return
 
     self(x, y):flag()
+
+    if self(x, y).is_flag then
+        self.flags += 1
+    else
+        self.flags -= 1
+    end
 end
 
 
