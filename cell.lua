@@ -288,8 +288,12 @@ end
 
 -- returns a random possible eigenstate given the cell's superposition.
 -- this does not collapse the wavefunction
-function QuantumCell:infer()
-    return rnd(self:hilbert())
+function QuantumCell:infer(space)
+
+    -- default space
+    space = space or self:hilbert()
+
+    return rnd(space)
 end
 
 
