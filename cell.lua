@@ -265,28 +265,23 @@ end
 
 
 
--- finds the ratio of eigenstates that are a mine to those that are not
+-- finds the ratio of eigenstates that are a mine to those that are not.
+-- for now, just for debug prints
 function QuantumCell:ratio()
-    local _, mineable = self:mineable()
-    local _, cellable = self:cellable()
-
-    return string.format("mines/cells = %s/%s", #mineable, #cellable)
+    return string.format("mines/cells = %s/%s", #self:mineable(), #self:cellable())
 end
 
 -- returns whether this cell can be a mine, and a list of mineable variants
 function QuantumCell:mineable()
 
     -- we don't need the '&,' but i'm keeping it for clarity
-    local cells = self:hilbert(self.superposition & self.eigenvalues)
-
-    return #cells > 0, cells
+    return self:hilbert(self.superposition & self.eigenvalues)
 end
 
 
 -- returns whether this cell can be a mineless cell, and a list of mineless variants
 function QuantumCell:cellable()
-    local cells = self:hilbert(self.superposition & ~self.eigenvalues)
-    return #cells > 0, cells
+    return self:hilbert(self.superposition & ~self.eigenvalues)
 end
 
 
