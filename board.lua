@@ -291,7 +291,7 @@ function Board:rclick(pos)
     local x, y = cursor:map(self.d)
 
     -- can't flag before the first click, revealed cell, or when there's too many flags
-    if (self.reveals == 0 or not self:inbounds(x, y) or self(x, y).is_reveal or self.flags >= self.bombs) return
+    if (self.reveals == 0 or not self:inbounds(x, y) or self(x, y).is_reveal or (self.flags >= self.bombs and not self(x, y).is_flag)) return
 
     self(x, y):flag()
 
