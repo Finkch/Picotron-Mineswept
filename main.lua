@@ -133,6 +133,11 @@
             - no matter the variation, every revealed cell would see the same number
               of mines in each variation
 
+    * quantum mine: how to observe?
+        > currently, observe one and all entangled are observed
+        > need an intermediate observation that removes the observed state but
+          only collaspses if there remains one state
+
 ]]
 
 -- a lib of mine with useful functions
