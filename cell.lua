@@ -298,9 +298,8 @@ end
 -- generosity > 0   ->  guaranteed non-mine
 function QuantumCell:infer(generosity)
 
-    -- default space
+    -- space to search
     local space = nil
-
 
     -- random state
     if not generosity or generosity == 0 then
