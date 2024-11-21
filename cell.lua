@@ -41,7 +41,7 @@ end
 function Cell:count()
 
     -- quantum cells don't have a value
-    if (self.quantum) return
+    if (self.is_quantum) return
 
     self.value = 0
     local eigenstate = nil
@@ -53,7 +53,7 @@ function Cell:count()
         if (cell.is_mine) self.value += 1
 
         -- counts quantum mines
-        if (cell.quantum) then
+        if (cell.is_quantum) then
 
             -- finds a random eigenstate.
             -- use this eigenstate for all adjacent quantum cells
@@ -98,7 +98,7 @@ function Cell:reveal()
     if (board.fairness == 1 and board.reveals > 0 and not board.second_gen) board:generate(self.x, self.y, board.bombs)
 
     -- insidious
-    if (board.fairness == 0 and self.quantum and not board.second_gen) board:generate(self.x, self.y, board.bombs)
+    if (board.fairness == 0 and self.is_quantum and not board.second_gen) board:generate(self.x, self.y, board.bombs)
 
 
 
@@ -237,7 +237,7 @@ function QuantumCell:new(base_sprite, x, y, d)
 
     local qc = Cell:new(base_sprite, x, y, d)
 
-    qc["quantum"]       = true  -- whether the cell is quantum or not
+    qc["is_quantum"]    = true  -- whether the cell is quantum or not
     qc["superposition"] = 0     -- the superposition state (aka variants)
     qc["eigenvalues"]   = 0     -- whether an eigenstate resolves to be a mine or no mine
 
@@ -385,13 +385,13 @@ function QuantumCell:collapse(eigenstate, generosity)
 
     -- collapses the wavefunciton, becoming a classical cell
     setmetatable(self, Cell)
-    self.quantum = false
+    self.is_quantum = false
     del(self.entagled, self)
 
 
     -- propogates collapse to entangled cells
     for _, cell in ipairs(self.entangled) do
-        if (cell.quantum) cell:observe(eigenstate)
+        if (cell.is_quantum) cell:observe(eigenstate)
     end
 
 
