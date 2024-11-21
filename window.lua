@@ -52,18 +52,8 @@ function Window:new(windowed, width, height)
     return w
 end
 
--- updates the window bounds based on the board
-function Window:edges()
-    self.sl = board.d + 1
-    self.sr = (board.w + 1) * board.d - 1
-    self.st = board.d + 1
-    self.sb = (board.h + 1) * board.d - 1
-end
 
--- moves camera to the centre of the board
-function Window:refocus()
-    self.focal = -Vec:new(board.w / 2 * board.d + board.d, board.h / 2 * board.d + board.d)
-end
+
 
 -- moves camera
 function Window:update()
@@ -103,6 +93,84 @@ function Window:update()
 
     -- sets the focus
     cam:focus(-self.focal)
+end
+
+
+-- draws window
+function Window:draw()
+    cls()
+
+    -- relative draws
+    cam()
+
+    if not state:__eq("menu") then 
+        
+        -- border around board
+        self:draw_border()
+       
+        board:draw()
+    end
+
+    cam(true)
+
+    -- absolute draws
+    self:draw_frame()
+    self:draw_banner()
+
+    cam(true)
+
+    -- state appropriate draws
+
+    -- menus
+    if state:__eq("menu") then
+
+        self:draw_menu()
+        self:draw_wl()
+
+    -- all play draws were performed earlier
+    elseif state:__eq("play") then
+
+    -- gameover
+    elseif state:__eq("gameover") then
+
+        self:draw_gameover()
+        self:draw_wl()
+    end
+
+    -- more relative draws
+    cam:focus(-self.focal)
+    cam()
+
+    cursor:draw()
+    
+
+    cam(true)
+end
+
+
+
+
+
+
+
+
+--[[
+//////////////////////////////////////////////////
+                draw tools
+//////////////////////////////////////////////////
+]]
+
+-- updates the window bounds based on the board
+function Window:edges()
+    self.sl = board.d + 1
+    self.sr = (board.w + 1) * board.d - 1
+    self.st = board.d + 1
+    self.sb = (board.h + 1) * board.d - 1
+end
+
+-- moves camera to the centre of the board
+function Window:refocus()
+    self.focal = -Vec:new(board.w / 2 * board.d + board.d, board.h / 2 * board.d + board.d)
 end
 
 
@@ -159,57 +227,18 @@ function Window:box_text(text, m, t)
     self:text(text, m, t)
 end
 
--- draws window
-function Window:draw()
-    cls()
 
-    -- relative draws
-    cam()
 
-    if not state:__eq("menu") then 
-        
-        -- border around board
-        self:draw_border()
-       
-        board:draw()
-    end
 
-    cam(true)
 
-    -- absolute draws
-    self:draw_frame()
-    self:draw_banner()
 
-    cam(true)
 
-    -- state appropriate draws
 
-    -- menus
-    if state:__eq("menu") then
-
-        self:draw_menu()
-        self:draw_wl()
-
-    -- all play draws were performed earlier
-    elseif state:__eq("play") then
-
-    -- gameover
-    elseif state:__eq("gameover") then
-
-        self:draw_gameover()
-        self:draw_wl()
-    end
-
-    -- more relative draws
-    cam:focus(-self.focal)
-    cam()
-
-    cursor:draw()
-    
-
-    cam(true)
-end
-
+--[[
+//////////////////////////////////////////////////
+                elements to draw
+//////////////////////////////////////////////////
+]]
 
 -- the background and frame behind important elements
 function Window:draw_frame()
