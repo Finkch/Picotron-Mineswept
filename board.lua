@@ -586,7 +586,7 @@ function Board:generate_insidious(x, y, mines)
         self.second_gen = true
 
         -- observes the quantum cell to a random ill favoured state
-        self(x, y):observe(rnd(self(x, y):mineable()))
+        self(x, y):collapse(nil, -1)
     end
 end
 
@@ -616,7 +616,7 @@ function Board:ensure_insidious()
    local cell = rnd(cells)
 
     -- selects a random mine-eigenstate and observes it 
-    cell:observe(rnd(cell:mineable()))
+    cell:collapse(nil, -1)
 end
 
 
