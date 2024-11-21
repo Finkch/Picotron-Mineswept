@@ -215,7 +215,7 @@ function Cell:draw()
 
     -- draws a black rectangle behind the sprite if needed
     if (wind.infini) rectfill(self.px, self.py, self.px + board.d - 1, self.py + board.d - 1, 0)
-    
+
     spr(self.s, self.px, self.py)
 end
 
@@ -291,11 +291,30 @@ end
 
 
 -- returns a random possible eigenstate given the cell's superposition.
--- this does not collapse the wavefunction
-function QuantumCell:infer(space)
+-- this does not collapse the wavefunction.
+-- generosity dictates whether the space will be random or not.
+-- generosity < 0   ->  guaranteed mine
+-- generosity = 0   ->  random eigenstate
+-- generosity > 0   ->  guaranteed non-mine
+function QuantumCell:infer(generosity)
 
     -- default space
-    space = space or self:hilbert()
+    local space = nil
+
+
+    -- random state
+    if not generosity or generosity == 0 then
+        space = self:hilbert()
+
+    -- random non-mine state
+    elseif generosity > 0 then
+        space = self:cellable()
+
+    -- random mine state
+    elseif generosity < 0 then
+        space = self:mineable()
+
+    end
 
     return rnd(space)
 end
@@ -326,26 +345,55 @@ function QuantumCell:resolve(eigenstate)
 end
 
 
--- observes the cell, collapsing the wavefunction and choosing an eigenstate.
---      !! todo !! this observation must affect entangled cells
+-- trims the superposition such that remaining eigenstates are compatable
+-- with the given eigenstate.
+-- if there only remains a single type of outcome (all outcomes lead to mine
+-- or vice versa), collapse
 function QuantumCell:observe(eigenstate)
-
-    -- if no eigenstate was provided, choose one at random
-    eigenstate = eigenstate or self:infer()
 
     -- ensures valid eigenstate
     assert(self:is_entangled(eigenstate), string.format("cannot observe non-entagled eigenstate; eigenstate '%s' for superposition '%s'", eigenstate, self.superposition))
 
+    -- !!   todo    !!
+    -- figure out how figure out which eigenstates are incompatable.
+    -- for now, just trim all other eigenstates
+    self.superposition  = self.superposition & eigenstate
+    self.eigenvalues    = self.eigenvalues & eigenstate
+
+    -- collapse if there is only one outcome.
+    -- there would be only one outcome if eigenvalues is entirely zeroes
+    -- on the superposition or entirely ones
+    if (self.superposition & self.eigenvalues == 0 or self.superposition & ~self.eigenvalues == 0) self:collapse()
+end
+
+
+-- collapses a wavefunction to a given state, or a random one if no state is provided.
+-- generosity will ensure the cell will/won't be a mine
+function QuantumCell:collapse(eigenstate, generosity)
+
+    -- gets an eigenstate if none were profided 
+    eigenstate = eigenstate or self:infer(generosity)
+
+
+    -- ensures this cell is entangled to the eigenstate
+    assert(self:is_entangled(eigenstate), string.format("cannot collapse to non-entagled eigenstate; eigenstate '%s' for superposition '%s'", eigenstate, self.superposition))
+
+
     -- checks if in this state, there is mine
     self.is_mine = self:resolve(eigenstate) < 0
+
 
     -- collapses the wavefunciton, becoming a classical cell
     setmetatable(self, Cell)
     self.quantum = false
+    del(self.entagled, self)
 
+
+    -- propogates collapse to entangled cells
     for _, cell in ipairs(self.entangled) do
         if (cell.quantum) cell:observe(eigenstate)
     end
+
 
     -- updates count after the resolution
     self:count()
