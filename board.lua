@@ -3,14 +3,27 @@
     the board is an wxh grid. each tile is an object that encodes
     the state of that tile; whether its a bomb or its value.
 
-    the board is encoded through the map. while it could be stored in
-    memory in a 2d table, the map offers an elegant solution. there
-    are 9 sprites representing unrevealed tiles, corresponding to
-    tiles with a value of 0-9 as well as a mine; the difference is
-    denoted by the sprites' flags.
-    that said, there still is a board object. it contains handy-dandy
-    methods of interacting with the map.
+    current grid approach
+        the board is stored in memory in a 2d table. each cell tracks
+        its own information, including its neighbours. while the deprecated
+        solution (below) offers some elegence, particularly in quick ways of
+        updating sprites and state, it is very inelegent to perform an operation
+        over all neighbours of a cell, which is very important for the non-fair
+        generation techniques. furthermore, the map approach does not practically
+        support tiles with a sidelength != 16, nor would it work for 'infinite'
+        grid sizes, as required of quantum minesweeper
 
+    deprecated
+        the board is encoded through the map. while it could be stored in
+        memory in a 2d table, the map offers an elegant solution. there
+        are 9 sprites representing unrevealed tiles, corresponding to
+        tiles with a value of 0-9 as well as a mine; the difference is
+        denoted by the sprites' flags.
+        that said, there still is a board object. it contains handy-dandy
+        methods of interacting with the map.
+
+
+        
     the strategy (normal) to build a board is as follows:
     * create a list of all tiles.
     * pop a random tile; turn the tile into a bomb tile
@@ -31,6 +44,15 @@
         under whichever tile the user picks
     * place mines in the tracked 50-50 in accordance; otherwise
         reveal the board as per normal
+    > ammendment: this special 50-50 encodes all possible variants,
+        or the superposition, of the positions of its mines. this uses
+        a special type of cell called a quantum cell. when the 50-50
+        is encountered, i.e. when the user reveals a quantum cell, it
+        chooses a random variant in which there is a mine there, and
+        "observes" that state, similar to collapsing a wavefunction.
+        it i wanted, it could do the opposite and ensure the user
+        succeeds in the 50-50 by observing a non-mine variant, 
+        but what fun would that be?
 ]]
 
 include("cell.lua")
