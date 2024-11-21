@@ -137,6 +137,9 @@
         > currently, observe one and all entangled are observed
         > need an intermediate observation that removes the observed state but
           only collaspses if there remains one state
+    * start working on infinite grid
+    x       > build clever scrolling background with map that appears infinite but
+    x         simply scrolls a single screen plus one tile
 
 ]]
 
