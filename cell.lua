@@ -212,6 +212,10 @@ function Cell:set()
 end
 
 function Cell:draw()
+
+    -- draws a black rectangle behind the sprite if needed
+    if (wind.infini) rectfill(self.px, self.py, self.px + board.d - 1, self.py + board.d - 1, 0)
+    
     spr(self.s, self.px, self.py)
 end
 

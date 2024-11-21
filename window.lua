@@ -35,7 +35,8 @@ function Window:new(windowed, width, height)
         sb = 0,
         sl = 0,
         sr = 0,
-        focal = Vec:new(0, 0)           -- centre of camera
+        focal = Vec:new(0, 0),          -- centre of camera
+        infini = false                  -- whether the board is infinitely big
     }
     setmetatable(w, Window)
 
@@ -104,9 +105,15 @@ function Window:draw()
     cam()
 
     if not state:__eq("menu") then 
+
+        -- infinite board illusion
+        if self.infini then
+            self:draw_infini()
         
-        -- border around board
-        self:draw_border()
+        -- otherwise, draw a boarder around the finite board
+        else
+            self:draw_border()
+        end
        
         board:draw()
     end
@@ -146,6 +153,7 @@ function Window:draw()
 
     cam(true)
 end
+
 
 
 
@@ -227,6 +235,43 @@ function Window:box_text(text, m, t)
     self:text(text, m, t)
 end
 
+
+
+
+
+
+
+
+
+
+--[[
+//////////////////////////////////////////////////
+                infini board
+//////////////////////////////////////////////////
+]]
+
+
+-- sets map tiles to one screen's worth of empty cells
+function Window:setup_infini()
+    self.infini = true
+
+    for x = 0, self.w // board.d + 2 do
+        for y = 0, self.h // board.d + 2 do
+            mset(x, y, board.bs - 1)
+        end
+    end
+end
+
+-- sets map tiles to one screen's worth of no-tile
+function Window:clear_infini()
+    self.infini = false
+    
+    for x = 0, self.w // board.d + 2 do
+        for y = 0, self.h // board.d + 2 do
+            mset(x, y, 0)
+        end
+    end
+end
 
 
 
@@ -465,4 +510,20 @@ function Window:draw_wl()
 
     -- losses text
     self:text(loss_message, l + w / 2, t + 4 + ib)
+end
+
+-- creates the illusion of an infinitely large board with only one screen of tiles
+function Window:draw_infini()
+
+    -- absolute draw
+    cam(true)
+
+    -- draws the map to fill the screen plus one spare tile of border.
+    -- the map's position is the camera mod tile dimension, which gives
+    -- the appearence of infinite scrolling.
+    -- no, i don't know why the y needs a weird offset (+7, by the way)
+    local x, y = self.focal.x, self.focal.y
+    map(0, 0, x % board.d - 16, y % board.d - 9, 31, 18)
+
+    cam()
 end
