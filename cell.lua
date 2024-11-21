@@ -371,7 +371,7 @@ end
 -- generosity will ensure the cell will/won't be a mine
 function QuantumCell:collapse(eigenstate, generosity)
 
-    -- gets an eigenstate if none were profided 
+    -- gets an eigenstate, if none were provided 
     eigenstate = eigenstate or self:infer(generosity)
 
 
