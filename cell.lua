@@ -23,7 +23,7 @@ function Cell:new(base_sprite, x, y, d)
         y = y,
         px = x * d,         -- pixel coordinates of the cell
         py = y * d,
-        v = 0,              -- count of adjacent mines; cell's value
+        v = nil,            -- count of adjacent mines; cell's value
         is_reveal   = false,-- is revealed
         is_mine     = false,-- is a mine
         is_flag     = false,-- is a flag
@@ -74,7 +74,8 @@ end
 function Cell:value()
     if (self.is_false)  return -2   -- should never hit this
     if (self.is_mine)   return -1
-    if (self.v == 0)    return self:count()
+    
+    if (not self.v)     self:count()
 
     return self.v
 end
