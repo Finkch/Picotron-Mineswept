@@ -276,7 +276,7 @@ function _init()
     winlosser = Winlosser:new()
 
     -- do debug printout
-    debug = true
+    debug = false
 end
 
 
