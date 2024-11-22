@@ -1,4 +1,12 @@
 
+--[[
+    the cruel strategy to build a board is as follows:
+    * don't do anything to build the board.
+    * after the players selects the first tile, reveal is as 1-8
+    * after the player selects a second tile, reveal it as a bomb
+    * place mines such that the board could be valid
+]]
+
 
 include("boards/classic.lua")
 

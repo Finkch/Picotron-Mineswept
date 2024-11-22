@@ -1,4 +1,10 @@
-
+--[[
+    the fair strategy to build a board is as follows:
+    * create a list of all tiles.
+    * pop a random tile; turn the tile into a bomb tile
+    * after mines have been placed, go over remaining tiles and
+        tally the count of neighbouring mines
+]]
 
 include("boards/classic.lua")
 

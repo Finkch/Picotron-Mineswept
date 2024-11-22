@@ -19,37 +19,6 @@
         that said, there still is a board object. it contains handy-dandy
         methods of interacting with the map.
 
-
-
-    the strategy (fair) to build a board is as follows:
-    * create a list of all tiles.
-    * pop a random tile; turn the tile into a bomb tile
-    * after mines have been placed, go over remaining tiles and
-        tally the count of neighbouring mines
-
-    the cruel strategy to build a board is as follows:
-    * don't do anything to build the board.
-    * after the players selects the first tile, reveal is as 1-8
-    * after the player selects a second tile, reveal it as a bomb
-    * place mines such that the board could be valid
-
-    the insidious strategy to build a board is as follows:
-    * first, place a 50-50 on the board; this 50-50 is tracked
-    * as the rest of the board is built, build according to first
-        strategy, except maintining boundary conditions
-    * when the player encounters the tracked 50-50, place a mine
-        under whichever tile the user picks
-    * place mines in the tracked 50-50 in accordance; otherwise
-        reveal the board as per normal
-        > ammendment: this special 50-50 encodes all possible variants,
-            or the superposition, of the positions of its mines. this uses
-            a special type of cell called a quantum cell. when the 50-50
-            is encountered, i.e. when the user reveals a quantum cell, it
-            chooses a random variant in which there is a mine there, and
-            "observes" that state, similar to collapsing a wavefunction.
-            it i wanted, it could do the opposite and ensure the user
-            succeeds in the 50-50 by observing a non-mine variant, 
-            but what fun would that be?
 ]]
 
 include("cell.lua")
