@@ -106,10 +106,10 @@ function Cell:reveal()
 
     -- performs the second generation, for those that need it
     -- cruel
-    if (board.fairness == 1 and board.reveals > 0 and not board.second_gen) board:generate(self.x, self.y, board.bombs)
+    if (board.fairness == 1 and board.reveals > 0 and not board.second_gen) board:generate(self.x, self.y, board.mines)
 
     -- insidious
-    if (board.fairness == 0 and self.is_quantum and not board.second_gen) board:generate(self.x, self.y, board.bombs)
+    if (board.fairness == 0 and self.is_quantum and not board.second_gen) board:generate(self.x, self.y, board.mines)
 
 
 
@@ -133,7 +133,7 @@ function Cell:reveal()
 
     -- if the final tile was revealed, and it isn't a gameover, win the game
     --      todo: push to board, or at least elsewhere?
-    if board.w * board.h - board.bombs == board.reveals then
+    if board.w * board.h - board.mines == board.reveals then
     
         -- push win to state
         state.data.win = true
