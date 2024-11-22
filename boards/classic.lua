@@ -74,7 +74,7 @@ function ClassicBoard:new(fairness, oldsprites, mines, w, h)
     cb:empty()
     cb:adjacify()
 
-    return b
+    return cb
 end
 
 
