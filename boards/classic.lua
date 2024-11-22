@@ -1,3 +1,4 @@
+--[[pod_format="raw",created="2024-11-22 21:16:21",modified="2024-11-22 21:17:39",revision=1]]
 --[[
     classic grid approach
         the board is stored in memory in a 2d table. each cell tracks
@@ -84,6 +85,11 @@ end
                 interface methods
 //////////////////////////////////////////////////
 ]]
+
+-- calling the board returns the given cell.
+function ClassicBoard:__call()
+    return Board.__call(self)
+end
 
 -- gets a 1d list representation of all cells
 function ClassicBoard:cells()
