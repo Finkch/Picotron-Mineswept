@@ -25,7 +25,7 @@ end
 
 
 -- lose in two moves
-function ClassicBoard:generate_unfair(x, y, mines)
+function CruelBoard:generate(x, y, mines)
 
     -- on first click, perform a false generation
     if not self.first_gen then
