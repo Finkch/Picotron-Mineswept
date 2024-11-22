@@ -87,8 +87,8 @@ end
 ]]
 
 -- calling the board returns the given cell.
-function ClassicBoard:__call()
-    return Board.__call(self)
+function ClassicBoard:__call(x, y)
+    return Board.__call(self, x, y)
 end
 
 -- gets a 1d list representation of all cells

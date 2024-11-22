@@ -20,8 +20,8 @@ end
 
 
 -- calling the board returns the given cell.
-function InsidiousBoard:__call()
-    return ClassicBoard.__call(self)
+function InsidiousBoard:__call(x, y)
+    return ClassicBoard.__call(self, x, y)
 end
 
 

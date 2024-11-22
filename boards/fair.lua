@@ -16,8 +16,8 @@ end
 
 
 -- calling the board returns the given cell.
-function FairBoard:__call()
-    return ClassicBoard.__call(self)
+function FairBoard:__call(x, y)
+    return ClassicBoard.__call(self, x, y)
 end
 
 

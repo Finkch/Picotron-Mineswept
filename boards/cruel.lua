@@ -18,8 +18,8 @@ end
 
 
 -- calling the board returns the given cell.
-function CruelBoard:__call()
-    return ClassicBoard.__call(self)
+function CruelBoard:__call(x, y)
+    return ClassicBoard.__call(self, x, y)
 end
 
 
