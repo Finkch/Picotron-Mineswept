@@ -48,10 +48,6 @@ end
 
 -- generates a guaranteed loss, that will take a while to uncover
 function InsidiousBoard:generate(x, y)
-
-    local do_log = false
-
-    local mines = self.mines
     
     -- on normal board generation
     if not self.first_gen then
@@ -73,11 +69,6 @@ function InsidiousBoard:generate(x, y)
         -- 0 is bottom left, increasing is clockwise
         local corners = {0, 1, 2, 3}
         local corner = -1
-
-        if do_log then
-            logger(string.format("min f(%d, %d) = %d; max d(%d, %d) // 2 = %d", fifty.w, fifty.h, min(fifty.w, fifty.h), board.w, board.h, max(board.w, board.h) // 2), "fd.txt")
-            logger(string.format("cursor: (%d, %d)\n", x, y), "fd.txt")
-        end
 
         
         -- whether or not the cursor's cell overlaps with the grid
@@ -187,7 +178,7 @@ function InsidiousBoard:generate(x, y)
 
         -- places mines.
         -- cells is the list of all cells without a mine
-        local cells = self:place(mines - fifty.mines)
+        local cells = self:place(self.mines - fifty.mines)
 
         -- clears any lingering false flags
         self:all(
