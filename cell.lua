@@ -292,25 +292,25 @@ end
 
 -- returns a random possible eigenstate given the cell's superposition.
 -- this does not collapse the wavefunction.
--- generosity dictates whether the space will be random or not.
--- generosity < 0   ->  guaranteed mine
--- generosity = 0   ->  random eigenstate
--- generosity > 0   ->  guaranteed non-mine
-function QuantumCell:infer(generosity)
+-- fairness dictates whether the space will be random or not.
+-- fairness < 0   ->  guaranteed mine
+-- fairness = 0   ->  random eigenstate
+-- fairness > 0   ->  guaranteed non-mine
+function QuantumCell:infer(fairness)
 
     -- space to search
     local space = nil
 
     -- random state
-    if not generosity or generosity == 0 then
+    if not fairness or fairness == 0 then
         space = self:hilbert()
 
     -- random non-mine state
-    elseif generosity > 0 then
+    elseif fairness > 0 then
         space = self:cellable()
 
     -- random mine state
-    elseif generosity < 0 then
+    elseif fairness < 0 then
         space = self:mineable()
 
     end
@@ -367,11 +367,11 @@ end
 
 
 -- collapses a wavefunction to a given state, or a random one if no state is provided.
--- generosity will ensure the cell will/won't be a mine
-function QuantumCell:collapse(eigenstate, generosity)
+-- fairness will ensure the cell will/won't be a mine
+function QuantumCell:collapse(eigenstate, fairness)
 
     -- gets an eigenstate, if none were provided 
-    eigenstate = eigenstate or self:infer(generosity)
+    eigenstate = eigenstate or self:infer(fairness)
 
 
     -- ensures this cell is entangled to the eigenstate
