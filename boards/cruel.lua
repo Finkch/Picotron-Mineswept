@@ -17,6 +17,10 @@ function CruelBoard:new(fairness, oldsprites, mines, w, h)
 end
 
 
+-- calling the board returns the given cell.
+function CruelBoard:__call()
+    return ClassicBoard.__call(self)
+end
 
 
 
