@@ -271,6 +271,14 @@ function QuantumCell:value()
     return self:ratio()
 end
 
+-- applies some coditional action to all entangled cells.
+-- [e]ntangled all
+function QuantumCell:eall(apply, condition)
+    for _, cell in ipairs(self.entagled) do
+        if ((not condition or condition(cell)) and cell.is_quantum) apply(cell)
+    end
+end
+
 
 -- obtains the collection of all eigenstates, state by state.
 -- not really a hilbert space, but the closest analogue i could find
