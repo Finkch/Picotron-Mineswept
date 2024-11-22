@@ -65,7 +65,7 @@ function menu_input()
 
     -- enforces bounds on mines
     state.data.maxmines = mid(6, (board.w - 1) * (board.h - 1) - 1, 999)
-    board.bombs = mid(state.data.minmines, board.bombs, state.data.maxmines)
+    board.mines = mid(state.data.minmines, board.mines, state.data.maxmines)
 
 
     -- reset score
@@ -105,12 +105,12 @@ function menu_input_keys()
             board.w += 1
             board.w = mid(state.data.mind, board.w, state.data.maxd)
 
-            board.bombs = board.w * board.h // 5
+            board.mines = board.w * board.h // 5
         elseif kbm:pressedr("left") then
             board.w -= 1
             board.w = mid(state.data.mind, board.w, state.data.maxd)
 
-            board.bombs = board.w * board.h // 5
+            board.mines = board.w * board.h // 5
         end
 
     elseif state.data.mi == 1 then
@@ -120,19 +120,19 @@ function menu_input_keys()
             board.h += 1
             board.h = mid(state.data.mind, board.h, state.data.maxd)
 
-            board.bombs = board.w * board.h // 5
+            board.mines = board.w * board.h // 5
         elseif kbm:pressedr("left") then
             board.h -= 1
             board.h = mid(state.data.mind, board.h, state.data.maxd)
 
-            board.bombs = board.w * board.h // 5
+            board.mines = board.w * board.h // 5
         end
 
     elseif state.data.mi == 2 then
 
         -- changes selected item
-        if (kbm:pressedr("right")) board.bombs += 1
-        if (kbm:pressedr("left")) board.bombs -= 1
+        if (kbm:pressedr("right")) board.mines += 1
+        if (kbm:pressedr("left")) board.mines -= 1
     
     elseif state.data.mi == 3 then
 
@@ -195,12 +195,12 @@ function menu_input_mouse()
                 board.w += 1
                 board.w = mid(state.data.mind, board.w, state.data.maxd)
 
-                board.bombs = board.w * board.h // 5
+                board.mines = board.w * board.h // 5
             elseif left then
                 board.w -= 1
                 board.w = mid(state.data.mind, board.w, state.data.maxd)
 
-                board.bombs = board.w * board.h // 5
+                board.mines = board.w * board.h // 5
             end
 
         elseif state.data.mi == 1 then
@@ -210,19 +210,19 @@ function menu_input_mouse()
                 board.h += 1
                 board.h = mid(state.data.mind, board.h, state.data.maxd)
 
-                board.bombs = board.w * board.h // 5
+                board.mines = board.w * board.h // 5
             elseif left then
                 board.h -= 1
                 board.h = mid(state.data.mind, board.h, state.data.maxd)
 
-                board.bombs = board.w * board.h // 5
+                board.mines = board.w * board.h // 5
             end
 
         elseif state.data.mi == 2 then
 
             -- changes selected item
-            if (not left) board.bombs += 1
-            if (left) board.bombs -= 1
+            if (not left) board.mines += 1
+            if (left) board.mines -= 1
         
         elseif state.data.mi == 3 then
 
