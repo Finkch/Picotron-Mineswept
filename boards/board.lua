@@ -30,10 +30,12 @@ function Board:new(fairness, oldsprites)
     end
 
     local b = {
-        fairness = fairness,
-        bs = base_sprite,
-        d = d,
-        grid = {}
+        fairness    = fairness,     -- used for generation
+        bs          = base_sprite,  -- which sprite set to use
+        d           = d,            -- cell pixel dimensions
+        flags       = 0,
+        reveals     = 0,
+        grid        = {}
     }
 
     setmetatable(b, Board)
