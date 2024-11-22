@@ -173,4 +173,4 @@ function Board:empty() assert(false, "invalid interface method call, board:empty
 
 -- creates the starting board state
 --  !!  interface method    !!
-function Board:generate() assert(false, "invalid interface method call, board:generate()") end
+function Board:generate(x, y, mines) assert(false, "invalid interface method call, board:generate()") end
