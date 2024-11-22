@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-19 22:26:20",revision=15]]
+--[[pod_format="raw",created="2024-11-04 21:31:02",modified="2024-11-22 21:15:05",revision=17]]
 --[[
     the board is a grid. each tile is an object that encodes
     the state of that tile; whether its a bomb or its value.
@@ -43,18 +43,6 @@ function Board:new(fairness, oldsprites)
 end
 
 
--- calling the board returns the given cell
-function Board:__call(x, y)
-    if (not x or not y) return self.grid
-
-    assert(x and y, string.format("invalid grid coordinates b(%s, %s)", x, y))
-    assert(self:inbounds(x, y), string.format("grid call out of bounds c(%d, %d)", x, y))
-
-    return self.grid[x][y]
-end
-
-
-
 -- gets the value of a given cell
 function Board:value(x, y)
     if (not self:inbounds(x, y)) return -3
@@ -78,7 +66,7 @@ end
 
 
 -- reveals mines and bad flags
-function Board:end()
+function Board:gameover()
 
     -- for some board gen strategies, ensures second gen occurs before mines are revealed.
     -- equality operator is in case second_gen is nil
@@ -149,6 +137,17 @@ end
                 interface methods
 //////////////////////////////////////////////////
 ]]
+
+-- calling the board returns the given cell.
+-- turns out, lua doesn't respect metamethod inheritence!
+function Board:__call(x, y)
+    if (not x or not y) return self.grid
+
+    assert(x and y, string.format("invalid grid coordinates b(%s, %s)", x, y))
+    assert(self:inbounds(x, y), string.format("grid call out of bounds c(%d, %d)", x, y))
+
+    return self.grid[x][y]
+end
 
 -- gets a 1d list representation of all cells
 --  !!  interface method    !!
