@@ -81,6 +81,14 @@ function Cell:value()
 end
 
 
+-- performs some conditional action on all neighbours
+function Cell:all(apply, condition)
+    for _, cell in ipairs(self.adj) do
+        if (not condition or condition(cell)) apply(cell)
+    end
+end
+
+
 -- this, er, uh...what does it do again?
 function Cell:count_flags()
     local flags = 0
