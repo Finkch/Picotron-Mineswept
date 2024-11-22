@@ -330,7 +330,7 @@ function Window:draw_banner()
     if state:__eq("menu") then
         print("0000", p, p, 8)
     else
-        print(string.format("%04d", board.bombs - board.flags), p, p, 8)
+        print(string.format("%04d", board.mines - board.flags), p, p, 8)
     end
 
 
@@ -464,7 +464,7 @@ function Window:draw_menu()
 
     -- mines selection
     self:box(wm - pw / 2 - 3, t + 2 * b, wm + pw / 2 + 1, t + 2 * b + 12)
-    print(string.format("%04d", board.bombs), wm - pw / 2, t + 2 * b + 3, c3)
+    print(string.format("%04d", board.mines), wm - pw / 2, t + 2 * b + 3, c3)
 
 
     -- difficulty select
