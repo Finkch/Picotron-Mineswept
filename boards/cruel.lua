@@ -60,7 +60,7 @@ function CruelBoard:generate(x, y)
         local cell = self(x, y)
 
         -- place a random number under the cursor
-        cell.value = start
+        cell.v = start
 
         -- updates tile's sprite
         cell:set()
