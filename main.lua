@@ -127,6 +127,7 @@
             - policy for very distant, isolated reveals
         > minimum desnity to guarantee finite (and sensible) first reveal
         > how the heck do i generate any frontier? what happens on the initial reveal?
+            - for each cell, find all valid superpositions for its frontier?
 
     * observations about quantum mines...
         > imagine each possible variation was tracked
@@ -147,12 +148,15 @@
 rm("/ram/cart/lib") -- makes sure at most one copy is present
 mount("/ram/cart/lib", "/ram/lib")
 
-include("board.lua")
 include("window.lua")
 include("cursor.lua")
 include("game.lua")
 include("fifties.lua")
 include("winloss.lua")
+
+include("boards/fair.lua")
+include("boards/cruel.lua")
+include("boards/insidious.lua")
 
 include("lib/queue.lua")
 include("lib/logger.lua")
@@ -180,7 +184,7 @@ function _init()
 
     -- creates the map.
     -- these values don't matter since new board will be made during bootup
-    board = Board:new(8, 8, 12, 0, false)
+    board = FairBoard:new(0, false, 12, 8, 8)
 
     -- creates the display window
     wind = Window:new()
@@ -206,7 +210,7 @@ function _init()
         elseif self:__eq("gameover") then
 
             -- reveals mines
-            board:reveal_mines()
+            board:gameover()
 
             -- update w:l ratio
             if self.data.win then
@@ -222,7 +226,14 @@ function _init()
         elseif self:__eq("play") then
 
             -- create a new board
-            board = Board:new(board.w, board.h, board.bombs, self.data.fairness, board.oldsprites)
+            --board = Board:new(board.w, board.h, board.bombs, self.data.fairness, board.oldsprites)
+            if self.data.fairness == 2 then
+                board = FairBoard:new(self.data.fairness, board.oldsprites, board.mines, board.w, board.h)
+            elseif self.data.fairness == 1 then
+                board = CruelBoard:new(self.data.fairness, board.oldsprites, board.mines, board.w, board.h)
+            elseif self.data.fairness == 0 then
+                board = InsidiousBoard:new(self.data.fairness, board.oldsprites, board.mines, board.w, board.h)
+            end
 
             -- precalculations for this board
             wind:edges()
@@ -289,7 +300,7 @@ function _update()
         q:add(cursor:posm())
         q:add(Vec:new(x, y))
         q:add(board:value(x, y))
-        q:add(board.corner or -1)
+        q:add(board.mines)
     end
 end
 
