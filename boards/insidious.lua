@@ -162,11 +162,8 @@ function InsidiousBoard:generate(x, y)
 
 
         -- sets false flags ensure first click reveals a zero
-        for dx = -1, 1 do
-            for dy = -1, 1 do
-                if (self:inbounds(x + dx, y + dy)) self(x + dx, y + dy):falsy()
-            end
-        end
+        self(x, y):all(function(cell) cell:falsy() end)
+        self(x, y):falsy()
 
         -- places mines.
         -- cells is the list of all cells without a mine
