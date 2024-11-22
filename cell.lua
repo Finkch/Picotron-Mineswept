@@ -266,7 +266,8 @@ function QuantumCell:new(base_sprite, x, y, d)
 end
 
 
--- returns the value of a quantum mine
+-- returns the value of a quantum mine:
+-- the probability that there is a mine on this cell
 function QuantumCell:value()
     return self:ratio()
 end
@@ -300,14 +301,6 @@ function QuantumCell:hilbert(space)
     return eigenstates
 end
 
-
-
-
--- finds the ratio of eigenstates that are a mine to those that are not.
--- for now, just for debug prints
-function QuantumCell:ratio()
-    return string.format("mines/cells = %s/%s", #self:mineable(), #self:cellable())
-end
 
 -- returns a list of eigenstates where this cell is a mine
 function QuantumCell:mineable()
