@@ -36,7 +36,7 @@ function FairBoard:generate(x, y)
 
     -- clears any lingering false flags
     self:all(
-        function(c) return c:falsy() end,
+        function(c) c:falsy() end,
         function(c) return c.is_false end,
         cells
     )
