@@ -269,7 +269,7 @@ end
 -- returns the value of a quantum mine:
 -- the probability that there is a mine on this cell
 function QuantumCell:value()
-    return self:ratio()
+    return #self:mineable() / #self:hilbert()
 end
 
 -- applies some coditional action to all entangled cells.
