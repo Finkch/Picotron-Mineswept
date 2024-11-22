@@ -7,7 +7,7 @@ FairBoard.__index = FairBoard
 FairBoard.__type = "fairboard"
 
 
-function FairBoard:new:new(fairness, oldsprites, mines, w, h)
+function FairBoard:new(fairness, oldsprites, mines, w, h)
     local fb = ClassicBoard:new(fairness, oldsprites, mines, w, h)
 
     setmetatable(fb, FairBoard)
