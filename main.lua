@@ -276,7 +276,7 @@ function _init()
     winlosser = Winlosser:new()
 
     -- do debug printout
-    debug = false
+    debug = true
 end
 
 
@@ -297,10 +297,10 @@ function _update()
     if debug then
         local x, y = cursor:map(board.d)
 
-        q:add(cursor:posm())
-        q:add(Vec:new(x, y))
-        q:add(board:value(x, y))
-        q:add(board.mines)
+        q:add("p" .. cursor:posm():__tostring())
+        q:add("b" .. Vec:new(x, y):__tostring())
+        q:add(string.format("cell value: %d", board:value(x, y)))
+        if (board.corner) q:add(string.format("ins. corner: %d", board.corner))
     end
 end
 
