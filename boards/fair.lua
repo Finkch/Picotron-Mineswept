@@ -15,6 +15,11 @@ function FairBoard:new(fairness, oldsprites, mines, w, h)
 end
 
 
+-- calling the board returns the given cell.
+function FairBoard:__call()
+    return ClassicBoard.__call(self)
+end
+
 
 -- creates a regular ol' board of mineswept.
 -- (x, y) is the position of the first reveal.
