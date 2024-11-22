@@ -98,9 +98,9 @@ function CruelBoard:generate(x, y)
 
         -- places most mines
         if adj then
-            self:place_mines(mines - fc)
+            self:place(mines - fc)
         else
-            self:place_mines(mines - fc - 1)
+            self:place(mines - fc - 1)
         end
         
 
@@ -124,9 +124,9 @@ function CruelBoard:generate(x, y)
 
         -- places the final mines about the initial reveal
         if adj then
-            self:place_mines(fc - 1, cells)
+            self:place(fc - 1, cells)
         else
-            self:place_mines(fc, cells)
+            self:place(fc, cells)
         end
 
         -- updates the counts around the board.

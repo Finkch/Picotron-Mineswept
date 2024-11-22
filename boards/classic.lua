@@ -193,7 +193,7 @@ end
 ]]
 
 -- places mines
-function ClassicBoard:place_mines(mines, cells)
+function ClassicBoard:place(mines, cells)
 
     -- in case cells were not provided
     if (not cells) cells = self:cells()

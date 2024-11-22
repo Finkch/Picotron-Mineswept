@@ -170,7 +170,7 @@ function InsidiousBoard:generate(x, y)
 
         -- places mines.
         -- cells is the list of all cells without a mine
-        local cells = self:place_mines(mines - fifty.mines)
+        local cells = self:place(mines - fifty.mines)
 
         -- clears any lingering false flags
         self:all(
