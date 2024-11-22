@@ -19,6 +19,11 @@ function InsidiousBoard:new(fairness, oldsprites, mines, w, h)
 end
 
 
+-- calling the board returns the given cell.
+function InsidiousBoard:__call()
+    return ClassicBoard.__call(self)
+end
+
 
 
 -- generates a guaranteed loss, that will take a while to uncover
