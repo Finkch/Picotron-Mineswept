@@ -23,7 +23,7 @@ function Cell:new(base_sprite, x, y, d)
         y = y,
         px = x * d,         -- pixel coordinates of the cell
         py = y * d,
-        value = 0,          -- count of adjacent mines
+        v = 0,              -- count of adjacent mines; cell's value
         is_reveal   = false,-- is revealed
         is_mine     = false,-- is a mine
         is_flag     = false,-- is a flag
@@ -43,14 +43,14 @@ function Cell:count()
     -- quantum cells don't have a value
     if (self.is_quantum) return
 
-    self.value = 0
+    self.v = 0
     local eigenstate = nil
 
     -- checks all neighbours for whether they are a mine
     for _, cell in ipairs(self.adj) do
 
         -- counts classical mines
-        if (cell.is_mine) self.value += 1
+        if (cell.is_mine) self.v += 1
 
         -- counts quantum mines
         if (cell.is_quantum) then
@@ -64,10 +64,21 @@ function Cell:count()
             -- any given cell must all have the same count. hence, we can
             -- simply use any random eigenstate.
             -- '& eigenvalue' ensures that the state corresponds to a mine
-            if (cell:resolve(eigenstate) < 0) self.value += 1
+            if (cell:resolve(eigenstate) < 0) self.v += 1
         end
     end
 end
+
+
+-- gets the value of the cell
+function Cell:value()
+    if (self.is_false)  return -2   -- should never hit this
+    if (self.is_mine)   return -1
+    if (self.v == 0)    return self:count()
+
+    return self.v
+end
+
 
 -- this, er, uh...what does it do again?
 function Cell:count_flags()
@@ -86,7 +97,7 @@ end
 function Cell:reveal()
 
     -- if the cell is revealed, try to cord then return
-    if (self.is_reveal and self.value == self:count_flags()) self:reveal_neighbours()
+    if (self.is_reveal and self.v == self:count_flags()) self:reveal_neighbours()
 
     -- can't reveal a flagged or revealed cell
     if (self.is_flag or self.is_reveal) return
@@ -115,7 +126,7 @@ function Cell:reveal()
     end
 
     -- if this cell is zero, reveal neighbours
-    if (self.value == 0) self:reveal_neighbours()
+    if (self.v == 0) self:reveal_neighbours()
 
     -- updates sprite
     self:set()
@@ -198,7 +209,7 @@ function Cell:set()
 
         -- normal reveal
         else
-            self.s = self.bs + 16 + self.value
+            self.s = self.bs + 16 + self.v
         end
 
     -- normal flag
@@ -243,6 +254,12 @@ function QuantumCell:new(base_sprite, x, y, d)
 
     setmetatable(qc, QuantumCell)
     return qc
+end
+
+
+-- returns the value of a quantum mine
+function QuantumCell:value()
+    return self:ratio()
 end
 
 
