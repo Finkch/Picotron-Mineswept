@@ -106,10 +106,10 @@ function Cell:reveal()
 
     -- performs the second generation, for those that need it
     -- cruel
-    if (board.fairness == 1 and board.reveals > 0 and not board.second_gen) board:generate(self.x, self.y, board.mines)
+    if (board.fairness == 1 and board.reveals > 0 and not board.second_gen) board:generate(self.x, self.y)
 
     -- insidious
-    if (board.fairness == 0 and self.is_quantum and not board.second_gen) board:generate(self.x, self.y, board.mines)
+    if (board.fairness == 0 and self.is_quantum and not board.second_gen) board:generate(self.x, self.y)
 
 
 

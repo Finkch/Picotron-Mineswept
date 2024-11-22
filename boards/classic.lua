@@ -156,7 +156,7 @@ function ClassicBoard:lclick(cursor)
     if (not self:inbounds(x, y)) return
 
     -- if this is the first click, also generate the board
-    if (self.reveals == 0) self:generate(x, y, self.mines)
+    if (self.reveals == 0) self:generate(x, y)
 
     -- otherwise, reveal a cell
     self(x, y):reveal()

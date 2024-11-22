@@ -23,7 +23,7 @@ end
 
 -- creates a regular ol' board of mineswept.
 -- (x, y) is the position of the first reveal.
-function FairBoard:generate(x, y, mines)
+function FairBoard:generate(x, y)
 
     -- sets false flags ensure first click reveals a zero
     for dx = -1, 1 do
@@ -34,7 +34,7 @@ function FairBoard:generate(x, y, mines)
 
     -- places mines.
     -- cells is the list of all cells without a mine
-    local cells = self:place_mines(mines)
+    local cells = self:place_mines(self.mines)
 
     -- clears any lingering false flags
     self:all(

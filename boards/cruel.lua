@@ -25,7 +25,9 @@ end
 
 
 -- lose in two moves
-function CruelBoard:generate(x, y, mines)
+function CruelBoard:generate(x, y)
+
+    local mines = self.mines
 
     -- on first click, perform a false generation
     if not self.first_gen then
@@ -153,7 +155,7 @@ function CruelBoard:ensure()
 
         -- if the spot is valid, start cruel gen
         if not cell.is_reveal then
-            self:generate(cell.x, cell.y, self.mines)
+            self:generate(cell.x, cell.y)
             return
         end
     end

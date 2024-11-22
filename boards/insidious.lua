@@ -27,9 +27,11 @@ end
 
 
 -- generates a guaranteed loss, that will take a while to uncover
-function InsidiousBoard:generate(x, y, mines)
+function InsidiousBoard:generate(x, y)
 
     local do_log = false
+
+    local mines = self.mines
     
     -- on normal board generation
     if not self.first_gen then
