@@ -84,43 +84,6 @@ end
 
 
 
--- left click to reveal or cord
-function Board:lclick(cursor)
-
-    -- converts screen coordinates to grid coordinates
-    local x, y = cursor:map(self.d)
-
-    -- makes sure the click is inbounds
-    if (not self:inbounds(x, y)) return
-
-    -- if this is the first click, also generate the board
-    if (self.reveals == 0) self:generate(x, y, self.bombs)
-
-    -- otherwise, reveal a cell
-    self(x, y):reveal()
-
-end
-
--- right click to flag
-function Board:rclick(pos)
-
-    -- converts screen coordinates to grid coordinates
-    local x, y = cursor:map(self.d)
-
-    -- can't flag before the first click, revealed cell, or when there's too many flags
-    if (self.reveals == 0 or not self:inbounds(x, y) or self(x, y).is_reveal or (self.flags >= self.bombs and not self(x, y).is_flag)) return
-
-    self(x, y):flag()
-
-    -- tracks number of flags
-    if self(x, y).is_flag then
-        self.flags += 1
-    else
-        self.flags -= 1
-    end
-end
-
-
 
 -- for each cell, call its draw method
 function Board:draw()

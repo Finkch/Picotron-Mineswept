@@ -1,4 +1,4 @@
---[[pod_format="raw",created="2024-11-22 21:16:21",modified="2024-11-22 21:17:39",revision=1]]
+--[[pod_format="raw",created="2024-11-22 21:16:21",modified="2024-11-22 22:15:09",revision=2]]
 --[[
     classic grid approach
         the board is stored in memory in a 2d table. each cell tracks
@@ -135,6 +135,52 @@ end
 -- that is the sole duty of the children of this metatable
 
 
+
+
+
+
+--[[
+//////////////////////////////////////////////////
+                interaction methods
+//////////////////////////////////////////////////
+]]
+
+
+-- left click to reveal or cord
+function ClassicBoard:lclick(cursor)
+
+    -- converts screen coordinates to grid coordinates
+    local x, y = cursor:map(self.d)
+
+    -- makes sure the click is inbounds
+    if (not self:inbounds(x, y)) return
+
+    -- if this is the first click, also generate the board
+    if (self.reveals == 0) self:generate(x, y, self.mines)
+
+    -- otherwise, reveal a cell
+    self(x, y):reveal()
+
+end
+
+-- right click to flag
+function ClassicBoard:rclick(pos)
+
+    -- converts screen coordinates to grid coordinates
+    local x, y = cursor:map(self.d)
+
+    -- can't flag before the first click, revealed cell, or when there's too many flags
+    if (self.reveals == 0 or not self:inbounds(x, y) or self(x, y).is_reveal or (self.flags >= self.mines and not self(x, y).is_flag)) return
+
+    self(x, y):flag()
+
+    -- tracks number of flags
+    if self(x, y).is_flag then
+        self.flags += 1
+    else
+        self.flags -= 1
+    end
+end
 
 
 
