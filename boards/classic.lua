@@ -237,7 +237,8 @@ function ClassicBoard:adjacify()
             end
             
             -- assigns neighbours
-            self(x, y).adj = adjs
+            self(x, y).adj  = adjs
+            self(x, y).adju = adjs
         end
     end
 end

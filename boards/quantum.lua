@@ -23,7 +23,8 @@
         \/
     quantum/infinit board reveal scheme
     * when a tile is revealed, add neighbours until it has 8 neigbbours
-        > every reveal is guaranteed to be on the frontier (y'know, by definition)
+        > every reveal is guaranteed to be on the frontier
+            - wait, no dumass, that ain't true. what about distant reveals?
 
 
     according to chatgpt, which in turn sites percolation theory (study of network
@@ -100,7 +101,7 @@ end
 function QuantumBoard:empty()
     self.grid = {}
     self.cells = {}
-    self.fronteir = {}
+    self.frontier = {}
 
     -- adds a starting cell that's guaranteed to not be a mine
     self:add(0, 0, 1, 0)
@@ -170,9 +171,36 @@ end
 
 
 
--- creates the starting board state
-function QuantumBoard:generate(x, y)
-end
+-- reveals a cell, adding new cells and updating quantum information
+function QuantumBoard:reveal(x, y)
+   
+    -- gets cell in question
+    local cell = self(x, y)
 
-function QuantumBoard:_generate(x, y, i)
+    -- deletes the cell from the frontier
+    del(self.frontier, cell)
+
+    -- tracks which cells need to figure out their superposition
+    local new_frontier = {}
+
+    -- adds new neighbours
+    for dx = -1, 1 do
+        for dy = -1, 1 do
+
+            -- self is not a neighbour of self.
+            -- we only create a cell if it is out-of-bounds, which just means that
+            -- it isn't on the board yet. hence, we need to add it
+            if not (dx == 0 and dy == 0) and not self:inbounds(u, v) self:add(u, v)
+        end
+    end
+
+    -- updates the frontier superposition
+    --  !! todo !! gaaaah!
+
+    -- counts cell's value
+    cell:count()
+
+    -- reveals cell
+    cell:reveal()
+
 end

@@ -29,7 +29,9 @@ function Cell:new(base_sprite, x, y, d)
         is_flag     = false,-- is a flag
         is_false    = false,-- is a false cell (aka, special flag)
         is_quantum  = false,-- whether the cell is a superposition of mine and not mine
-        adj = {}            -- list of adjacent cells
+        adj  = {},          -- list of all adjacent cells
+        adju = {},          -- list of adjacent, unrevealed cells
+        adjr = {}           -- list of adjacent, revealed cells
     }
 
     setmetatable(c, Cell)
@@ -134,9 +136,10 @@ function Cell:reveal()
         return
     end
 
-    -- when a cell is revealed, it removes itself from its neighbours' adjacency
+    -- when a cell is revealed, updated adjacency information
     for _, cell in ipairs(self.adj) do
-        del(cell.adj, self)
+        del(cell.adju, self)
+        add(cell.adjr, self)
     end
 
     -- if this cell is zero, reveal neighbours
@@ -188,6 +191,9 @@ function Cell:reveal_neighbours()
         adj:reveal()
     end
 end
+
+
+
 
 function Cell:mine()
     self.is_mine = not self.is_mine
