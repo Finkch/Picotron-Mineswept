@@ -136,3 +136,13 @@ function Board:empty() assert(false, "invalid interface method call, board:empty
 -- creates the starting board state
 --  !!  interface method    !!
 function Board:generate(x, y, mines) assert(false, "invalid interface method call, board:generate()") end
+
+
+-- game actions for left click: reveal, cord
+--  !!  interface method    !!
+function Board:lclick(cursor) assert(false, "invalid interface method call, board:lclick()") end
+
+
+-- game actions for right click: flag
+--  !!  interface method    !!
+function Board:rclick(cursor) assert(false, "invalid interface method call, board:rclick()") end
