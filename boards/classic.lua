@@ -133,7 +133,7 @@ function ClassicBoard:lclick(cursor)
 end
 
 -- right click to flag
-function ClassicBoard:rclick(pos)
+function ClassicBoard:rclick(cursor)
 
     -- converts screen coordinates to grid coordinates
     local x, y = cursor:map(self.d)
