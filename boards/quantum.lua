@@ -61,3 +61,13 @@ end
 -- creates the starting board state
 function QuantumBoard:generate(x, y)
 end
+
+
+-- game actions for left click: reveal, cord
+function QuantumBoard:lclick(cursor) 
+end
+
+
+-- game actions for right click: flag
+function QuantumBoard:rclick(cursor)
+end
