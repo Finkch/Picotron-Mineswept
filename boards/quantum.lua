@@ -166,4 +166,13 @@ function QuantumBoard:generate(x, y)
 end
 
 function QuantumBoard:_generate(x, y, i)
+
+    -- base case: recursion got out of hand
+
+    -- base case: no valid neighbours
+
+    -- add tile
+
+    -- add tile's neighbours
+
 end
