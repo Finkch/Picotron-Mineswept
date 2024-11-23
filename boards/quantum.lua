@@ -17,6 +17,15 @@
         up full quantum data for the given board
 
 
+    quantum/infini board generation scheme v2
+    * do nothing.
+        |
+        \/
+    quantum/infinit board reveal scheme
+    * when a tile is revealed, add neighbours until it has 8 neigbbours
+        > every reveal is guaranteed to be on the frontier (y'know, by definition)
+
+
     according to chatgpt, which in turn sites percolation theory (study of network
     connectiveness), the smallest desnity (or critical density) to ensure the first
     reveal is finite rather than infinite p(mine) must be greater than 0.5927 or so.
@@ -91,6 +100,10 @@ end
 function QuantumBoard:empty()
     self.grid = {}
     self.cells = {}
+    self.fronteir = {}
+
+    -- adds a starting cell that's guaranteed to not be a mine
+    self:add(0, 0, 1, 0)
 end
 
 
@@ -119,17 +132,18 @@ end
 
 
 -- adds a cell to the board
-function QuantumBoard:add(x, y)
+function QuantumBoard:add(x, y, superposition, eigenvalues)
 
     -- creates a new cell
-    local cell = QuantumCell:new(self.bs, x, y, self.d)
+    local cell = QuantumCell:new(self.bs, x, y, self.d, superposition, eigenvalues)
 
     -- ensures that column exists
     if (not self.grid[x]) self.grid[x] = {}
 
     -- adds the cell to the map
     self.grid[x][y] = cell
-    add(self:cells(), cell)
+    add(self.cells, cell)
+    add(self.frontier, cell)
 
     -- updates adjacency
     self(x, y).adj = {}
@@ -158,22 +172,7 @@ end
 
 -- creates the starting board state
 function QuantumBoard:generate(x, y)
-
-    -- we don't need to do this, but useful for clarity
-    self:empty()
-
-    -- starts recursive generation
-    self:_generate(x, y, 0)
 end
 
 function QuantumBoard:_generate(x, y, i)
-
-    -- base case: recursion got out of hand
-
-    -- base case: no valid neighbours
-
-    -- add tile
-
-    -- add tile's neighbours
-
 end
