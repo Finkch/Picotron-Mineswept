@@ -44,6 +44,7 @@ function QuantumBoard:new(fairness, oldsprites, density)
 
     qb["density"]   = density   -- mines per tile
     qb["cells"]     = {}        -- a 1d representation constantly stored in memory
+    qb["frontier"]  = {}        -- the frontier is comprised of all undiscovered cells
 
     setmetatable(ib, QuantumBoard)
     return ib
