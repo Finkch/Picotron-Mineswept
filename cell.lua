@@ -257,13 +257,17 @@ QuantumCell = setmetatable({}, Cell)
 QuantumCell.__index = QuantumCell
 QuantumCell.__type = "quantumcell"
 
-function QuantumCell:new(base_sprite, x, y, d)
+function QuantumCell:new(base_sprite, x, y, d, superposition, eigenvalues)
+
+    -- defaults
+    local superposition = 0
+    local eigenvalues = 0
 
     local qc = Cell:new(base_sprite, x, y, d)
 
-    qc["is_quantum"]    = true  -- whether the cell is quantum or not
-    qc["superposition"] = 0     -- the superposition state (aka variants)
-    qc["eigenvalues"]   = 0     -- whether an eigenstate resolves to be a mine or no mine
+    qc["is_quantum"]    = true          -- whether the cell is quantum or not
+    qc["superposition"] = superposition -- the superposition state (aka variants)
+    qc["eigenvalues"]   = eigenvalues   -- whether an eigenstate resolves to be a mine or no mine
 
     setmetatable(qc, QuantumCell)
     return qc
