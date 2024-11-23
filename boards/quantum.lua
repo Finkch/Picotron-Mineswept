@@ -121,6 +121,9 @@ function QuantumBoard:add(x, y)
     -- creates a new cell
     local cell = QuantumCell:new(self.bs, x, y, self.d)
 
+    -- ensures that column exists
+    if (not self.grid[x]) self.grid[x] = {}
+
     -- adds the cell to the map
     self.grid[x][y] = cell
     add(self:cells(), cell)
