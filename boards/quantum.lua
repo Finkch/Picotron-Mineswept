@@ -96,6 +96,10 @@ end
 
 -- game actions for left click: reveal, cord
 function QuantumBoard:lclick(cursor)
+
+    -- for first reveal, force cursor to b(0, 0)
+    if (self.reveals == 0) cursor.pos = -cam.pos + cursor.pos % 8
+
 end
 
 
