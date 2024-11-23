@@ -17,7 +17,9 @@ function QuantumBoard:new(fairness, oldsprites, density)
     
     local qb = Board:new(fairness, oldsprites)
 
-    qb["density"] = density
+
+    qb["density"]   = density   -- mines per tile
+    qb["cells"]     = {}        -- a 1d representation constantly stored in memory
 
     setmetatable(ib, QuantumBoard)
     return ib
@@ -35,6 +37,7 @@ end
 
 -- calling the board returns the given cell.
 function QuantumBoard:__call(x, y)
+    return Board.__call(self, x, y)
 end
 
 -- gets a 1d list representation of all cells
