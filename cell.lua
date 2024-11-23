@@ -134,6 +134,11 @@ function Cell:reveal()
         return
     end
 
+    -- when a cell is revealed, it removes itself from its neighbours' adjacency
+    for _, cell in ipairs(self.adj) do
+        del(cell.adj, self)
+    end
+
     -- if this cell is zero, reveal neighbours
     if (self.v == 0) self:reveal_neighbours()
 
