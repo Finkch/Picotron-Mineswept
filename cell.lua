@@ -193,6 +193,15 @@ function Cell:reveal_neighbours()
 end
 
 
+-- updates adjacency
+function Cell:neighbour(cell)
+    add(self.adj, cell)
+    add(cell.adj, self)
+
+    add(self.adju, cell)
+    add(cell.adju, cell)
+end
+
 
 
 function Cell:mine()
