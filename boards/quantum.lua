@@ -29,6 +29,8 @@
 include("cells.lua")
 include("board/boards.lua")
 
+
+
 QuantumBoard = setmetatable({}, Board)
 QuantumBoard.__index = QuantumBoard
 QuantumBoard.__type = "quantumboard"
@@ -93,7 +95,7 @@ end
 
 
 -- game actions for left click: reveal, cord
-function QuantumBoard:lclick(cursor) 
+function QuantumBoard:lclick(cursor)
 end
 
 
@@ -109,10 +111,6 @@ end
                 generation methods
 //////////////////////////////////////////////////
 ]]
-
--- creates the starting board state
-function QuantumBoard:generate(x, y)
-end
 
 
 -- adds a cell to the board
@@ -149,4 +147,19 @@ function QuantumBoard:add(x, y)
 
     -- !! todo !!
     -- builds frontier superpositions
+end
+
+
+
+-- creates the starting board state
+function QuantumBoard:generate(x, y)
+
+    -- we don't need to do this, but useful for clarity
+    self:empty()
+
+    -- starts recursive generation
+    self:_generate(x, y, 0)
+end
+
+function QuantumBoard:_generate(x, y, i)
 end
