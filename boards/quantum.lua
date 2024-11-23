@@ -17,7 +17,6 @@ function QuantumBoard:new(fairness, oldsprites, density)
     
     local qb = Board:new(fairness, oldsprites)
 
-
     qb["density"]   = density   -- mines per tile
     qb["cells"]     = {}        -- a 1d representation constantly stored in memory
 
@@ -42,17 +41,23 @@ end
 
 -- gets a 1d list representation of all cells
 function QuantumBoard:cells()
+    return self.cells
 end
 
 
 -- ensures grid position exists.
+-- simply checks if the value exists
 function QuantumBoard:inbounds(x, y)
+    return self.grid[x] and self.grid[x][y]
 end
 
 
 -- quick all. same as all, but faster.
 -- uses pregenerated list, but lacks option to go over only subset.
 function QuantumBoard:qall(apply, condition)
+    for _, cell in self:cells() do
+        if (condition(cell)) apply(cell)
+    end
 end
 
 
