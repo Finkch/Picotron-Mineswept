@@ -134,10 +134,6 @@ function Cell:reveal()
         return
     end
 
-    -- if the cell was on the frontier, remove it.
-    -- only relevant to quantum games
-    if (board.frontier) del(board.frontier, self)
-
     -- if this cell is zero, reveal neighbours
     if (self.v == 0) self:reveal_neighbours()
 
