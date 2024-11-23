@@ -6,30 +6,58 @@
 
 include("board/boards.lua")
 
-QuantumBoard = {}
+QuantumBoard = setmetatable({}, Board)
 QuantumBoard.__index = QuantumBoard
 QuantumBoard.__type = "quantumboard"
 
+
 -- Board header so I know what each field means
 --function ClassicBoard:new(w, h, bombs, fairness, oldsprites)
-function QuantumBoard:new(density, generosity, oldsprites)
+function QuantumBoard:new(fairness, oldsprites, density)
     
-    -- sprite info
-    local base_sprite   = 72
-    local d             = 8
-    if not oldsprites then
-        base_sprite = 8
-        d           = 16
-    end
+    local qb = Board:new(fairness, oldsprites)
 
-    local ib = {
-        density = density,
-        generosity = generosity,
-        bs = base_sprite,
-        d = d,
-    }
-
+    qb["density"] = density
 
     setmetatable(ib, QuantumBoard)
     return ib
+end
+
+
+
+
+--[[
+//////////////////////////////////////////////////
+                interface methods
+//////////////////////////////////////////////////
+]]
+
+
+-- calling the board returns the given cell.
+function QuantumBoard:__call(x, y)
+end
+
+-- gets a 1d list representation of all cells
+function QuantumBoard:cells()
+end
+
+
+-- ensures grid position exists.
+function QuantumBoard:inbounds(x, y)
+end
+
+
+-- quick all. same as all, but faster.
+-- uses pregenerated list, but lacks option to go over only subset.
+function QuantumBoard:qall(apply, condition)
+end
+
+
+-- creates an empty grid
+function QuantumBoard:empty()
+end
+
+
+-- creates the starting board state
+function QuantumBoard:generate(x, y)
 end
