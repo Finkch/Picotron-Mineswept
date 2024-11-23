@@ -86,6 +86,8 @@ end
 
 -- creates an empty grid
 function QuantumBoard:empty()
+    self.grid = {}
+    self.cells = {}
 end
 
 
