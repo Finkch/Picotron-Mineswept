@@ -4,27 +4,36 @@
     defined by mine density rather than count of mines.
 
 
-    quantum/infini board generation scheme
-    * start with no grid.
-    * wherever the user first clicks and in a (Chebyshev) radius of one about the click,
-        place qcells with eigenvalues of 0 (no mine).
-    * then, building (Chebyshev) radially outward next to 0 values cells by placing 
-        qcells with eigenvalues of (0...01) corresponding to the board's density.
-        > whenever a new cell is placed, count its neighbours
-        > new cells can only be added next to cells with a count of 0
-    * stop building when there are no more 0 values cells that lack neighbours
-    * go over the frontier, wiping starting quantum data and building
-        up full quantum data for the given board
+    hm, this approach likely isn't that good.
+        quantum/infini board generation scheme
+        * start with no grid.
+        * wherever the user first clicks and in a (Chebyshev) radius of one about the click,
+            place qcells with eigenvalues of 0 (no mine).
+        * then, building (Chebyshev) radially outward next to 0 values cells by placing 
+            qcells with eigenvalues of (0...01) corresponding to the board's density.
+            > whenever a new cell is placed, count its neighbours
+            > new cells can only be added next to cells with a count of 0
+        * stop building when there are no more 0 values cells that lack neighbours
+        * go over the frontier, wiping starting quantum data and building
+            up full quantum data for the given board
 
 
     quantum/infini board generation scheme v2
     * do nothing.
         |
         \/
-    quantum/infinit board reveal scheme
-    * when a tile is revealed, add neighbours until it has 8 neigbbours
-        > every reveal is guaranteed to be on the frontier
-            - wait, no dumass, that ain't true. what about distant reveals?
+    quantum/infini board cell reveal scheme
+    --  * when a tile is revealed, add neighbours until it has 8 neigbbours
+    --      > every reveal is guaranteed to be on the frontier
+    --          - wait, no dumass, that ain't true. what about distant reveals?
+    * when a tile is revealed, choose an appropriate value
+        > first, observe a state for adjacent quantum cells
+        > second, add a random number E 0, #new_frontier
+            - the random number follows a binomial distribition?
+        > the revealed cell's value is the sum of qmines and new_frontier roll
+    * update the frontier to include the new frontier
+        > update superpositions
+    
 
 
     according to chatgpt, which in turn sites percolation theory (study of network
