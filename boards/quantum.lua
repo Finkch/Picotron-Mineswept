@@ -169,6 +169,8 @@ function QuantumBoard:add(x, y, superposition, eigenvalues)
 
     -- !! todo !!
     -- builds frontier superpositions
+
+    return cell
 end
 
 
@@ -183,24 +185,29 @@ function QuantumBoard:reveal(x, y)
     -- gets cell in question
     local cell = self(x, y)
 
-    -- deletes the cell from the frontier
+    -- deletes the revealed cell from the frontier
     del(self.frontier, cell)
 
-    -- adds new neighbours
+    -- tracks the new frontier
+    local nfrontier = {}
+
+    -- adds new cells to the frontier
     for dx = -1, 1 do
         for dy = -1, 1 do
 
             -- self is not a neighbour of self.
             -- we only create a cell if it is out-of-bounds, which just means that
             -- it isn't on the board yet. hence, we need to add it
-            if not (dx == 0 and dy == 0) and not self:inbounds(u, v) self:add(u, v)
+            if not (dx == 0 and dy == 0) and not self:inbounds(u, v) then
+                
+                -- gets the cell added to the frontier
+                local ncell = self:add(u, v)
+                add(nfrontier, ncell)
+            end
         end
     end
 
-    -- counts cell's value
-    cell:count()
 
     -- reveals cell
     cell:reveal()
-
 end
