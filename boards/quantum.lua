@@ -190,6 +190,9 @@ function QuantumBoard:reveal(x, y)
     -- deletes the revealed cell from the frontier
     del(self.frontier, cell)
 
+    -- finds the number of adjacent mines for currently existing qcells
+    local qmines = cell:count()
+
     -- tracks the new frontier
     local nfrontier = {}
 
@@ -208,9 +211,32 @@ function QuantumBoard:reveal(x, y)
         end
     end
 
-    
+
+    -- updates the cell's value
+    local fmines = self:frontier_mines(#nfrontier, 1 / self.density)
+    cell.v = qmines + fmines
+
 
     -- reveals cell
     --  !! todo !!  incorporate fairness
     cell:reveal()
+end
+
+
+-- returns a random amount of successes given n trials at probability p.
+-- used to calcualte the number of mines on the new frontier
+-- i was going to calculate the binomial cdf and randomly choose a bin,
+-- but i realised that was a very costly operation. so i asked gpt and it
+-- told me to roll a dice n times. yeah, sometimes i overthing these things.
+function QuantumBoard:binomial(n, p)
+    
+    -- number of successes
+    local k = 0
+
+    -- performs n trials
+    for i = 1, n do
+        if (rnd() <= p) k += 1
+    end
+
+    return k
 end
