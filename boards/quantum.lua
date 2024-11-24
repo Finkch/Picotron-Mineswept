@@ -144,6 +144,8 @@ end
 -- adds a cell to the board
 function QuantumBoard:add(x, y, superposition, eigenvalues)
 
+    assert(not self:inbounds(x, y), string.format("cannot add cell to already occupied cell position at b(%s, %s)", x, y))
+
     -- creates a new cell
     local cell = QuantumCell:new(self.bs, x, y, self.d, superposition, eigenvalues)
 
@@ -201,13 +203,14 @@ function QuantumBoard:reveal(x, y)
             if not (dx == 0 and dy == 0) and not self:inbounds(u, v) then
                 
                 -- gets the cell added to the frontier
-                local ncell = self:add(u, v)
-                add(nfrontier, ncell)
+                add(nfrontier, self:add(u, v))
             end
         end
     end
 
+    
 
     -- reveals cell
+    --  !! todo !!  incorporate fairness
     cell:reveal()
 end
