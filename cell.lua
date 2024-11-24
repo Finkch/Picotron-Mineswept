@@ -198,8 +198,17 @@ function Cell:neighbour(cell)
     add(self.adj, cell)
     add(cell.adj, self)
 
-    add(self.adju, cell)
-    add(cell.adju, cell)
+    if self.is_reveal then
+        add(cell.adjr, self)
+    else
+        add(cell.adju, self)
+    end
+
+    if cell.is_reveal then
+        add(self.adjr, cell)
+    else
+        add(self.adju, cell)
+    end
 end
 
 
