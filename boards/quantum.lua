@@ -213,7 +213,7 @@ function QuantumBoard:reveal(x, y)
 
 
     -- updates the cell's value
-    local fmines = self:frontier_mines(#nfrontier, 1 / self.density)
+    local fmines = self:binomial(#nfrontier, 1 / self.density)
     cell.v = qmines + fmines
 
 
