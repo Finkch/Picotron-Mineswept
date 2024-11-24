@@ -214,7 +214,7 @@ end
 -- updates values
 function ClassicBoard:count(cells)
     self:all(
-        function(cell) cell:count() end,
+        function(cell) cell:ucount() end,
         function(cell) return not cell.is_reveal and not cell.is_mine end,
         cells
     )

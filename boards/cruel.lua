@@ -139,7 +139,7 @@ function CruelBoard:generate(x, y)
 
         -- updates the counts around the board.
         -- stricly, we don't need to do this because other tiles are never revealed...
-        self:count()
+        self:ucount()
 
     end
 end

@@ -188,7 +188,7 @@ function InsidiousBoard:generate(x, y)
         )
 
         -- updates values
-        self:count(cells)
+        self:ucount(cells)
 
         
 
@@ -225,7 +225,7 @@ function InsidiousBoard:generate(x, y)
         self:adjacify()
 
         -- updates the board's counts
-        self:count()
+        self:ucount()
 
     -- on finding the special 50-50.
     -- i.e., when revealing a quantum cell

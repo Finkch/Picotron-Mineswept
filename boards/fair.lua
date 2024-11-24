@@ -48,5 +48,5 @@ function FairBoard:generate(x, y)
     )
 
     -- counts the value of all non-mine cells
-    self:count(cells)
+    self:ucount(cells)
 end

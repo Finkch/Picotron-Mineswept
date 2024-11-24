@@ -39,20 +39,18 @@ function Cell:new(base_sprite, x, y, d)
 end
 
 
--- updates the value of this cell based on the count of adjacent mines
+-- counts the number of adjacent mines in unrevealed cells.
+-- doesn't care about revealed mines since that would be a gameover anyways
 function Cell:count()
 
-    -- quantum cells don't have a value
-    if (self.is_quantum) return
-
-    self.v = 0
+    local v = 0
     local eigenstate = nil
 
-    -- checks all neighbours for whether they are a mine
-    for _, cell in ipairs(self.adj) do
+    -- checks all unrevealed neighbours for whether they are a mine
+    for _, cell in ipairs(self.adju) do
 
         -- counts classical mines
-        if (cell.is_mine) self.v += 1
+        if (cell.is_mine) v += 1
 
         -- counts quantum mines
         if (cell.is_quantum) then
@@ -66,9 +64,16 @@ function Cell:count()
             -- any given cell must all have the same count. hence, we can
             -- simply use any random eigenstate.
             -- '& eigenvalue' ensures that the state corresponds to a mine
-            if (cell:resolve(eigenstate) < 0) self.v += 1
+            if (cell:resolve(eigenstate) < 0) v += 1
         end
     end
+
+    return v
+end
+
+-- same as cell:count(), except updates the cell's value rather than returning value
+function Cell:ucount()
+    self.v = self:count()
 end
 
 
@@ -77,7 +82,7 @@ function Cell:value()
     if (self.is_false)  return -2   -- should never hit this
     if (self.is_mine)   return -1
     
-    if (not self.v)     self:count()
+    if (not self.v)     self:ucount()
 
     return self.v
 end
@@ -455,5 +460,5 @@ function QuantumCell:collapse(eigenstate, fairness)
 
 
     -- updates count after the resolution
-    self:count()
+    self:ucount()
 end
