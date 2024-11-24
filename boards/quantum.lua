@@ -217,6 +217,9 @@ function QuantumBoard:reveal(x, y)
     cell.v = qmines + fmines
 
 
+    -- updates superposition on the new frontier
+
+
     -- reveals cell
     --  !! todo !!  incorporate fairness
     cell:reveal()
@@ -224,7 +227,8 @@ end
 
 
 -- returns a random amount of successes given n trials at probability p.
--- used to calcualte the number of mines on the new frontier
+-- used to calcualte the number of mines on the new frontier.
+--
 -- i was going to calculate the binomial cdf and randomly choose a bin,
 -- but i realised that was a very costly operation. so i asked gpt and it
 -- told me to roll a dice n times. yeah, sometimes i overthing these things.
@@ -239,4 +243,143 @@ function QuantumBoard:binomial(n, p)
     end
 
     return k
+end
+
+
+-- given some cells on a frontier and a number of mines that
+-- belong to them all, updates their superposition.
+-- all cells are assumed to be adjacent to the cell with value = "mines"
+--
+-- let n = #frontier, m = mines.
+-- superposition will be "1" * nCm.
+-- eigenvalues will be permutations of "1" * m + "0" * (n - m).
+--
+-- note: n = 8, m = 4 -> nCm = 70. off by 6!
+-- and there's a ~5% chance an 8 reveal (empty tile) results in
+-- this bad outcome. 
+function QuantumBoard:quantum_frontier(frontier, mines)
+
+    -- special case: no mines
+    if mines == 0 then
+        for _, cell in ipairs(frontier) do
+            cell.superposition = 1
+            cell.eigenvalues = 0
+        end
+        return
+    end
+
+    -- special case: same number of mines as frontier cells
+    if mines == #frontier then
+        for _, cells in ipairs(frontier) do
+            cell.superposition = 1
+            cell.eigenvalues = 1
+        end
+        return
+    end
+
+    -- generates permutations of mines within the cells
+    local perms = self:generate_permutations(#frontier, mines)
+
+
+    -- assigns permutations to the frontier
+    self:count_permutations(perms, frontier)
+
+end
+
+
+-- n is the number of permutations, aka the length of the binary number,
+-- and m is the count of 1s. c is the current 
+function QuantumBoard:generate_permutations(n, m)
+
+    -- i don't usually use local functions, but gpt suggests...
+    -- o and z are ones and zeroes remaining to be added
+    local function generate(current, o, z, perms)
+        
+        -- base case: nothing left to add
+        if o == 0 and z == 0 then
+
+            -- adds results when 
+            table.insert(perms, table.concat(current))
+            return
+        end
+
+        -- tries placing a one in this position
+        if o > 0 then
+            current[#current + 1] = "1"
+            generate(current, o - 1, z, perms)
+            table.remove(current)
+        end
+
+        -- tries placing a zero in this position
+        if z > 0 then
+            current[#current + 1] = "0"
+            generate(current, o, z - 1, perms)
+            table.remove(current)
+        end
+    end
+
+    -- gneerates permutations
+    local perms = {}
+    generate({}, m, n - m, perms)
+
+
+    -- there is a small chance there are more than 64 permutations,
+    -- which can occur when revealing 8 new cells (an isolated cell)
+    -- with a mine value of 4, resulting in 70 permutations.
+    -- pop permutations until there are 64 or less
+    while #perms > 64 do
+        del(perms, rnd(perms))
+    end
+
+    -- converts each binary string sequence to a decimal number
+    for i = 1, #perms do
+        local d = 0
+        for j = 1, #perms[i] do
+            if (perms[i][j] == "1") d |= 1 << j
+        end
+        perms[i] = d
+    end
+
+    return perms
+end
+
+
+-- counts permutations and assigns them to the new frontier
+function QuantumBoard:count_permutations(p, frontier)
+
+    for i = 0, #frontier - 1 do
+
+        -- grabs the current cell
+        local cell = frontier[i + 1]
+
+        -- assigns superposition
+        cell.superposition = (1 << #p) - 1
+
+        local eigenvalues = 0
+
+        -- for each permutation where a mine is present, make the corresponding
+        -- eigenvalue a one. so, the j-th digit corresponds to the j-th permutation
+        for j = 0, #p - 1 do
+            eigenvalues |= ((p[j + 1] >> i) & 1) << j
+        end
+
+        -- assigns value
+        cell.eigenvalues = eigenvalues
+    end
+end
+
+
+-- nCr function
+function choose(n, m)
+    return factorial(n) / (factorial(m) * factorial(n - m))
+end
+
+-- bang! factorial
+function factorial(n)
+    local m = 1
+    for i = 2, n do
+        m *= i
+    end
+
+    return i
 end
